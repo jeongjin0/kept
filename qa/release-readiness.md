@@ -1,30 +1,31 @@
-# Release readiness · 0.3.7
+# Release readiness · 0.4.0
 
-Checked on 2026-10-09 KST, macOS ARM64. This candidate removes a constant idle cost. With grid filtering off, the shipped default, every tab still listed all of its page links every 400 ms only to find cards ScrollPlus might have hidden. It now lists them only while grid filtering is on or while a card it hid may still need restoring. Filtering rules, defaults, UI, permissions, dependencies and the MAIN-world scripts are unchanged. Chrome Web Store submission has not occurred; SPEC.md says not to submit it.
+Checked on 2026-10-11 KST, macOS ARM64. This candidate adds a Skip ads switch (popup and Settings, off by default) and recognises YouTube Shorts ads, which fixes ads being skipped by the like rule on YouTube. Rules, presets and every other default are unchanged; there is no new permission or dependency. Chrome Web Store submission has not occurred; SPEC.md says not to submit it.
 
 | Check | Result | Evidence / scope |
 | --- | --- | --- |
-| TypeScript | Pass | `npm run compile` |
-| Unit tests | 45 passed | `npm test` |
-| Built-script browser tests | 29 passed, no skips or flaky results | `npm run test:e2e`; adds the idle-cost regression to the 28 existing tests, including all grid, adapter, Undo, UI and storage paths |
-| Idle-cost regression | Fails on published 0.3.6, passes now | A page with 20,000 links costs 0.29 s of script time per 3 idle seconds on 0.3.6 against a 0.1 s limit; this candidate uses under 0.01 s. See [idle cost](idle-cost.md) |
-| Minimum Chrome 120 | 29 passed on Linux | [PR CI](https://github.com/jeongjin0/scrollplus/actions/runs/37887335116) on the final code commit; official Chrome for Testing 120.0.6099.109, actual built scripts on controlled fixtures. The same run passed 45 unit tests and the current-Chrome suite |
-| Package | Pass | `npm run zip` and `node scripts/check-package.mjs`; MV3, Chrome 120+, storage and the existing three host permissions |
-| Package scope | 16 of 20 extracted files identical to published 0.3.6 | Only the manifest and the three isolated site scripts changed (the shared controller is bundled into each). Both MAIN bundles, background, popup/settings, locales and icons are byte-identical |
-| Native signed-in TikTok / Instagram | Not repeated on 0.3.7 | The [0.3.6 sampling](signed-in-smoke.md#version-036-candidate--2026-10-09) stays scoped to that package. The code change touches only the periodic grid scan, which the shipped defaults leave off |
-| Real YouTube long feed | Completed with recoveries, not a clean pass | Exact 0.3.7: a 6-hour run (1 reload recovery) and a 12-hour run (4), fresh signed-out profiles, 0 page errors. Exact 0.3.6: 6 hours, 0 recoveries. The feed intermittently stops responding until a reload; in the six instrumented stalls YouTube's request for more Shorts failed with HTTP 503 (also without ScrollPlus). See the [stall investigation](soak.md#youtube-shorts-feed-stalls-youtubes-feed-request-fails). Not ordinary human day-use |
-| Chrome Web Store | Not submitted | [Submission checklist](../store/submission-checklist.md) prepared |
+| TypeScript | Pass | npm run compile |
+| Unit tests | 61 passed | npm test; adds ad decisions, defaults and old settings, and eleven engine tests for the ad skip, its Undo, the six-skip pause and stale decisions |
+| Built-script browser tests | 35 passed, no skips or flaky results | npm run test:e2e; adds five Skip ads tests (YouTube, TikTok and Instagram routed pages, an Instagram disclosure-only ad, a site that is off) and popup/options/Reset coverage |
+| Skip ads regression | Fails on published 0.3.7, passes now | On 0.3.7 the YouTube test fails at "an ad stays by default": the ad that showed 125 likes was skipped by the like rule. See [skip ads](ads.md) |
+| Live YouTube Shorts | Pass for both settings | One hour on, one hour off, the built 0.4.0 in fresh signed-out profiles on real Shorts: all 65 first-time ads skipped with Skip ads on, none of 97 skipped with it off, no ordinary video skipped by the ad rule, no page errors. See [skip ads](ads.md#live-youtube-check) |
+| Minimum Chrome 120 | 35 passed on Linux | [PR CI](https://github.com/jeongjin0/scrollplus/actions/runs/38118323787) on the final code commit; official Chrome for Testing 120.0.6099.109, actual built scripts on controlled fixtures. The same run passed 61 unit tests and the current-Chrome suite |
+| Package | Pass | npm run zip and node scripts/check-package.mjs; MV3, Chrome 120+, storage and the existing three host permissions |
+| Package scope | 6 of 20 extracted files identical to published 0.3.7 | Changed: the manifest, the locale files, the background worker, the popup and options pages with their chunks and stylesheet, and four content bundles that carry the new engine (YouTube, TikTok, Instagram and Instagram's page script). Identical: the TikTok and YouTube MAIN scripts and the icons |
+| Native signed-in TikTok / Instagram | Not repeated on 0.4.0 | No live TikTok or Instagram ad skip was observed for this change (a signed-out TikTok run was interrupted by a sign-up dialog). Those two rest on the sites' own ad flags and routed pages. Earlier [signed-in QA](signed-in-smoke.md) stays scoped to its packages |
+| Long feed | Not run on 0.4.0 | The 60-minute live runs above covered 1,885 videos. The last 24-hour run was 0.3.5; see the [long feed report](soak.md) and its stall investigation |
+| Chrome Web Store | Not submitted | [Submission checklist](../store/submission-checklist.md) updated for the new single purpose |
 
 ## Artifact
 
-`scrollplus-0.3.7-chrome.zip`, 127,215 bytes.
+scrollplus-0.4.0-chrome.zip, 128,034 bytes.
 
-SHA-256: `4896a36cf9cedf62fb18dfe634892b1bf4b06bb45d33543d454f8063ec32ea75`.
+SHA-256: 2722d2751f82d7c1de747f8f1108915755659772460e7aed07d7545ceab27749.
 
-This identifies the tested local candidate. CI ZIP metadata can differ. The previous exact-package reports remain in [0.3.6 release readiness](release-readiness-036.md#artifact) and [0.3.5 release readiness](release-readiness-035.md#artifact).
+This identifies the tested local candidate. CI ZIP metadata can differ. The previous exact-package reports remain in [0.3.7 release readiness](release-readiness-037.md#artifact), [0.3.6](release-readiness-036.md#artifact) and [0.3.5](release-readiness-035.md#artifact).
 
 ## Remaining gates
 
-1. See the Instagram advertisement guard on a live advertisement, and exercise Instagram Undo/reload and a genuine Following video feed natively. These need the signed-in QA browser on the Pro host, which was not reachable without a new screen-sharing login.
-2. Ordinary human day-use. YouTube Shorts feed stalls are explained by a failing YouTube request (see the investigation above) and are not fixed by ScrollPlus; whether to detect and report the stuck state is an owner decision outside SPEC.md. The idle scan above is a measured CPU saving unrelated to them.
+1. See a live TikTok and Instagram ad skipped with Skip ads on. TikTok needs a signed-in session and Instagram needs one too; the signed-in QA browser on the Pro host was not reachable without a new screen-sharing login.
+2. Ordinary human day-use. YouTube feed stalls are explained by a failing YouTube request (see the [stall investigation](soak.md#youtube-shorts-feed-stalls-youtubes-feed-request-fails)).
 3. Update the listing only to match verified support. Store submission remains an owner decision.

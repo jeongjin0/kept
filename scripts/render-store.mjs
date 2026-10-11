@@ -17,7 +17,7 @@ const LANGS = {
   en: {
     ui: "en", locale: "en-US", dropKo: true,
     shots: path.join(root, "store/screenshots"), tileFile: path.join(root, "store/tile.png"), marqueeFile: path.join(root, "store/marquee.png"),
-    popup: ["Low-like videos <em>skip themselves.</em>", "Ready on install. Choose your minimum like count."],
+    popup: ["Low-like videos <em>skip themselves.</em>", "Ready on install. Pick a like minimum, and skip ads if you want."],
     options: ["Your numbers, <em>your rules.</em>", "Pick a preset or type your own. Likes, comments, views."],
     chip: ["Skipped. <em>Undo</em> in one tap.", "Every skip tells you why, and you can take it back."],
     tile: "Skips Shorts, Reels &amp; TikToks <em>with too few likes.</em>",
@@ -25,7 +25,7 @@ const LANGS = {
   ko: {
     ui: "ko", locale: "ko-KR", dropKo: false,
     shots: path.join(root, "store/screenshots/ko"), tileFile: path.join(root, "store/tile-ko.png"), marqueeFile: path.join(root, "store/marquee-ko.png"),
-    popup: ["좋아요 적은 영상은 <em>알아서 넘어가요.</em>", "설치하면 바로 켜져요. 좋아요 기준은 언제든 바꿀 수 있어요."],
+    popup: ["좋아요 적은 영상은 <em>알아서 넘어가요.</em>", "설치하면 바로 켜져요. 좋아요 기준을 고르고, 광고도 넘길 수 있어요."],
     options: ["내 기준, <em>내 숫자.</em>", "프리셋을 고르거나 직접 입력하세요. 좋아요, 댓글, 조회수."],
     chip: ["넘김. <em>되돌리기</em>는 한 번에.", "넘기는 이유가 보여요. 몇 초 동안 되돌릴 수 있어요."],
     tile: "좋아요 적은 쇼츠·릴스·틱톡을 <em>알아서 넘겨요.</em>",
@@ -59,7 +59,7 @@ async function capture(lang, cfg, dirOut) {
   const worker = context.serviceWorkers()[0] || await context.waitForEvent("serviceworker");
   const id = new URL(worker.url()).host;
   const popup = await context.newPage();
-  await popup.setViewportSize({ width: 320, height: 420 });
+  await popup.setViewportSize({ width: 320, height: 480 });
   await popup.goto("chrome-extension://" + id + "/popup.html");
   await popup.waitForSelector(".ready");
   await popup.evaluate(() => chrome.storage.local.set({ dailySkips: { day: new Date().toLocaleDateString("sv"), count: 18 } }));

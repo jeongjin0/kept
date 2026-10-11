@@ -84,6 +84,7 @@ export function OptionsApp() {
         <section>
           <h2>{t("behaviorTitle")}</h2>
           <div className="card">
+            <Row icon="megaphone" title={t("skipAds")} on={settings.skipAds} label={t("skipAds")} onToggle={(next) => update((current) => ({ ...current, skipAds: next }))} />
             <Row icon="grid" title={t("filterGrids")} on={settings.filterGrids} label={t("filterGrids")} onToggle={(next) => update((current) => ({ ...current, filterGrids: next }))} />
             <Row icon="pill" title={t("showChip")} on={settings.showSkipChip} label={t("showChip")} onToggle={(next) => update((current) => ({ ...current, showSkipChip: next }))} />
           </div>

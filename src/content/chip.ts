@@ -38,6 +38,7 @@ function button(label: string, onClick: () => void, icon?: Parameters<typeof svg
 }
 
 function skippedLabel(model: Extract<ChipModel, { mode: "skipped" }>): string {
+  if (model.metric === "ad") return t("chipAd");
   const count = formatCount(model.value);
   if (model.metric === "comments") return t("chipComments", count);
   if (model.metric === "views") return t("chipViews", count);

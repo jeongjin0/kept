@@ -30,8 +30,8 @@ test(`popup fits in ${language} at 1x and 2x, even with the optional rows`, asyn
         };
       });
       expect(box).not.toBeNull();
-      expect(box?.plain).toBeLessThanOrEqual(420);
-      expect(box?.full).toBeLessThanOrEqual(420);
+      expect(box?.plain).toBeLessThanOrEqual(480);
+      expect(box?.full).toBeLessThanOrEqual(480);
       expect(box?.fits).toBe(true);
       expect(box?.star).toBe("https://github.com/jeongjin0/scrollplus");
       expect(box?.text).toMatch(/ScrollPlus/);
@@ -57,6 +57,14 @@ test("a fresh install already skips under 5K likes, and the popup changes the ru
 
     await page.getByRole("switch", { name: "TikTok" }).click();
     await expect.poll(async () => (await stored(page)).platforms.tiktok).toBe(false);
+
+    // Ads stay unless the user asks otherwise, and the switch is right there in the popup.
+    expect((await stored(page)).skipAds).toBe(false);
+    const ads = page.getByRole("switch", { name: /Skip ads|광고 건너뛰기/ });
+    await expect(ads).toHaveAttribute("aria-checked", "false");
+    await ads.click();
+    await expect(ads).toHaveAttribute("aria-checked", "true");
+    await expect.poll(async () => (await stored(page)).skipAds).toBe(true);
 
     await page.getByRole("button", { name: /ScrollPlus is on|ScrollPlus 켜짐/ }).click();
     await expect.poll(async () => (await stored(page)).enabled).toBe(false);
@@ -113,6 +121,14 @@ test("settings accept typed numbers and mark the popup as custom", async () => {
     await options.getByRole("switch", { name: /Comments|댓글/ }).click();
     await expect.poll(async () => (await stored(options)).rule.comments.on).toBe(true);
 
+    const optionsAds = options.getByRole("switch", { name: /Skip ads|광고 건너뛰기/ });
+    await expect(optionsAds).toHaveAttribute("aria-checked", "false");
+    await optionsAds.click();
+    await expect.poll(async () => (await stored(options)).skipAds).toBe(true);
+    const popupWithAds = await open(context, id, "popup.html");
+    await expect(popupWithAds.getByRole("switch", { name: /Skip ads|광고 건너뛰기/ })).toHaveAttribute("aria-checked", "true");
+    await popupWithAds.close();
+
     const popup = await open(context, id, "popup.html");
     await expect(popup.locator(".badge")).toHaveText(/Custom|직접/);
 
@@ -122,6 +138,8 @@ test("settings accept typed numbers and mark the popup as custom", async () => {
       comments: { on: false, min: 100 },
       views: { on: false, min: 100000 },
     });
+    // Reset puts ads back to being kept.
+    await expect.poll(async () => (await stored(options)).skipAds).toBe(false);
   } finally {
     await context.close();
   }

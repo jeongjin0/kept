@@ -87,7 +87,7 @@ h1, h2, p { margin: 0; }
 .icon-button { width: 32px; height: 32px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); display: grid; place-items: center; transition: background var(--t) var(--ease), color var(--t) var(--ease); }
 .icon-button:hover { background: var(--surface-2); color: var(--text); }
 
-.popup { width: 320px; max-height: 420px; padding: 14px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; font-size: 14px; line-height: 1.35; }
+.popup { width: 320px; max-height: 480px; padding: 14px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; font-size: 14px; line-height: 1.35; }
 .popup .body { display: flex; flex-direction: column; gap: 8px; transition: opacity var(--t) var(--ease); }
 .popup.paused .body { opacity: 0.45; }
 .popup .foot { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }

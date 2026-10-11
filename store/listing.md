@@ -22,11 +22,13 @@ Instagram Reels support remains experimental while longer use is being checked. 
 
 Want a different level? Open the popup and pick Lenient (under 1,000 likes), Balanced (under 5,000), or Strict (under 20,000). Want your own numbers? Settings lets you set the minimum for likes, comments, and views, switch a site off, and keep creators you like.
 
-Every skip tells you why, for example "Skipped · 312 likes", with an Undo. Restored videos stay for the browser session, including reloads and new tabs; this choice stays only in memory. If a count is missing, the video stays, and so do ads and photo posts. After six skips in a row it stops and asks, so a quiet feed never turns into a runaway one.
+Ads stay by default. Turn on Skip ads in the popup and ScrollPlus also moves past ads that YouTube Shorts, TikTok, and Instagram Reels mark as ads. It only moves past the ad that fills the player; it does not block ad requests or hide anything in lists.
+
+Every skip tells you why, for example "Skipped · 312 likes" or "Skipped · ad", with an Undo. Restored videos stay for the browser session, including reloads and new tabs; this choice stays only in memory. If a count is missing, the video stays, and so do photo posts. After six skips in a row it stops and asks, so a quiet feed never turns into a runaway one.
 
 ScrollPlus is not affiliated with YouTube, TikTok, or Instagram. Counts stay on your device. The extension does not collect or transmit data. Open source, MIT: https://github.com/jeongjin0/scrollplus
 
-Single purpose: skip YouTube Shorts, TikTok videos, and Instagram Reels that have too few likes, using counts already on the page.
+Single purpose: skip YouTube Shorts, TikTok videos, and Instagram Reels the user does not want to see: those with too few likes and, if the user turns it on, ads. It uses counts and ad markers already on the page.
 
 ## Korean
 
@@ -44,8 +46,10 @@ ScrollPlus는 좋아요가 설정한 기준보다 적은 숏폼 영상을 자동
 
 다른 기준이 필요하면 팝업에서 느슨(1천 미만), 기본(5천 미만), 엄격(2만 미만) 중에서 고르세요. 직접 정하고 싶다면 세부 설정에서 좋아요, 댓글, 조회수의 최소 개수를 입력하고, 사이트를 끄거나 계속 보고 싶은 제작자를 지정할 수 있습니다.
 
-넘길 때마다 이유가 표시됩니다. 예: "넘김 · 좋아요 312" 그리고 되돌리기 버튼이 나옵니다. 되돌린 영상은 새로고침하거나 새 탭에서 열어도 브라우저를 종료할 때까지 유지되며, 이 선택은 메모리에만 남습니다. 수치를 읽지 못하면 영상은 그대로 두고, 광고와 사진 게시물도 건드리지 않습니다. 연속으로 여섯 번 넘기면 멈추고 물어봅니다.
+광고는 기본적으로 그대로 둡니다. 팝업에서 광고 건너뛰기를 켜면 유튜브 쇼츠, 틱톡, 인스타그램 릴스가 광고로 표시한 영상도 넘깁니다. 화면을 채운 광고만 넘기며, 광고 요청을 막거나 목록의 광고를 숨기지는 않습니다.
+
+넘길 때마다 이유가 표시됩니다. 예: "넘김 · 좋아요 312", "넘김 · 광고" 그리고 되돌리기 버튼이 나옵니다. 되돌린 영상은 새로고침하거나 새 탭에서 열어도 브라우저를 종료할 때까지 유지되며, 이 선택은 메모리에만 남습니다. 수치를 읽지 못하면 영상은 그대로 두고, 사진 게시물도 건드리지 않습니다. 연속으로 여섯 번 넘기면 멈추고 물어봅니다.
 
 ScrollPlus는 YouTube, TikTok, Instagram과 관계가 없습니다. 수치는 기기 안에서만 쓰며, 수집하거나 전송하지 않습니다. 오픈소스(MIT): https://github.com/jeongjin0/scrollplus
 
-단일 목적: 페이지에 이미 있는 수치로 좋아요가 적은 유튜브 쇼츠, 틱톡, 인스타그램 릴스를 넘깁니다.
+단일 목적: 보고 싶지 않은 유튜브 쇼츠, 틱톡, 인스타그램 릴스를 넘깁니다. 좋아요가 적은 영상과, 사용자가 켠 경우 광고가 대상입니다. 페이지에 이미 있는 수치와 광고 표시를 사용합니다.

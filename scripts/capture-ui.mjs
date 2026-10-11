@@ -33,7 +33,7 @@ for (const language of ["en", "ko"]) {
     page.on("pageerror", (error) => errors.push(error.message));
     for (const scale of [1, 2]) {
       const client = await context.newCDPSession(page);
-      await client.send("Emulation.setDeviceMetricsOverride", { width: 320, height: 420, deviceScaleFactor: scale, mobile: false });
+      await client.send("Emulation.setDeviceMetricsOverride", { width: 320, height: 480, deviceScaleFactor: scale, mobile: false });
       await page.goto(`chrome-extension://${id}/popup.html`);
       await page.waitForSelector(".ready");
       await page.locator(".popup").screenshot({ path: path.join(output, `01-popup-${language}-${scale}x.png`), animations: "disabled" });

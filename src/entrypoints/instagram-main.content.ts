@@ -28,10 +28,10 @@ export default defineContentScript({
     document.addEventListener("DOMContentLoaded", readEmbedded);
     window.addEventListener("message", (event) => {
       if (event.source !== window) return;
-      const data = event.data as { source?: string; type?: string; key?: string } | null;
+      const data = event.data as { source?: string; type?: string; key?: string; ad?: boolean } | null;
       if (!data || data.source !== "scrollplus" || data.type !== "advance" || (data.key !== "ArrowUp" && data.key !== "ArrowDown")) return;
       try {
-        moveReel(data.key === "ArrowUp" ? "prev" : "next");
+        moveReel(data.key === "ArrowUp" ? "prev" : "next", data.ad === true);
       } catch {
         /* leave the page alone */
       }
@@ -48,8 +48,8 @@ const PREV = { label: /previous|prev|이전/i, key: "ArrowUp", code: 38 };
 
 // Click the reel navigation control from the page script, because a click sent from the
 // extension's isolated world is ignored on the other two sites. Press the key only as a last resort.
-function moveReel(direction: "next" | "prev"): void {
-  if (direction === "next" && (!visibleVideo() || instagramHasVisibleAd())) return;
+function moveReel(direction: "next" | "prev", ad: boolean): void {
+  if (direction === "next" && !ad && (!visibleVideo() || instagramHasVisibleAd())) return;
   const target = direction === "next" ? NEXT : PREV;
   for (const node of document.querySelectorAll("button, [role='button']")) {
     if (target.label.test(node.getAttribute("aria-label") || "") && node instanceof HTMLElement) {

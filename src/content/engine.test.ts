@@ -19,6 +19,7 @@ function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAd
   let seq = 1;
   const tasks: Array<{ id: number; at: number; fn: () => void }> = [];
   const advances: string[] = [];
+  const reasons: string[] = [];
   const retreats: string[] = [];
   const chips: string[] = [];
   const models: unknown[] = [];
@@ -29,9 +30,10 @@ function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAd
   const engine = createEngine({
     getSettings: () => settings,
     now: () => clock,
-    advance: async () => {
+    advance: async (reason) => {
       calls += 1;
       advances.push(latest);
+      reasons.push(reason);
       duringAdvance?.((item) => {
         latest = item.id;
         engine.onItem(item);
@@ -96,6 +98,7 @@ function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAd
     flush,
     drain,
     advances,
+    reasons,
     retreats,
     chips,
     models,
@@ -104,6 +107,136 @@ function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAd
     setBlocked(value: boolean) { blocked = value; },
   };
 }
+
+function ad(id: string, metrics: EngineItem["metrics"] = null): EngineItem {
+  return { ...low(id), kind: "ad", metrics };
+}
+
+const good = { views: 900000, likes: 40000, comments: 200, shares: 10, saves: null };
+
+describe("engine and ads", () => {
+  it("keeps an ad that has few likes while Skip ads is off", async () => {
+    const box = harness();
+    box.show(ad("a", low("a").metrics));
+    await box.drain();
+    box.flush(10000);
+    await box.drain();
+    expect(box.advances).toEqual([]);
+    expect(box.skips).toBe(0);
+  });
+
+  it("skips an ad as soon as it is known to be one, without waiting for counts", async () => {
+    const box = harness({ skipAds: true });
+    box.flush(10000);
+    box.show(ad("a"));
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+    expect(box.reasons).toEqual(["ad"]);
+    expect(box.skips).toBe(1);
+    expect(box.models.at(-1)).toEqual({ mode: "skipped", metric: "ad" });
+  });
+
+  it("skips an ad that has plenty of likes, and still names the ad rule", async () => {
+    const box = harness({ skipAds: true });
+    box.flush(10000);
+    box.show(ad("a", good));
+    await box.drain();
+    expect(box.reasons).toEqual(["ad"]);
+    expect(box.models.at(-1)).toEqual({ mode: "skipped", metric: "ad" });
+  });
+
+  it("tells the page it is leaving for a count, not an ad, when likes are low", async () => {
+    const box = harness({ skipAds: true });
+    box.show(low("a"));
+    await box.drain();
+    expect(box.reasons).toEqual(["below"]);
+  });
+
+  it("does not skip ordinary videos that pass because Skip ads is on", async () => {
+    const box = harness({ skipAds: true });
+    box.flush(10000);
+    box.show({ ...low("a"), metrics: good });
+    await box.drain();
+    box.flush(5000);
+    expect(box.advances).toEqual([]);
+  });
+
+  it("skips a video once it turns out to be an ad shortly after it opened", async () => {
+    const box = harness({ skipAds: true });
+    box.flush(10000);
+    box.show({ ...low("a"), metrics: good });
+    await box.drain();
+    expect(box.advances).toEqual([]);
+    box.flush(300);
+    box.show(ad("a", good));
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+    expect(box.reasons).toEqual(["ad"]);
+  });
+
+  it("leaves an ad alone that is only recognised after the decision window has passed", async () => {
+    const box = harness({ skipAds: true });
+    box.flush(10000);
+    box.show({ ...low("a"), metrics: good });
+    await box.drain();
+    box.flush(2500);
+    box.show(ad("a", good));
+    await box.drain();
+    expect(box.advances).toEqual([]);
+  });
+
+  it("applies the setting to the ad already on screen when it is switched on", async () => {
+    const box = harness();
+    box.flush(10000);
+    box.show(ad("a"));
+    await box.drain();
+    expect(box.advances).toEqual([]);
+    box.settings.skipAds = true;
+    box.engine.settingsChanged();
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+  });
+
+  it("restores a skipped ad on Undo and keeps it for the session", async () => {
+    const box = harness({ skipAds: true });
+    box.flush(10000);
+    box.show(ad("a"));
+    await box.drain();
+    box.engine.undo();
+    await box.drain();
+    expect(box.retreats).toEqual(["a"]);
+    box.show(ad("a"));
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+  });
+
+  it("counts ads and low-like videos together toward the six-skip pause", async () => {
+    const box = harness({ skipAds: true });
+    box.flush(10000);
+    for (let index = 1; index <= 7; index += 1) {
+      box.show(index % 2 ? ad("v" + index) : low("v" + index));
+      await box.drain();
+      if (index < 6) box.flush(450);
+    }
+    expect(box.advances).toEqual(["v1", "v2", "v3", "v4", "v5", "v6"]);
+    expect(box.chips.at(-1)).toBe("paused");
+  });
+
+  it("stops trying to skip an ad when the page cannot move", async () => {
+    const box = harness({ skipAds: true }, false);
+    box.flush(10000);
+    box.show(ad("a"));
+    await box.drain();
+    expect(box.calls).toBe(1);
+    box.flush(6000);
+    await box.drain();
+    const calls = box.calls;
+    box.engine.poke();
+    await box.drain();
+    expect(box.calls).toBe(calls);
+    expect(box.skips).toBe(0);
+  });
+});
 
 describe("engine", () => {
   it("reconsiders a mounted player at the same id and preserves its session Undo across kind changes", async () => {

@@ -47,7 +47,7 @@ export async function open(context: BrowserContext, id: string, file: string, sc
   await page.goto("chrome-extension://" + id + "/" + file);
   if (file === "popup.html") {
     const client = await context.newCDPSession(page);
-    await client.send("Emulation.setDeviceMetricsOverride", { width: 320, height: 420, deviceScaleFactor: scale, mobile: false });
+    await client.send("Emulation.setDeviceMetricsOverride", { width: 320, height: 480, deviceScaleFactor: scale, mobile: false });
   }
   await page.waitForSelector(".ready");
   return page;

@@ -2,7 +2,7 @@
 
 This file is the product spec. Implement it. Do not add features that are not written here. If a rule is missing, leave the behavior out and record the gap in qa/gaps.md. Read this file before coding and again before calling the work done.
 
-Status: 0.3.7 beta. While grid filtering is off, pages are not rescanned for links. Instagram keeps disclosed advertisements and non-video cards. TikTok/Instagram publish only changed rows and active-player data; unchanged embedded payloads are not reparsed. Undo now survives reloads and new tabs for the browser session; Reset clears those temporary choices. Bounded 0.3.5 signed-in default filtering and TikTok Undo/reload/Reset were observed in Aside Chromium 153; earlier 0.3.3/0.3.4 paths retain their own package scope. The exact-0.3.5 automated 24-hour YouTube run completed with two reviewed page-reload recoveries. Current Instagram Undo/reload, broader signed-in Google Chrome, positive-path live Following and ordinary human day-use remain open. See qa/session-undo.md and qa/release-readiness.md. Decisions below are locked.
+Status: 0.4.0 beta. A Skip ads switch, off by default, moves past an ad that fills the player on YouTube Shorts, TikTok and Instagram Reels. While grid filtering is off, pages are not rescanned for links. Instagram keeps disclosed advertisements and non-video cards. TikTok/Instagram publish only changed rows and active-player data; unchanged embedded payloads are not reparsed. Undo now survives reloads and new tabs for the browser session; Reset clears those temporary choices. Bounded 0.3.5 signed-in default filtering and TikTok Undo/reload/Reset were observed in Aside Chromium 153; earlier 0.3.3/0.3.4 paths retain their own package scope. The exact-0.3.5 automated 24-hour YouTube run completed with two reviewed page-reload recoveries. Current Instagram Undo/reload, broader signed-in Google Chrome, positive-path live Following and ordinary human day-use remain open. See qa/session-undo.md and qa/release-readiness.md. Decisions below are locked.
 
 ## Product
 
@@ -33,7 +33,7 @@ The locale files hold two strings: extName is the manifest name and the store ti
 - Local directory: /Users/jeongjin/Developer/edgethink/kept (keeps its old name)
 - Public GitHub repo: github.com/jeongjin0/scrollplus
 - License: MIT
-- Version: 0.3.7
+- Version: 0.4.0
 - Do not put this project in the Obsidian vault
 - Do not submit it to the Chrome Web Store
 
@@ -44,7 +44,8 @@ Do not build any of these:
 - AI or model classification
 - Keyword, topic, or channel blocklists other than the creator allowlist
 - Hiding all Shorts, Reels, or TikTok
-- Ad skipping, downloaders, auto-like, auto-follow, or auto-comment
+- Downloaders, auto-like, auto-follow, or auto-comment
+- Blocking ad requests, hiding ads inside lists, or restyling a site. Skip ads only moves past the ad that fills the player.
 - Accounts, sync, payments, analytics, servers, or remote code
 - Firefox, Safari, mobile apps, or embedded players on other sites
 - m.youtube.com, music.youtube.com, and non-www TikTok or Instagram hosts
@@ -66,7 +67,7 @@ Skip a video when any turned-on condition has a known count that is under its mi
 - A count equal to the minimum passes.
 - If the creator is allowlisted, keep the video.
 - If the platform is off or the master switch is off, keep the video.
-- Ads, photo carousels, and items with no metrics are kept.
+- Photo carousels and items with no metrics are kept. Ads are kept too unless Skip ads is on (see Ads).
 
 ### Presets
 
@@ -83,6 +84,22 @@ The popup and options show the active preset. Any rule that matches no preset is
 ### Numbers
 
 Counts are shown short in the interface language: 5K and 20K in English, 5천 and 2만 in Korean. Fields accept what people type: 5000, 5,000, 5k, 2만, 3천. The plus and minus buttons step through round numbers: 5, 10, 20, 50, 100, 200, 500, 1K, 2K, 5K, 10K, 20K, 50K, 100K, and up to 10M.
+
+### Ads
+
+Skip ads is a switch, off by default. Off, an ad is kept whatever its counts: an ad that shows 125 likes stays. On, an ad that fills the player is skipped as soon as it is known to be one, without waiting for counts and without looking at them. The chip says "Skipped · ad" / "넘김 · 광고" with Undo, and Undo keeps that ad for the browser session like any other skip.
+
+- Only the active player is judged. Ad cards in lists and grids are never hidden, even with Skip ads and filterGrids both on.
+- The usual keeps apply first: the master switch, a site that is off, and a creator the user kept.
+- An ad counts as a skip: toward today's count and toward the six-in-a-row pause.
+- Never skip on a guess. An item is an ad only when the site marks it as one:
+  - YouTube: the Shorts reel renderer carries the is-ads-overlay attribute. It changes in the same millisecond as the URL and the navigate-finish event, in both directions, so it never lags the id it belongs to. The ad's own ytd-ad-slot-renderer is not used: it stays in the DOM for up to 200 ms after the next Short has started.
+  - TikTok: the ad flag (isAd) in the item data the page loaded.
+  - Instagram: the ad flag (is_ad) in the data the page loaded, or a visible "Ad", "Sponsored" or "광고" disclosure inside the player of a reel that is on screen. A page without a visible video is a photo card and is kept unless its data flags it as an ad.
+- The data flag of an ad outranks a guess from the layout.
+- Before moving, the page script checks once more that the item is still what the decision assumed. A count never moves on from an ad, and the ad rule never moves on from something that is not an ad, so a stale decision cannot skip the wrong item.
+- An ad the site does not mark this way is an ordinary video and is judged by its counts.
+- An ad the site serves again with an id already decided in this page session is not decided again. This is the same rule that leaves a video alone when the user goes back with the site's own Previous control.
 
 ### Grids and shelves
 
@@ -102,10 +119,11 @@ On install, write these defaults and apply them immediately. The extension must 
       "platforms": { "youtube": true, "tiktok": true, "instagram": true },
       "filterGrids": false,
       "showSkipChip": true,
+      "skipAds": false,
       "allowlist": []
     }
 
-Settings from 0.1.x that hold a sensitivity map to the matching preset. Anything unreadable falls back to the defaults.
+Settings from 0.1.x that hold a sensitivity map to the matching preset. Settings saved before 0.4.0 have no skipAds and read as off. Anything unreadable falls back to the defaults.
 
 Rule and power changes re-evaluate the current video immediately. Undo still keeps its video for the session. A deliberate Continue or Lower action renews the decision window after a long pause; known counts that arrived on time remain usable after writing a comment.
 
@@ -126,7 +144,7 @@ This applies to the active vertical player only.
 - If the next control does not exist, stop and leave the current video. Do not loop.
 - The extension's only host-page UI is the chip. No banner, no sidebar, and no restyling of YouTube, TikTok, or Instagram.
 
-When a skip happens and showSkipChip is on, the chip says why, with the count that missed: "Skipped · 454 likes" / "넘김 · 좋아요 454", plus "Undo" / "되돌리기", for 2.5 seconds. Comments and views read the same way. Undo moves back one item and keeps the skipped id for the browser session, even when the engine already sees the next video. Undo does not write the creator allowlist. Repeated polling never replaces a focused chip button.
+When a skip happens and showSkipChip is on, the chip says why, with the count that missed: "Skipped · 454 likes" / "넘김 · 좋아요 454", plus "Undo" / "되돌리기", for 2.5 seconds. Comments and views read the same way, and an ad skipped by Skip ads reads "Skipped · ad" / "넘김 · 광고". Undo moves back one item and keeps the skipped id for the browser session, even when the engine already sees the next video. Undo does not write the creator allowlist. Repeated polling never replaces a focused chip button.
 
 A session keep-set is memory only, shared across reloads and tabs by platform. Use trusted-only chrome.storage.session through a background message broker, and commit before retreating. Do not persist video ids to disk. Browser restart, extension reload/update/disable and Reset clear the temporary choices. Older delayed messages must not restore choices cleared by Reset.
 
@@ -144,13 +162,14 @@ Match on that id. Options can remove entries. The allowlist survives restarts an
 
 ## Popup and options
 
-The popup is 320 wide and no taller than 420. It does not scroll, including when the creator button and the signed-out note are both shown.
+The popup is 320 wide and no taller than 480. It does not scroll, including when the creator button and the signed-out note are both shown.
 
 Popup contains only:
 
 - The app mark and the name, and a round power button for the master switch
 - Today's skip count, large, with the label "skipped today" / "오늘 넘김"
 - The preset control: Lenient, Balanced, Strict, each showing its like count
+- One row with a switch, "Skip ads" / "광고 건너뛰기", with a megaphone icon, in its own card under the presets
 - Three site rows, each with an original icon, the site name, and a switch. No other text in the row.
 - "Keep this creator" when a supported video is active
 - The signed-out note when it applies
@@ -164,7 +183,7 @@ Options, top to bottom:
 - Today's skip count
 - Rules: the preset control, then one row each for Likes, Comments, and Views. Each row has an icon, the name, a stepper with plus, minus, and a typeable number, and a switch. Comments shows the TikTok and Reels icons, because YouTube does not show comment counts. A turned-off row is dimmed and its stepper is disabled.
 - Sites: the three site rows
-- Behavior: also filter lists and grids, and show the skip chip
+- Behavior: skip ads, also filter lists and grids, and show the skip chip
 - Creators to keep: the list with a remove button, or an empty state
 - Reset to defaults, which clears temporary Undo choices and keeps the allowlist and today's count, and the GitHub button. Disable Reset while pending; report a failure inline rather than claiming success.
 - A one-line privacy statement
@@ -212,7 +231,7 @@ The background worker serializes counter writes across tabs. An open options pag
 
 Read metrics the page has already loaded. Do not call private APIs yourself.
 
-- YouTube: read player and reel data YouTube already placed on the page, including ytInitialPlayerResponse and reel renderers updated on navigation. Ignore ad requests. YouTube shows views and likes; comment counts are not in this data.
+- YouTube: read player and reel data YouTube already placed on the page, including ytInitialPlayerResponse and reel renderers updated on navigation. Ignore ad requests. An ad Short is recognised as described in Ads. YouTube shows views and likes; comment counts are not in this data.
 - TikTok: read __UNIVERSAL_DATA_FOR_REHYDRATION__, SIGI_STATE when present, and feed JSON the page itself requested. Use playCount, diggCount, and commentCount. The active video is the id in the URL on a video page, and on For You it is the id in the player wrapper's element id (xgwrapper-N-ID), with the creator from the author link in the same feed item.
 - Instagram: read reel counts in responses Instagram already requested for the page. Use like, comment, and play or view counts. If counts are hidden or the user is signed out, keep every reel.
 
@@ -256,7 +275,7 @@ Store assets, rendered by scripts/render-store.mjs:
 - one 440 by 280 tile and three 1280 by 800 screenshots, in English and in Korean (store/screenshots/ko and store/tile-ko.png)
 - English and Korean listing copy, including the single-purpose sentence used for review
 
-Single purpose: skip YouTube Shorts, TikTok videos, and Instagram Reels that have too few likes, using counts already on the page.
+Single purpose: skip YouTube Shorts, TikTok videos, and Instagram Reels the user does not want to see: those with too few likes and, if the user turns it on, ads. It uses counts and ad markers already on the page.
 
 ## Acceptance
 
