@@ -103,7 +103,13 @@ export function pressIn(rootSelector: string, pattern: RegExp, key: "ArrowDown" 
   return true;
 }
 
-export function moveUntilIdChanges(press: () => boolean, readId: () => string | null): Promise<boolean> {
+export interface MoveOptions {
+  // For a site that announces when a move starts. A press the site did not act on starts nothing, and a press made before a
+  // move starts is ignored, so press again from afterMs on, every everyMs, until begun() says the move has started.
+  repress?: { afterMs: number; everyMs: number; begun: () => boolean };
+}
+
+export function moveUntilIdChanges(press: () => boolean, readId: () => string | null, options: MoveOptions = {}): Promise<boolean> {
   const before = readId();
   let pressed = false;
   try {
@@ -114,6 +120,7 @@ export function moveUntilIdChanges(press: () => boolean, readId: () => string | 
   if (!pressed) return Promise.resolve(false);
   return new Promise((resolve) => {
     const started = Date.now();
+    let lastPress = started;
     const timer = window.setInterval(() => {
       const next = readId();
       if (next && next !== before) {
@@ -121,9 +128,20 @@ export function moveUntilIdChanges(press: () => boolean, readId: () => string | 
         resolve(true);
         return;
       }
-      if (Date.now() - started > 1800) {
+      const now = Date.now();
+      if (now - started > 1800) {
         window.clearInterval(timer);
         resolve(false);
+        return;
+      }
+      const again = options.repress;
+      if (again && now - started >= again.afterMs && now - lastPress >= again.everyMs && !again.begun()) {
+        lastPress = now;
+        try {
+          press();
+        } catch {
+          // The wait above ends the attempt.
+        }
       }
     }, 50);
   });
