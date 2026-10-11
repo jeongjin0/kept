@@ -71,9 +71,9 @@ function recorder(settings) {
     session: { get: async () => ({}) },
     onChanged: { addListener() {}, removeListener() {} },
   };
-  const chrome = window.chrome && typeof window.chrome === 'object' ? window.chrome : {};
-  try { chrome.runtime = runtime; chrome.storage = storage; } catch (error) { /* replaced below */ }
-  if (!chrome.runtime || chrome.runtime.id !== 'scrollplus-emulation') Object.defineProperty(window, 'chrome', { value: { runtime, storage }, configurable: true });
+  const existing = window.chrome && typeof window.chrome === 'object' ? window.chrome : null;
+  try { if (existing) { existing.runtime = runtime; existing.storage = storage; } } catch (error) { /* replaced below */ }
+  if (!existing || existing.runtime !== runtime) Object.defineProperty(window, 'chrome', { value: { runtime, storage }, configurable: true, writable: true });
   // The simulated scroller.
   const sim = { id: null, arrival: 0, pressedFor: null, lastUser: 0, lastEngine: 0, tapped: 0 };
   window.addEventListener('message', (event) => { if (event.source === window && event.data && event.data.source === 'scrollplus' && event.data.type === 'advance') sim.lastEngine = T(); }, true);
