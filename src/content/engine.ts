@@ -30,6 +30,8 @@ export interface EngineDeps {
   cancel: (id: number) => void;
   sessionKeep?: Set<string>;
   rememberUndo?: (id: string) => Promise<void>;
+  // Shortest wait between two automatic moves. Defaults to ADVANCE_GAP_MS.
+  advanceGapMs?: number;
 }
 
 const METRIC_WAIT_MS = 700;
@@ -43,6 +45,7 @@ const RETRY_FOR_MS = 5000;
 
 export function createEngine(deps: EngineDeps) {
   const bornAt = deps.now();
+  const advanceGapMs = deps.advanceGapMs ?? ADVANCE_GAP_MS;
   let current: EngineItem | null = null;
   let waitTimer: number | null = null;
   let chipTimer: number | null = null;
@@ -121,7 +124,7 @@ export function createEngine(deps: EngineDeps) {
     if (deps.isBlocked()) return;
     const decision = judge(current);
     if (decision.action !== "skip") return;
-    const gap = ADVANCE_GAP_MS - (deps.now() - lastAdvanceAt);
+    const gap = advanceGapMs - (deps.now() - lastAdvanceAt);
     if (gap > 0) {
       if (skipQueuedFor === item.id) return;
       skipQueuedFor = item.id;
@@ -167,6 +170,8 @@ export function createEngine(deps: EngineDeps) {
       return;
     }
     showSkipped(decision);
+    // The next video may have arrived while this move was still settling. Judge it now instead of at the next poll.
+    if (current && current.id !== item.id) evaluate(current);
   }
 
   function evaluate(item: EngineItem) {

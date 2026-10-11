@@ -13,7 +13,7 @@ function low(id: string): EngineItem {
   };
 }
 
-function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void, undoDeps: Pick<EngineDeps, "rememberUndo" | "sessionKeep"> = {}) {
+function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void, undoDeps: Pick<EngineDeps, "rememberUndo" | "sessionKeep" | "advanceGapMs"> = {}) {
   const settings: Settings = { ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms }, rule: presetRule("balanced"), allowlist: [], ...partial };
   let clock = 0;
   let seq = 1;
@@ -473,5 +473,88 @@ describe("engine", () => {
     box.flush(1000);
     await box.drain();
     expect(box.calls).toBe(calls);
+  });
+});
+
+describe("pace between automatic moves", () => {
+  it("holds the next move back for 450 ms by default", async () => {
+    const box = harness();
+    box.flush(10000);
+    box.show(low("a"));
+    await box.drain();
+    box.show(low("b"));
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+    box.flush(449);
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+    box.flush(1);
+    await box.drain();
+    expect(box.advances).toEqual(["a", "b"]);
+  });
+
+  it("moves straight on to the next low video when the site allows no wait", async () => {
+    const box = harness({}, true, undefined, { advanceGapMs: 0 });
+    box.flush(10000);
+    box.show(low("a"));
+    await box.drain();
+    box.show(low("b"));
+    await box.drain();
+    expect(box.advances).toEqual(["a", "b"]);
+  });
+
+  it("judges a video that arrives while the move is still settling", async () => {
+    let first = true;
+    const box = harness({}, true, (show) => {
+      if (!first) return;
+      first = false;
+      show(low("b"));
+    }, { advanceGapMs: 0 });
+    box.flush(10000);
+    box.show(low("a"));
+    await box.drain();
+    expect(box.advances).toEqual(["a", "b"]);
+  });
+
+  it("still waits the default gap for a video that arrives while the move is settling", async () => {
+    let first = true;
+    const box = harness({}, true, (show) => {
+      if (!first) return;
+      first = false;
+      show(low("b"));
+    });
+    box.flush(10000);
+    box.show(low("a"));
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+    box.flush(450);
+    await box.drain();
+    expect(box.advances).toEqual(["a", "b"]);
+  });
+
+  it("keeps a good video that arrives while the move is still settling", async () => {
+    let first = true;
+    const box = harness({}, true, (show) => {
+      if (!first) return;
+      first = false;
+      show({ ...low("b"), metrics: good });
+    }, { advanceGapMs: 0 });
+    box.flush(10000);
+    box.show(low("a"));
+    await box.drain();
+    box.flush(10000);
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+  });
+
+  it("still pauses after six skips in a row when there is no wait", async () => {
+    const box = harness({}, true, undefined, { advanceGapMs: 0 });
+    box.flush(10000);
+    for (let index = 1; index <= 7; index += 1) {
+      box.show(low("v" + index));
+      await box.drain();
+    }
+    expect(box.advances).toEqual(["v1", "v2", "v3", "v4", "v5", "v6"]);
+    expect(box.chips.at(-1)).toBe("paused");
   });
 });

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1 – 2026-10-11
+
+- On YouTube Shorts a Short that follows another skip is now on screen for about 0.5 s instead of 0.8 s (median over 20 live minutes at a strict bar). The next skip follows 150 ms after the move instead of 450 ms, and a Short that arrives while the previous move is still being confirmed is judged at once. The first skip of a row is unchanged at about 0.5 s: ScrollPlus decides within 2 ms, and YouTube itself starts the next move about 0.37 s after the last one finished. TikTok and Instagram keep the 450 ms wait. Measurements, and what does not help, are in [skip timing](qa/skip-timing.md).
+- YouTube sometimes does nothing for a Next press when it has only one or two Shorts left and is fetching more. ScrollPlus used to wait 2 s before pressing again; it now presses again after 0.7 s, only when YouTube has not started a move, and never once a move has started.
+- The Short that is being skipped is muted while it is skipped, so the first half second of a low-like video is no longer heard. A player you muted stays muted, and the volume the site stores is not touched.
+- New scripts/skip-latency.mjs repeats the timing measurements on live YouTube Shorts. Defaults, rules, UI and permissions are unchanged.
+
 ## 0.4.0 – 2026-10-11
 
 - New **Skip ads** switch in the popup and in Settings, off by default. When it is on, ScrollPlus moves past an ad that fills the player on YouTube Shorts, TikTok and Instagram Reels as soon as the site marks it as one, with the chip "Skipped · ad" and Undo. It never blocks ad requests and never hides ads in lists.

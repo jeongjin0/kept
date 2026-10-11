@@ -12,6 +12,8 @@ export interface Adapter {
   retreat: () => Promise<boolean>;
   listGrid: () => Array<{ id: string; element: HTMLElement }>;
   instagramSignedOut?: () => boolean;
+  // Shortest wait between two automatic moves on this site. The engine default applies when absent.
+  advanceGapMs?: number;
 }
 
 interface ItemMessage {
@@ -37,6 +39,7 @@ export function startFilter(adapter: Adapter): void {
   const engine = createEngine({
     getSettings: () => settings,
     now: () => Date.now(),
+    advanceGapMs: adapter.advanceGapMs,
     advance: (reason) => adapter.advance(reason),
     retreat: () => adapter.retreat(),
     onSkipped: () => {

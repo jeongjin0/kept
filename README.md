@@ -26,6 +26,8 @@ In Settings you can also turn on a minimum for comments or views, switch a site 
 
 **Skip ads** is a switch in the popup, off by default. Ads stay unless you turn it on, whatever their like count. Once it is on, ScrollPlus also moves past an ad as soon as the site marks it as one, with the same reason chip ("Skipped · ad") and Undo. It only moves past the ad that fills the player. It does not block ad requests or hide anything in lists.
 
+A skip is the site's own Next control, pressed for you, so you see the usual slide to the next video. On YouTube Shorts a skipped video is on screen for about half a second, and it is muted meanwhile. That half second is YouTube's own pace between moves ([timing](qa/skip-timing.md)).
+
 If a count is missing, the video stays. Photo posts stay too. It never skips on a guess, never hides a feed, and stops after six skips in a row so you can decide to keep going or lower the bar.
 
 Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English and Korean.
