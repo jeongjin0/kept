@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.3 – 2026-10-11
+
+- Instagram Reels skips are faster. A skipped reel was on screen for a median 0.62 s (mean 0.78 s) and now stays for 0.32 s (mean 0.52 s), measured live in a signed-in browser at a strict bar (80-second runs: four of 0.4.2, three of 0.4.3). The first skip of a row went from 0.31 s to 0.21 s and a skip that follows a skip from 0.64 s to 0.35 s. Between two skips ScrollPlus waited 450 ms, which Reels does not need, because it takes a press while it is still scrolling: none of the 669 presses measured was ignored, at any wait. The wait is 100 ms now, ScrollPlus looks at the feed while it scrolls instead of every 400 ms, and it presses as soon as the reel is on screen enough to be moved on from. What was measured, and the numbers tried, are in [skip timing on Instagram](qa/skip-timing-instagram.md).
+- Reels loads reels 13 at a time. When skipping reaches the end of those, the page shows no reel for 1.2 to 4.7 s (1.8 times a minute in these runs, as often on 0.4.2). That wait is the site's.
+- TikTok: the wait after a video arrives is 180 ms instead of 150 ms. TikTok answers a press made less than about 0.16 s after a video arrived 0.1 s late, so 150 ms cost about 0.1 s on every first skip of a row. The median skipped video is on screen for 0.31 s instead of 0.38 s, in each of four rounds of live runs ([skip timing on TikTok](qa/skip-timing-tiktok.md#how-long-to-wait-after-a-video-arrives)).
+- The Instagram figures come from the built Instagram scripts run in the page behind a stand-in for chrome.storage, because an extension could not be loaded into the signed-in browser. A person who scrolls with a wheel or a trackpad was not simulated, and the account showed no advertisement.
+- New scripts/instagram-latency.mjs repeats the Instagram measurements. YouTube, defaults, rules, sound and permissions are unchanged.
+
 ## 0.4.2 – 2026-10-11
 
 - TikTok skips are faster. A skipped video was on screen for 1.03 s on average and now stays for 0.48 s (live, signed-out For You, four 75-second runs of each build at a strict bar). A skip that follows a skip went from 0.59 s to 0.35 s; the first skip of a row stays at about 0.4 s. What was measured, and what was tried and dropped, is in [skip timing on TikTok](qa/skip-timing-tiktok.md).

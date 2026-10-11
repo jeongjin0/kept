@@ -20,10 +20,11 @@ export default defineContentScript({
       // TikTok keeps its next control disabled until it has the next video, often for half a second and sometimes for two.
       ready: tiktokNextReady,
       // TikTok takes a second press while it is still scrolling, but ignores one made within a few hundredths of a second of the
-      // first, and answers a press made 0.1-0.3 s after a video arrived as fast as one made at once (qa/skip-timing-tiktok.md).
+      // first. It answers a press made less than about 0.16 s after a video arrived in 0.23 s instead of 0.13 s, so a press at 150 ms
+      // leaves the skipped video on screen longer than one at 180 ms does (qa/skip-timing-tiktok.md).
       // The sound is left alone: TikTok keeps a mute made by a script as the person's own choice for every later video.
       advanceGapMs: 100,
-      settleMs: 150,
+      settleMs: 180,
       watchScroll: true,
     });
   },
