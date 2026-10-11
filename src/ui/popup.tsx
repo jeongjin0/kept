@@ -26,6 +26,9 @@ export function PopupApp() {
         <Hero count={skips} />
         <PresetControl value={preset} labels={labels} onChange={(name) => update((current) => ({ ...current, rule: presetRule(name, current.rule) }))} />
         <div className="card">
+          <Row icon="megaphone" title={t("skipAds")} on={settings.skipAds} label={t("skipAds")} onToggle={(next) => update((current) => ({ ...current, skipAds: next }))} />
+        </div>
+        <div className="card">
           {PLATFORMS.map((platform) => (
             <Row
               key={platform}

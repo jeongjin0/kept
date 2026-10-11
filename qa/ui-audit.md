@@ -38,3 +38,7 @@ Both popups measure 320 × 356 CSS pixels. At 1x and 2x they fit without scrolli
 No unresolved overlap or overflow was found in these captures. This is a scoped product/keyboard audit, not a full screen-reader or accessibility-conformance certification. Signed-in site flows remain the separate gates in [release-readiness.md](release-readiness.md).
 
 Reproduce with `npm run build` followed by `node scripts/capture-ui.mjs`; raw reports and additional Custom/2x captures stay in `qa/tmp/`.
+
+## 0.4.0 addendum · Skip ads
+
+2026-10-11. The popup gains one card under the presets: a megaphone icon, "Skip ads" / "광고 건너뛰기" and a switch, off by default. Settings gains the same switch as the first row of Behavior. The popup now stops at 406 px (480 px with the creator button and the signed-out note shown), up from 356 (420), so the height limit in SPEC.md moved from 420 to 480. At 1x and 2x, in English and Korean, it fits without scrolling or horizontal overflow, and the narrow settings view at 360 px has no overflow (`node scripts/capture-ui.mjs`, no page errors). The browser tests cover the switch in both places, its persistence, and Reset turning it off. The popup, Korean settings and narrow captures above were refreshed from this build.

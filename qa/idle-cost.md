@@ -1,6 +1,6 @@
 # Idle cost of the grid scan · 0.3.7
 
-2026-10-09 KST. Real built extension scripts in isolated Chrome for Testing, on a routed controlled YouTube page. Before: the published 0.3.6 ZIP, SHA-256 `3d6325f8ab76539e791a52e9b6f31f4e577b9c1743d33ddabc510cc4ee71a994`. After: [0.3.7 candidate](release-readiness.md#artifact). This is a CPU measurement of script time on a static page; it does not measure memory or a real feed.
+2026-10-09 KST. Real built extension scripts in isolated Chrome for Testing, on a routed controlled YouTube page. Before: the published 0.3.6 ZIP, SHA-256 `3d6325f8ab76539e791a52e9b6f31f4e577b9c1743d33ddabc510cc4ee71a994`. After: [0.3.7 candidate](release-readiness-037.md#artifact). This is a CPU measurement of script time on a static page; it does not measure memory or a real feed.
 
 ## What was running
 

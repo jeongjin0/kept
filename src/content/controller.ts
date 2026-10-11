@@ -1,14 +1,14 @@
 import { decide, DEFAULT_SETTINGS, normalizeSettings, STORAGE_SETTINGS, type ItemKind, type Metrics, type Platform, type Settings } from "../lib/score";
 import { incrementSkips, loadSettings, saveSettings } from "../lib/storage";
 import { loadUndoKeeps, rememberUndo, validVideoId, type UndoView } from "../lib/session-keep";
-import { createEngine, type EngineItem } from "./engine";
+import { createEngine, type EngineItem, type SkipReason } from "./engine";
 import { mountChip } from "./chip";
 import type { ExtractedItem } from "../platforms/extract";
 
 export interface Adapter {
   platform: Platform;
   readActive: () => { id: string; creatorId: string | null; kind?: ItemKind } | null;
-  advance: () => Promise<boolean>;
+  advance: (reason: SkipReason) => Promise<boolean>;
   retreat: () => Promise<boolean>;
   listGrid: () => Array<{ id: string; element: HTMLElement }>;
   instagramSignedOut?: () => boolean;
@@ -37,7 +37,7 @@ export function startFilter(adapter: Adapter): void {
   const engine = createEngine({
     getSettings: () => settings,
     now: () => Date.now(),
-    advance: () => adapter.advance(),
+    advance: (reason) => adapter.advance(reason),
     retreat: () => adapter.retreat(),
     onSkipped: () => {
       void incrementSkips();
@@ -94,7 +94,8 @@ export function startFilter(adapter: Adapter): void {
       surface: "player",
       creatorId: cached?.creatorId ?? active.creatorId,
       metrics: cached?.metrics ?? null,
-      kind: active.kind ?? cached?.kind ?? "video",
+      // The site's own ad flag outranks a guess from the layout (for example a photo card).
+      kind: cached?.kind === "ad" ? "ad" : active.kind ?? cached?.kind ?? "video",
     };
     engine.onItem(item);
   }

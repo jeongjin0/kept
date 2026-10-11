@@ -11,12 +11,16 @@ export interface EngineItem {
 
 export type ChipModel =
   | { mode: "skipped"; metric: Metric; value: number }
+  | { mode: "skipped"; metric: "ad" }
   | { mode: "paused"; canLower: boolean };
+
+// Why ScrollPlus is moving on: a count under its minimum, or an ad with Skip ads on.
+export type SkipReason = "below" | "ad";
 
 export interface EngineDeps {
   getSettings: () => Settings;
   now: () => number;
-  advance: () => Promise<boolean>;
+  advance: (reason: SkipReason) => Promise<boolean>;
   retreat: () => Promise<boolean>;
   onSkipped: () => void;
   setRule: (next: Rule) => void;
@@ -100,7 +104,7 @@ export function createEngine(deps: EngineDeps) {
       deps.render(null);
       return;
     }
-    deps.render({ mode: "skipped", metric: decision.metric, value: decision.value });
+    deps.render(decision.reason === "ad" ? { mode: "skipped", metric: "ad" } : { mode: "skipped", metric: decision.metric, value: decision.value });
     chipTimer = deps.schedule(() => {
       chipTimer = null;
       if (!paused) deps.render(null);
@@ -132,7 +136,7 @@ export function createEngine(deps: EngineDeps) {
     advancing = true;
     let moved = false;
     try {
-      moved = await deps.advance();
+      moved = await deps.advance(decision.reason);
     } catch {
       moved = false;
     } finally {
@@ -217,7 +221,8 @@ export function createEngine(deps: EngineDeps) {
       }
       if (changed) clearWait();
       if (finished.has(item.id)) return;
-      if (item.surface === "player" && item.metrics == null) {
+      // An ad needs no counts, so it is judged as soon as it is known to be one.
+      if (item.surface === "player" && item.metrics == null && item.kind !== "ad") {
         armWait(item);
         return;
       }

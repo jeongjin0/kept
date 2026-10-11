@@ -57,7 +57,8 @@ try {
   const checkDefaults = async () => {
     if (!settingsPage) return null;
     const data = await settingsPage.evaluate(() => chrome.storage.local.get(null));
-    expect(data.settings).toEqual({ enabled: !extensionOff, rule: { likes: { on: true, min: 5000 }, comments: { on: false, min: 100 }, views: { on: false, min: 100000 } }, platforms: { youtube: true, tiktok: true, instagram: true }, filterGrids: false, showSkipChip: true, allowlist: [] });
+    // Builds before 0.4.0 do not store skipAds; it is off by default.
+    expect({ skipAds: false, ...data.settings }).toEqual({ enabled: !extensionOff, rule: { likes: { on: true, min: 5000 }, comments: { on: false, min: 100 }, views: { on: false, min: 100000 } }, platforms: { youtube: true, tiktok: true, instagram: true }, filterGrids: false, showSkipChip: true, skipAds: false, allowlist: [] });
     return data.dailySkips;
   };
   report.initialDailyCount = await checkDefaults();

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 – 2026-10-11
+
+- New **Skip ads** switch in the popup and in Settings, off by default. When it is on, ScrollPlus moves past an ad that fills the player on YouTube Shorts, TikTok and Instagram Reels as soon as the site marks it as one, with the chip "Skipped · ad" and Undo. It never blocks ad requests and never hides ads in lists.
+- YouTube Shorts ads are now recognised, from the reel renderer's own ad attribute. Before, a Shorts ad was an ordinary video, so an ad showing 125 likes was skipped by the default like rule although ads were meant to stay. Ads now stay unless Skip ads is on.
+- Before it moves on, the page script checks again that the item is still what the decision assumed, so a count never skips an ad and the ad rule never skips an ordinary video, including the first moments after an ad ends.
+- The popup can be up to 480 px tall (it was 420) for the new row. Settings saved earlier read as Skip ads off; every other default is unchanged. Evidence, including what was and was not seen on real feeds, is in [qa/ads.md](qa/ads.md).
+
 ## 0.3.7 – 2026-10-09
 
 - Pages no longer list all of their links every 400 ms while grid filtering is off, the default. On a page with 20,000 links that was about 0.3 s of script time per 3 idle seconds; it is now near zero. Cards hidden by optional grid filtering are still restored immediately when filtering is lowered or turned off.

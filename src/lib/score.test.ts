@@ -66,6 +66,30 @@ describe("decide", () => {
     expect(decide({ ...base, settings: settings({ enabled: false }), metrics: low }).reason).toBe("disabled");
     expect(decide({ ...base, settings: settings({ platforms: { youtube: false, tiktok: true, instagram: true } }), metrics: low }).reason).toBe("disabled");
   });
+  it("keeps an ad whatever its counts when Skip ads is off, which is the default", () => {
+    expect(DEFAULT_SETTINGS.skipAds).toBe(false);
+    for (const likes of [0, 125, 90000]) {
+      expect(decide({ ...base, kind: "ad", settings: settings(), metrics: metrics({ likes }) })).toEqual({ action: "keep", reason: "ad" });
+    }
+    expect(decide({ ...base, kind: "ad", settings: settings(), metrics: null })).toEqual({ action: "keep", reason: "ad" });
+  });
+  it("skips an ad when Skip ads is on, with or without counts, and says it was an ad", () => {
+    const on = settings({ skipAds: true });
+    expect(decide({ ...base, kind: "ad", settings: on, metrics: metrics({ likes: 90000 }) })).toEqual({ action: "skip", reason: "ad" });
+    expect(decide({ ...base, kind: "ad", settings: on, metrics: null })).toEqual({ action: "skip", reason: "ad" });
+  });
+  it("does not let Skip ads touch videos, carousels or cards in lists", () => {
+    const on = settings({ skipAds: true });
+    expect(decide({ ...base, settings: on, metrics: metrics({ likes: 90000 }) })).toEqual({ action: "keep", reason: "passes" });
+    expect(decide({ ...base, kind: "carousel", settings: on, metrics: metrics({ likes: 0 }) }).reason).toBe("carousel");
+    expect(decide({ ...base, kind: "ad", surface: "grid", settings: settings({ skipAds: true, filterGrids: true }), metrics: metrics({ likes: 0 }) })).toEqual({ action: "keep", reason: "ad" });
+  });
+  it("keeps ads on a site that is off, when the master switch is off, and for a creator the user kept", () => {
+    const ad = { ...base, kind: "ad" as const, metrics: null };
+    expect(decide({ ...ad, settings: settings({ skipAds: true, enabled: false }) }).reason).toBe("disabled");
+    expect(decide({ ...ad, settings: settings({ skipAds: true, platforms: { youtube: false, tiktok: true, instagram: true } }) }).reason).toBe("disabled");
+    expect(decide({ ...ad, settings: settings({ skipAds: true, allowlist: [{ platform: "youtube", id: "channel" }] }) }).reason).toBe("allowlist");
+  });
   it("leaves grids alone unless asked", () => {
     const low = metrics({ likes: 0 });
     expect(decide({ ...base, surface: "grid", settings: settings(), metrics: low }).reason).toBe("grid-off");
@@ -92,6 +116,13 @@ describe("presets and settings", () => {
     const lowered = lowerRule(presetRule("balanced"));
     expect(lowered?.likes.min).toBe(2000);
     expect(lowerRule({ ...presetRule("balanced"), likes: { on: true, min: 5 } })).toBeNull();
+  });
+  it("leaves Skip ads off for settings saved before it existed and only accepts a real true", () => {
+    expect(normalizeSettings(undefined).skipAds).toBe(false);
+    expect(normalizeSettings({ enabled: true, rule: presetRule("strict") }).skipAds).toBe(false);
+    expect(normalizeSettings({ skipAds: "yes" }).skipAds).toBe(false);
+    expect(normalizeSettings({ skipAds: 1 }).skipAds).toBe(false);
+    expect(normalizeSettings({ skipAds: true }).skipAds).toBe(true);
   });
   it("starts from the balanced preset and reads old settings", () => {
     expect(normalizeSettings(undefined).rule).toEqual(presetRule("balanced"));

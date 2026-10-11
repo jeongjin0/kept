@@ -178,5 +178,11 @@
   },
   "appName": {
     "message": "ScrollPlus"
+  },
+  "skipAds": {
+    "message": "Skip ads"
+  },
+  "chipAd": {
+    "message": "Skipped · ad"
   }
 }

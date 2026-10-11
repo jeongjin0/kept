@@ -24,7 +24,9 @@ The default is simple: **skip anything under 5,000 likes**. Pick a different lev
 
 In Settings you can also turn on a minimum for comments or views, switch a site off, and keep creators you like. Numbers can be typed the way you say them: `5k`, `2만`, `1,000`.
 
-If a count is missing, the video stays. Ads and photo posts stay too. It never skips on a guess, never hides a feed, and stops after six skips in a row so you can decide to keep going or lower the bar.
+**Skip ads** is a switch in the popup, off by default. Ads stay unless you turn it on, whatever their like count. Once it is on, ScrollPlus also moves past an ad as soon as the site marks it as one, with the same reason chip ("Skipped · ad") and Undo. It only moves past the ad that fills the player. It does not block ad requests or hide anything in lists.
+
+If a count is missing, the video stays. Photo posts stay too. It never skips on a guess, never hides a feed, and stops after six skips in a row so you can decide to keep going or lower the bar.
 
 Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English and Korean.
 

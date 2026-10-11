@@ -178,5 +178,11 @@
   },
   "appName": {
     "message": "ScrollPlus"
+  },
+  "skipAds": {
+    "message": "광고 건너뛰기"
+  },
+  "chipAd": {
+    "message": "넘김 · 광고"
   }
 }

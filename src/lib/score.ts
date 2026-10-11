@@ -50,6 +50,7 @@ export interface Settings {
   platforms: Record<Platform, boolean>;
   filterGrids: boolean;
   showSkipChip: boolean;
+  skipAds: boolean;
   allowlist: AllowEntry[];
 }
 
@@ -89,6 +90,7 @@ export const DEFAULT_SETTINGS: Settings = {
   platforms: { youtube: true, tiktok: true, instagram: true },
   filterGrids: false,
   showSkipChip: true,
+  skipAds: false,
   allowlist: [],
 };
 
@@ -141,13 +143,15 @@ export type KeepReason =
 
 export type Decision =
   | { action: "keep"; reason: KeepReason }
-  | { action: "skip"; reason: "below"; metric: Metric; value: number; min: number };
+  | { action: "skip"; reason: "below"; metric: Metric; value: number; min: number }
+  | { action: "skip"; reason: "ad" };
 
 export function decide(input: DecideInput): Decision {
   const { settings, platform, surface, creatorId, metrics, kind } = input;
   if (!settings.enabled || !settings.platforms[platform]) return { action: "keep", reason: "disabled" };
   if (isAllowlisted(settings, platform, creatorId)) return { action: "keep", reason: "allowlist" };
-  if (kind === "ad") return { action: "keep", reason: "ad" };
+  // Ads are kept unless the user turned Skip ads on. Only the active player is skipped; ad cards in lists stay.
+  if (kind === "ad") return settings.skipAds && surface === "player" ? { action: "skip", reason: "ad" } : { action: "keep", reason: "ad" };
   if (kind === "carousel") return { action: "keep", reason: "carousel" };
   if (!metrics) return { action: "keep", reason: "no-metrics" };
   if (surface === "grid" && !settings.filterGrids) return { action: "keep", reason: "grid-off" };
@@ -208,6 +212,7 @@ export function normalizeSettings(value: unknown): Settings {
     },
     filterGrids: raw.filterGrids === true,
     showSkipChip: raw.showSkipChip !== false,
+    skipAds: raw.skipAds === true,
     allowlist,
   };
 }
