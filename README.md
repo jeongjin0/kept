@@ -26,7 +26,7 @@ In Settings you can also turn on a minimum for comments or views, switch a site 
 
 **Skip ads** is a switch in the popup, off by default. Ads stay unless you turn it on, whatever their like count. Once it is on, ScrollPlus also moves past an ad as soon as the site marks it as one, with the same reason chip ("Skipped · ad") and Undo. It only moves past the ad that fills the player. It does not block ad requests or hide anything in lists.
 
-A skip is the site's own Next control, pressed for you, so you see the usual slide to the next video. On YouTube Shorts a skipped video is on screen for about half a second, and it is muted meanwhile. That half second is YouTube's own pace between moves ([timing](qa/skip-timing.md)).
+A skip is the site's own Next control, pressed for you, so you see the usual slide to the next video. On YouTube Shorts a skipped video is on screen for about half a second, and it is muted meanwhile. That half second is YouTube's own pace between moves ([timing](qa/skip-timing.md)). On TikTok a skipped video is on screen for about 0.4 s, with its sound on: TikTok takes a mute made by a script as your own choice, so ScrollPlus leaves it alone ([timing](qa/skip-timing-tiktok.md)). Instagram Reels has not been measured.
 
 If a count is missing, the video stays. Photo posts stay too. It never skips on a guess, never hides a feed, and stops after six skips in a row so you can decide to keep going or lower the bar.
 
@@ -39,6 +39,7 @@ ScrollPlus is a public beta, installed from a GitHub release for now (see below)
 - Tested on controlled pages for all three sites, including Chrome 120, the oldest supported version.
 - Tried on real feeds: YouTube Shorts (a 24-hour automated run on 0.3.5, with two page-reload recoveries), TikTok For You, and Instagram Reels in a signed-in browser. Instagram Reels is the newest and least exercised site.
 - Known issue: on YouTube Shorts the feed can occasionally stop responding to scroll and Next while the video keeps playing; reloading the page fixes it. In long automated runs this was YouTube's own request for more Shorts failing with a server error, and it also happens without ScrollPlus ([details](qa/soak.md#youtube-shorts-feed-stalls-youtubes-feed-request-fails)).
+- Skip pacing: measured on live YouTube Shorts and, for 0.4.2, on signed-out TikTok For You ([YouTube](qa/skip-timing.md), [TikTok](qa/skip-timing-tiktok.md)). On TikTok a skipped video went from 1.03 s on screen on average to 0.48 s. Instagram Reels pacing has not been measured.
 - Skip ads: checked on real YouTube Shorts ads (65 of 65 first-time ads skipped with it on, none with it off). On TikTok and Instagram it rests on the sites' own ad flags and was checked on controlled pages only ([details](qa/ads.md)).
 - Not yet established: ordinary day-long use, and the Instagram advertisement guard on a live advertisement.
 

@@ -1,31 +1,32 @@
-# Release readiness · 0.4.1
+# Release readiness · 0.4.2
 
-Checked on 2026-10-11 KST, macOS ARM64. This candidate changes how ScrollPlus moves on from a Short on YouTube only: the next skip follows 150 ms after the move instead of 450 ms and a Short that arrives while a move is being confirmed is judged at once, a press the site did not act on is pressed again after 0.7 s instead of 2 s, and the Short being skipped is muted until the move ends. Rules, presets, defaults, UI and permissions are unchanged. TikTok and Instagram keep the 450 ms wait. Chrome Web Store submission has not occurred; SPEC.md says not to submit it.
+Checked on 2026-10-11 KST, macOS ARM64. This candidate changes how ScrollPlus moves on from a video on TikTok: while TikTok keeps its Next control disabled (until it has the next video) it presses nothing and looks again every 50 ms, it waits 100 ms after the previous move and 150 ms after the video arrived instead of 450 ms, and it looks at the feed when it scrolls and when it stops. On all three sites a missing player counts as leaving the feed only after 300 ms, and a skip that follows a skip changes the words of the chip in place. TikTok's sound is left alone on purpose. Instagram Reels and YouTube Shorts keep their waits and their sound. Rules, presets, defaults, popup, options and permissions are unchanged. Chrome Web Store submission has not occurred; SPEC.md says not to submit it.
 
 | Check | Result | Evidence / scope |
 | --- | --- | --- |
 | TypeScript | Pass | npm run compile |
-| Unit tests | 67 passed | npm test; adds six engine tests (the default 450 ms wait, no wait, a video that arrives while a move is still being confirmed, and the six-skip pause without a wait). Four of them fail on the 0.4.0 engine |
-| Built-script browser tests | 41 passed | npm run test:e2e; adds six routed-page YouTube tests: no old wait between skips, a press the site never acts on is pressed again once, a move that has started is never pressed again, a Short is quiet while skipped, a player the person muted stays muted, and a skip that never happens puts the sound back. One earlier full run failed the existing YouTube Skip ads Undo test once (its chip is on offer for 2.5 s); it passed in the ten runs after that, including six in parallel and three full suites |
-| Live YouTube Shorts | Pass | The final 0.4.1 build in fresh signed-out profiles on real Shorts, 10 minutes at a strict bar and 10 at the default bar: 236 skips, a skipped Short on screen 0.52 s and 0.54 s on average, no page errors, and all 427 kept Shorts sampled were playing unmuted one second after arriving. Four skips took over 1 s: three presses the site ignored while it had one Short left moved after the second or third press (1.04–1.47 s), and the first Short after a page load took 2.14 s, as it does on 0.4.0. See [skip timing](skip-timing.md) |
-| Skips in a row | Faster on YouTube | A Short that follows another skip: 0.79 s on 0.4.0 against 0.51 s, 20 live minutes each at the strict bar (154 and 201 such skips; the 0.4.1 run was a candidate without the repeated press and the mute). The first skip of a row stays at 0.52 s, which is YouTube's own pace |
-| Minimum Chrome 120 | 41 passed on Linux | [PR CI](https://github.com/jeongjin0/scrollplus/actions/runs/38129895791) on the final code commit; official Chrome for Testing 120.0.6099.109, actual built scripts on controlled fixtures. The same run passed 67 unit tests and the current-Chrome suite (41 passed) |
+| Unit tests | 75 passed | npm test; adds eight engine tests: the settle time is counted from the arrival of a video, a video passed over before it has settled is left, a site that cannot move yet is waited for and pressed within 50 ms of being ready, given up 5 s after the video opened, not pressed past a video the person left or while they type, and Undo stays available while the next skip waits |
+| Built-script browser tests | 49 passed | npm run test:e2e; adds eight routed TikTok tests (a disabled Next control is waited for, the pace of skips in a row, the sound is never touched, a control that never opens is given up, one chip for a row of skips, Undo while a skip waits, no press past a video the person scrolled to, and the pause after six skips when the player is missing between videos). Five of the eight fail on the 0.4.1 build; the other three guard behaviour that was not wrong before |
+| Live TikTok For You | Pass for the stated scope | The packaged build, byte for byte, in fresh signed-out profiles on real TikTok at 1280×800: 100 skipped videos at the 20,000-like bar (four 75 s runs), 33 at the default bar (three runs) and 126 at 100,000 (two runs). On screen for 0.48 s on average at 20,000 likes against 1.03 s for 0.4.1 (90 videos); 4% of the skipped videos stayed over 1 s against 21%; the press followed a median 11 ms after TikTok offered its Next control against 1.63 s. No video at or above the bar was moved on from, in either build. The only page error was TikTok's own "a.init is not a function", which also appears in runs without the extension. See [skip timing on TikTok](skip-timing-tiktok.md) |
+| TikTok sound | Left alone | A test build that muted the skipped video made TikTok start later videos muted in 3 of 4 runs, kept videos too, and TikTok stored the mute in localStorage in script-only runs; see [the sound section](skip-timing-tiktok.md#sound) |
+| Minimum Chrome 120 | 49 passed on Linux | [PR CI](https://github.com/jeongjin0/scrollplus/actions/runs/38137782915) on the final code commit; official Chrome for Testing 120.0.6099.109, actual built scripts on controlled fixtures. The same run passed 75 unit tests and the current-Chrome suite (49 passed) |
 | Package | Pass | npm run zip and node scripts/check-package.mjs; MV3, Chrome 120+, storage and the existing three host permissions |
-| Package scope | The three content bundles and the manifest changed | The YouTube bundle carries the new wait, the repeated press and the mute. The TikTok and Instagram bundles carry the shared engine and move helper, whose behaviour on those sites is the same except that a video that arrives while a move is being confirmed is judged when the move is confirmed instead of at the next poll, inside the same 450 ms wait. Locale files, popup and options pages are unchanged apart from the version |
-| Native signed-in TikTok / Instagram | Not repeated on 0.4.1 | Not observed live for this change. Earlier [signed-in QA](signed-in-smoke.md) stays scoped to its packages |
-| Long feed | Not run on 0.4.1 | Beyond the 20 live minutes above (236 skips). The last 24-hour run was 0.3.5; see the [long feed report](soak.md) |
+| Package scope | The shared bundle, the TikTok bundles and the manifest version changed | The YouTube and Instagram bundles carry the shared engine and controller, whose behaviour on those sites differs only by the 300 ms before a missing player counts as leaving the feed and by the chip changing its words in place. Locale files, popup and options pages are unchanged apart from the version |
+| Native signed-in TikTok / Instagram | Not repeated on 0.4.2 | Not observed live for this change. Earlier [signed-in QA](signed-in-smoke.md) stays scoped to its packages |
+| Instagram Reels pacing | Not measured | Signed out, /reels/ redirects to the login page and no signed-in browser was available. Reels keeps its 450 ms wait and its sound |
+| Long feed | Not run on 0.4.2 | The runs above were 75 seconds each. The last 24-hour run was 0.3.5; see the [long feed report](soak.md) |
 | Chrome Web Store | Not submitted | [Submission checklist](../store/submission-checklist.md) is unchanged |
 
 ## Artifact
 
-scrollplus-0.4.1-chrome.zip, 128,472 bytes.
+scrollplus-0.4.2-chrome.zip, 129,545 bytes.
 
-SHA-256: 694fc07a3fc571c8b5b4469a56a8d923f34aef131ef394badeaf71f3b727556f.
+SHA-256: d4e81299d10c32557fd4daed28ca5b3157eaed245f74481109b89aa666ba0721.
 
-This identifies the tested local candidate. CI ZIP metadata can differ. The previous exact-package reports remain in [0.4.0 release readiness](release-readiness-040.md#artifact), [0.3.7](release-readiness-037.md#artifact), [0.3.6](release-readiness-036.md#artifact) and [0.3.5](release-readiness-035.md#artifact).
+This identifies the tested local candidate. CI ZIP metadata can differ. The previous exact-package reports remain in [0.4.1 release readiness](release-readiness-041.md#artifact), [0.4.0](release-readiness-040.md#artifact), [0.3.7](release-readiness-037.md#artifact), [0.3.6](release-readiness-036.md#artifact) and [0.3.5](release-readiness-035.md#artifact).
 
 ## Remaining gates
 
-1. See a live TikTok and Instagram skip with the 0.4.1 bundles, and a live ad skip on both. TikTok and Instagram need signed-in sessions.
-2. Ordinary human day-use, and a long YouTube run on 0.4.1. The paced runs here were 10 to 20 minutes each.
+1. Measure Instagram Reels and see a live skip, an ad skip and the sound there; Reels needs a signed-in session. See a live signed-in TikTok skip with the 0.4.2 bundles.
+2. Ordinary human day-use, and a long TikTok and YouTube run on 0.4.2.
 3. Update the listing only to match verified support. Store submission remains an owner decision.

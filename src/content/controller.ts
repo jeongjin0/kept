@@ -14,6 +14,13 @@ export interface Adapter {
   instagramSignedOut?: () => boolean;
   // Shortest wait between two automatic moves on this site. The engine default applies when absent.
   advanceGapMs?: number;
+  // Shortest time a video is the active one before ScrollPlus moves on from it. None when absent.
+  settleMs?: number;
+  // False while the site cannot move yet (see the engine). Absent: always ready.
+  ready?: () => boolean;
+  // The site scrolls from one video to the next and announces nothing when the next one has arrived. Look at which video is
+  // active while the page scrolls and when it stops, not only at the next poll.
+  watchScroll?: boolean;
 }
 
 interface ItemMessage {
@@ -22,6 +29,12 @@ interface ItemMessage {
   item?: ExtractedItem & { platform?: Platform };
   items?: ExtractedItem[];
 }
+
+// A missing player is only the end of the feed once it stays missing: on a site that scrolls from one video to the next there is
+// none for a moment in between.
+const INACTIVE_AFTER_MS = 300;
+// While a feed that is watched scrolls, look at which video is active about this often.
+const SCROLL_LOOK_MS = 60;
 
 export function startFilter(adapter: Adapter): void {
   let settings: Settings = DEFAULT_SETTINGS;
@@ -40,6 +53,8 @@ export function startFilter(adapter: Adapter): void {
     getSettings: () => settings,
     now: () => Date.now(),
     advanceGapMs: adapter.advanceGapMs,
+    settleMs: adapter.settleMs,
+    ready: adapter.ready,
     advance: (reason) => adapter.advance(reason),
     retreat: () => adapter.retreat(),
     onSkipped: () => {
@@ -83,13 +98,18 @@ export function startFilter(adapter: Adapter): void {
     };
   }
 
+  let inactiveSince = 0;
+
   function showActive(): void {
     if (!ready) return;
     const active = adapter.readActive();
     if (!active) {
-      engine.onInactive();
+      const now = Date.now();
+      if (!inactiveSince) inactiveSince = now;
+      if (now - inactiveSince >= INACTIVE_AFTER_MS) engine.onInactive();
       return;
     }
+    inactiveSince = 0;
     const cached = cache.get(active.id);
     const item: EngineItem = {
       id: active.id,
@@ -174,6 +194,21 @@ export function startFilter(adapter: Adapter): void {
     if (!inside) engine.poke();
   }, true);
   window.addEventListener("focusout", () => engine.poke(), true);
+
+  // Idle pages produce no scroll events, so this costs nothing until the feed moves.
+  if (adapter.watchScroll) {
+    let scrollTimer: number | null = null;
+    let lastScrollLook = 0;
+    window.addEventListener("scroll", () => {
+      if (scrollTimer != null) return;
+      scrollTimer = window.setTimeout(() => {
+        scrollTimer = null;
+        lastScrollLook = Date.now();
+        showActive();
+      }, Math.max(0, SCROLL_LOOK_MS - (Date.now() - lastScrollLook)));
+    }, { capture: true, passive: true });
+    window.addEventListener("scrollend", () => showActive(), true);
+  }
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message?.type === "scrollplus:session" && _sender.id === chrome.runtime.id) {

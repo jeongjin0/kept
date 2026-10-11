@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.2 – 2026-10-11
+
+- TikTok skips are faster. A skipped video was on screen for 1.03 s on average and now stays for 0.48 s (live, signed-out For You, four 75-second runs of each build at a strict bar). A skip that follows a skip went from 0.59 s to 0.35 s; the first skip of a row stays at about 0.4 s. What was measured, and what was tried and dropped, is in [skip timing on TikTok](qa/skip-timing-tiktok.md).
+- TikTok keeps its Next control disabled until it has added the next video, which was the case for about one skipped video in five, for up to 3 s. ScrollPlus pressed the disabled control anyway, waited 1.8 s for a move that could not come and tried again, so it moved a median 1.6 s after the control was offered. It now looks every 50 ms and moves 11 ms after (median).
+- Between two skips on TikTok it waits 100 ms after the previous move and 150 ms after the video arrived, instead of 450 ms, and it looks at the feed when it scrolls and when it stops, not only every 400 ms.
+- TikTok's sound is left alone on purpose. TikTok takes a mute made by a script as your own choice: in about half of the sessions measured it started every later video muted, and stored the mute in localStorage. A skipped TikTok is heard while it is on screen.
+- A row of skips shows one chip whose words change, instead of a new chip for every video. A moment without a player between two videos, as in TikTok's scroll, no longer clears the chip or resets the count of six. Both apply to all three sites.
+- Instagram Reels and YouTube Shorts keep their waits and their sound. Reels was not measured: signed out it redirects to the login page.
+- New scripts/tiktok-latency.mjs repeats the TikTok measurements. Defaults, rules and permissions are unchanged.
+
 ## 0.4.1 – 2026-10-11
 
 - On YouTube Shorts a Short that follows another skip is now on screen for about 0.5 s instead of 0.8 s (median over 20 live minutes at a strict bar). The next skip follows 150 ms after the move instead of 450 ms, and a Short that arrives while the previous move is still being confirmed is judged at once. The first skip of a row is unchanged at about 0.5 s: ScrollPlus decides within 2 ms, and YouTube itself starts the next move about 0.37 s after the last one finished. TikTok and Instagram keep the 450 ms wait. Measurements, and what does not help, are in [skip timing](qa/skip-timing.md).

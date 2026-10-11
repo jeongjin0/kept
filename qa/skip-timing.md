@@ -105,5 +105,5 @@ Each run starts a fresh signed-out Chromium profile, so use a new output directo
 
 - Desktop layout, signed-out public feed, Chromium 140, a fast wired connection. YouTube's behaviour can change; the 0.37 s and the one-second prefetch are observations, not documented values.
 - The recommendation feed differs between runs and between people, so the share of skipped Shorts and of chains differs too, and the runs are not paired. The strict runs exaggerate chains on purpose.
-- TikTok and Instagram were not measured. The change in 0.4.1 applies to YouTube only; they keep the 450 ms wait.
+- TikTok and Instagram were not measured. The change in 0.4.1 applies to YouTube only; they keep the 450 ms wait. TikTok was measured afterwards: see [skip timing on TikTok](skip-timing-tiktok.md).
 - Local evidence: `qa/tmp/flash` (not committed).
