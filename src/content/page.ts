@@ -71,6 +71,31 @@ export function tiktokMarker(): string | null {
   return best ? "item:" + best : null;
 }
 
+const TIKTOK_CONTROLS = {
+  next: { selectors: ['[data-e2e="feed-navigation-next"]', 'button[data-e2e="arrow-down"]', 'button[data-e2e="arrow-right"]'], label: /next video|다음 동영상|다음 비디오/i },
+  prev: { selectors: ['[data-e2e="feed-navigation-prev"]', 'button[data-e2e="arrow-up"]', 'button[data-e2e="arrow-left"]'], label: /previous video|이전 동영상|이전 비디오/i },
+};
+
+// The control TikTok offers for moving to the next or previous video, in the order the page script tries them.
+export function tiktokControl(direction: "next" | "prev"): HTMLElement | null {
+  const target = TIKTOK_CONTROLS[direction];
+  for (const selector of target.selectors) {
+    const node = document.querySelector(selector);
+    if (node instanceof HTMLElement) return node;
+  }
+  for (const button of document.querySelectorAll("button")) {
+    if (target.label.test(button.getAttribute("aria-label") || "")) return button;
+  }
+  return null;
+}
+
+// TikTok disables the next control until the next video has been added to the feed, which it does not do before the current
+// one has been on screen for a while. Pressing it before then does nothing. Without any control the page script presses the key.
+export function tiktokNextReady(): boolean {
+  const control = tiktokControl("next");
+  return !control || !(control instanceof HTMLButtonElement && control.disabled) && control.getAttribute("aria-disabled") !== "true";
+}
+
 export function gridAnchors(pattern: RegExp): Array<{ id: string; element: HTMLElement }> {
   const found: Array<{ id: string; element: HTMLElement }> = [];
   const seen = new Set<string>();

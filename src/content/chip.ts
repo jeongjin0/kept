@@ -86,6 +86,16 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
       ensure();
       if (!root) return;
       clearLeave();
+      // A skip that follows a skip changes the words of the chip that is already there. A new chip each time would flicker
+      // once for every video in a row, and a chip button that has focus would be replaced.
+      const shown = root.firstElementChild;
+      if (model?.mode === "skipped" && shown instanceof HTMLElement && shown.dataset.mode === "skipped" && !shown.classList.contains("leaving")) {
+        const label = shown.querySelector(".label");
+        if (label) {
+          label.textContent = skippedLabel(model);
+          return;
+        }
+      }
       if (!model) {
         const existing = root.firstElementChild;
         if (!existing) return;
@@ -98,6 +108,7 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
       }
       const chip = document.createElement("div");
       chip.className = model.mode === "paused" ? "chip stack" : "chip";
+      chip.dataset.mode = model.mode;
       chip.setAttribute("role", "status");
       if (model.mode === "skipped") {
         const dot = document.createElement("span");

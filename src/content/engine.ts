@@ -32,6 +32,11 @@ export interface EngineDeps {
   rememberUndo?: (id: string) => Promise<void>;
   // Shortest wait between two automatic moves. Defaults to ADVANCE_GAP_MS.
   advanceGapMs?: number;
+  // Shortest time a video is the active one before ScrollPlus moves on from it. Defaults to none.
+  settleMs?: number;
+  // False while the site cannot move yet, for example while TikTok has no next video and keeps its next control disabled. A press
+  // then does nothing and the wait for its move would take 1.8 s, so the engine looks again every 50 ms instead.
+  ready?: () => boolean;
 }
 
 const METRIC_WAIT_MS = 700;
@@ -42,10 +47,12 @@ const CHIP_HOLD_MS = 2500;
 const SKIP_CAP = 6;
 const RETRY_GAP_MS = 400;
 const RETRY_FOR_MS = 5000;
+const READY_POLL_MS = 50;
 
 export function createEngine(deps: EngineDeps) {
   const bornAt = deps.now();
   const advanceGapMs = deps.advanceGapMs ?? ADVANCE_GAP_MS;
+  const settleMs = deps.settleMs ?? 0;
   let current: EngineItem | null = null;
   let waitTimer: number | null = null;
   let chipTimer: number | null = null;
@@ -124,7 +131,8 @@ export function createEngine(deps: EngineDeps) {
     if (deps.isBlocked()) return;
     const decision = judge(current);
     if (decision.action !== "skip") return;
-    const gap = advanceGapMs - (deps.now() - lastAdvanceAt);
+    const now = deps.now();
+    const gap = Math.max(advanceGapMs - (now - lastAdvanceAt), settleMs - (now - seenAt));
     if (gap > 0) {
       if (skipQueuedFor === item.id) return;
       skipQueuedFor = item.id;
@@ -134,6 +142,22 @@ export function createEngine(deps: EngineDeps) {
         skipQueuedFor = null;
         void performSkip(item);
       }, gap);
+      return;
+    }
+    if (deps.ready && !deps.ready()) {
+      if (now - seenAt >= RETRY_FOR_MS) {
+        finished.add(item.id);
+        deps.render(null);
+        return;
+      }
+      if (skipQueuedFor === item.id) return;
+      skipQueuedFor = item.id;
+      if (gapTimer != null) deps.cancel(gapTimer);
+      gapTimer = deps.schedule(() => {
+        gapTimer = null;
+        skipQueuedFor = null;
+        void performSkip(item);
+      }, READY_POLL_MS);
       return;
     }
     advancing = true;

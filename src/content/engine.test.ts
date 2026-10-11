@@ -13,7 +13,7 @@ function low(id: string): EngineItem {
   };
 }
 
-function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void, undoDeps: Pick<EngineDeps, "rememberUndo" | "sessionKeep" | "advanceGapMs"> = {}) {
+function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void, undoDeps: Pick<EngineDeps, "rememberUndo" | "sessionKeep" | "advanceGapMs" | "settleMs" | "ready"> = {}) {
   const settings: Settings = { ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms }, rule: presetRule("balanced"), allowlist: [], ...partial };
   let clock = 0;
   let seq = 1;
@@ -556,5 +556,144 @@ describe("pace between automatic moves", () => {
     }
     expect(box.advances).toEqual(["v1", "v2", "v3", "v4", "v5", "v6"]);
     expect(box.chips.at(-1)).toBe("paused");
+  });
+});
+
+describe("settling before a move", () => {
+  it("does not move on from a video until it has been the active one for the settle time", async () => {
+    const box = harness({}, true, undefined, { advanceGapMs: 0, settleMs: 150 });
+    box.flush(10000);
+    box.show(low("a"));
+    await box.drain();
+    box.flush(149);
+    await box.drain();
+    expect(box.advances).toEqual([]);
+    box.flush(1);
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+  });
+
+  it("counts the settle time from the arrival of the video, not from the last move", async () => {
+    const box = harness({}, true, undefined, { advanceGapMs: 100, settleMs: 150 });
+    box.flush(10000);
+    box.show(low("a"));
+    box.flush(150);
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+    // b arrives 80 ms after the move: the 100 ms gap is over before it has settled, the settle time is not.
+    box.flush(80);
+    box.show(low("b"));
+    await box.drain();
+    box.flush(149);
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+    box.flush(1);
+    await box.drain();
+    expect(box.advances).toEqual(["a", "b"]);
+  });
+
+  it("leaves a video that is passed over before it has settled", async () => {
+    const box = harness({}, true, undefined, { advanceGapMs: 0, settleMs: 150 });
+    box.flush(10000);
+    box.show(low("a"));
+    box.flush(100);
+    box.show({ ...low("b"), metrics: good });
+    await box.drain();
+    box.flush(1000);
+    await box.drain();
+    expect(box.advances).toEqual([]);
+  });
+});
+
+describe("a site that cannot move yet", () => {
+  function waiting() {
+    let open = false;
+    const box = harness({}, true, undefined, { advanceGapMs: 0, ready: () => open });
+    return { box, open: () => { open = true; } };
+  }
+
+  it("waits until the site can move, then moves within a moment", async () => {
+    const { box, open } = waiting();
+    box.flush(10000);
+    box.show(low("a"));
+    await box.drain();
+    box.flush(1000);
+    await box.drain();
+    expect(box.advances).toEqual([]);
+    open();
+    box.flush(49);
+    await box.drain();
+    expect(box.advances).toEqual([]);
+    box.flush(1);
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+  });
+
+  it("gives up 5 s after the video opened when the site never can", async () => {
+    const { box } = waiting();
+    box.flush(10000);
+    box.show(low("a"));
+    await box.drain();
+    box.flush(4900);
+    await box.drain();
+    box.flush(200);
+    await box.drain();
+    box.engine.poke();
+    box.flush(2000);
+    await box.drain();
+    expect(box.calls).toBe(0);
+    expect(box.chips.at(-1)).toBe("none");
+  });
+
+  it("does not move on from a video the person has already left", async () => {
+    const { box, open } = waiting();
+    box.flush(10000);
+    box.show(low("a"));
+    await box.drain();
+    box.flush(500);
+    box.show({ ...low("b"), metrics: good });
+    await box.drain();
+    open();
+    box.flush(2000);
+    await box.drain();
+    expect(box.advances).toEqual([]);
+  });
+
+  it("does not move while the person is typing, then moves when they stop", async () => {
+    const { box, open } = waiting();
+    box.flush(10000);
+    box.show(low("a"));
+    await box.drain();
+    box.setBlocked(true);
+    open();
+    box.flush(300);
+    await box.drain();
+    expect(box.advances).toEqual([]);
+    box.setBlocked(false);
+    box.engine.poke();
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+  });
+
+  it("keeps Undo available for the last skip while the next one waits", async () => {
+    let open = true;
+    const box = harness({}, true, undefined, { advanceGapMs: 0, ready: () => open });
+    box.flush(10000);
+    box.show(low("a"));
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+    open = false;
+    box.show(low("b"));
+    await box.drain();
+    box.flush(800);
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+    box.engine.undo();
+    await box.drain();
+    expect(box.retreats).toHaveLength(1);
+    open = true;
+    box.flush(2000);
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
   });
 });

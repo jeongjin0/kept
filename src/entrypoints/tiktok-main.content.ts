@@ -1,5 +1,5 @@
 import { defineContentScript } from "wxt/utils/define-content-script";
-import { tiktokActive } from "../content/page";
+import { tiktokActive, tiktokControl } from "../content/page";
 import { extractTikTok } from "../platforms/extract";
 import { createEmbeddedReader, createItemBridge } from "../platforms/item-bridge";
 import { observeJsonResponses } from "../platforms/observe";
@@ -38,23 +38,14 @@ export default defineContentScript({
   },
 });
 
-const NEXT = { selectors: ['[data-e2e="feed-navigation-next"]', 'button[data-e2e="arrow-down"]', 'button[data-e2e="arrow-right"]'], label: /next video|다음 동영상|다음 비디오/i, key: "ArrowDown", code: 40 };
-const PREV = { selectors: ['[data-e2e="feed-navigation-prev"]', 'button[data-e2e="arrow-up"]', 'button[data-e2e="arrow-left"]'], label: /previous video|이전 동영상|이전 비디오/i, key: "ArrowUp", code: 38 };
+const KEYS = { next: { key: "ArrowDown", code: 40 }, prev: { key: "ArrowUp", code: 38 } };
 
 function moveFeed(direction: "next" | "prev"): void {
-  const target = direction === "next" ? NEXT : PREV;
-  for (const selector of target.selectors) {
-    const node = document.querySelector(selector);
-    if (node instanceof HTMLElement) {
-      node.click();
-      return;
-    }
+  const control = tiktokControl(direction);
+  if (control) {
+    control.click();
+    return;
   }
-  for (const button of document.querySelectorAll("button")) {
-    if (target.label.test(button.getAttribute("aria-label") || "")) {
-      button.click();
-      return;
-    }
-  }
-  document.dispatchEvent(new KeyboardEvent("keydown", { key: target.key, code: target.key, keyCode: target.code, which: target.code, bubbles: true, cancelable: true }));
+  const { key, code } = KEYS[direction];
+  document.dispatchEvent(new KeyboardEvent("keydown", { key, code: key, keyCode: code, which: code, bubbles: true, cancelable: true }));
 }
