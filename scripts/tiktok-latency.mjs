@@ -374,6 +374,13 @@ function report(dirs) {
       console.log('  ' + title.padEnd(40) + describe(set.map((row) => row[key]).filter((value) => value != null)));
     }
   }
+  // TikTok answers a press made soon after a video arrived more slowly than one made a little later (qa/skip-timing-tiktok.md).
+  const pressed = rows.filter((row) => row.click != null && row.clickToNext != null && row.decide < 400);
+  console.log('== click to next video active, by how long after the video arrived the press was made (presses made within 0.4 s)');
+  for (const [low, high, title] of [[0, 160, 'under 160 ms'], [160, 200, '160 to 199 ms'], [200, 400, '200 ms or more']]) {
+    const set = pressed.filter((row) => row.decide >= low && row.decide < high);
+    console.log('  ' + title.padEnd(16) + describe(set.map((row) => row.clickToNext)) + ' | over 180 ms: ' + set.filter((row) => row.clickToNext > 180).length);
+  }
 }
 
 function reportProbe(dir, data) {

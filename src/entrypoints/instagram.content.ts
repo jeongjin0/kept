@@ -36,6 +36,12 @@ export default defineContentScript({
       retreat: () => moveUntilIdChanges(() => requestMove("ArrowUp"), instagramReelId),
       listGrid: () => gridAnchors(/\/reel\/([A-Za-z0-9_-]+)/),
       instagramSignedOut: signedOut,
+      // Reels is moved by its own Next control, which is never disabled, and takes a press while it is still scrolling
+      // (qa/skip-timing-instagram.md). The address of a reel changes a little before the reel is on screen enough to be moved on
+      // from (at least 60% of it), so look again every 50 ms until it is.
+      advanceGapMs: 100,
+      ready: () => visibleVideo() != null,
+      watchScroll: true,
     });
   },
 });
