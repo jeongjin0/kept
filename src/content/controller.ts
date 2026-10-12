@@ -8,7 +8,7 @@ import type { ExtractedItem } from "../platforms/extract";
 
 export interface Adapter {
   platform: Platform;
-  readActive: () => { id: string; creatorId: string | null; kind?: ItemKind } | null;
+  readActive: () => { id: string; creatorId: string | null; kind?: ItemKind; followed?: boolean | null } | null;
   advance: (reason: SkipReason) => Promise<boolean>;
   retreat: () => Promise<boolean>;
   listGrid: () => Array<{ id: string; element: HTMLElement }>;
@@ -121,7 +121,7 @@ export function startFilter(adapter: Adapter): void {
       surface: "player",
       creatorId: cached?.creatorId ?? active.creatorId,
       metrics: cached?.metrics ?? null,
-      followed: cached?.followed ?? null,
+      followed: active.followed === true || active.followed === false ? active.followed : cached?.followed ?? null,
       // The site's own ad flag outranks a guess from the layout (for example a photo card).
       kind: cached?.kind === "ad" ? "ad" : active.kind ?? cached?.kind ?? "video",
     };

@@ -1,15 +1,13 @@
 # Keep accounts I follow
 
-Checked on 2026-10-12. ScrollPlus 0.5.1 keeps a TikTok video when the item the page already loaded says the viewer follows that creator. The switch is on by default. It is in Settings, with the TikTok icon, because YouTube and Instagram are not read.
+Checked on 2026-10-12. ScrollPlus 0.5.2 keeps a video when the page already says the viewer subscribes to or follows its creator. The switch is on by default, in Settings. It covers YouTube Shorts, TikTok and Instagram Reels. 0.5.1 covered TikTok only.
 
-The field is author.relation on the same object that holds stats. A signed-out For You response (/api/recommend/item_list/, two items, captured in qa/tmp/follow-probe/tt-bodies.json) had relation 0 on both authors. The embedded rehydration payload from that same signed-out load had no video items, so the first video's relation, when it exists, comes from the feed response.
+Nothing about who is followed is stored. Permissions are unchanged. A missing answer is judged by likes. An ad is still skipped when Skip ads is on.
 
-The values used are the ones published for this field: 0 none, 1 the viewer follows, 2 the author follows the viewer, 3 both. 1 and 3 are kept. 0 and 2 are judged by likes. A missing value, or any other number, is judged by likes. That mapping was not seen with a signed-in account. Relation was 0 in the only live capture.
+YouTube. The player and reel responses carry subscriptionStateEntity.subscribed, matched to the video when that response names one video, or the older subscribeButtonRenderer.subscribed flag. The visible Shorts button is also read: 구독중, 구독됨 and Subscribed mean subscribed, and 구독 and Subscribe mean not. A signed-out Shorts page in Chrome on this machine showed the button labelled 구독 and a login link, and the captured reel response had the subscribe button without a subscriptionStateEntity. That signed-out shape keeps the video on the like bar. A subscribed fixture stays.
 
-An ad is still skipped when Skip ads is on, including an ad from a followed creator. The master switch, a site that is off, and a creator on the allowlist are judged first.
+TikTok. author.relation on the item the page loaded: 0 none, 1 the viewer follows, 2 the author follows the viewer, 3 both. 1 and 3 stay. A signed-out For You response had relation 0. The values 1 and 3 were not seen on a signed-in account.
 
-Nothing about who is followed is stored. Permissions are unchanged. A 0.5.0 install has no keepFollowed key; reading the missing key as on does not rewrite storage.
+Instagram. friendship_status.following on the reel the page loaded, and the button beside the reel: 팔로잉 and Following mean followed, 팔로우 and Follow mean not. Signed out, Reels redirects to the login page, so a live reel was not seen. A fixture with following true stays.
 
-YouTube Shorts, signed out, exposes a subscribe button and a subscribe-state key, and no subscribed boolean was present in the captured player data. Instagram signed out redirects to login. Neither site is covered.
-
-Open: watch a signed-in TikTok and confirm a creator you follow arrives with relation 1 (or 3 when they follow you back), and that a low-like video from them stays while one from someone you do not follow is skipped.
+The Chrome window on this machine was signed out of YouTube, TikTok and Instagram, so a real subscribed channel and a real followed account were not watched. The signals above are what those pages already render for a signed-in viewer, and the controlled pages exercise them.

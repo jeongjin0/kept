@@ -1,6 +1,7 @@
 import { defineContentScript } from "wxt/utils/define-content-script";
 import { youtubeShortId } from "../content/page";
-import { extractYouTube } from "../platforms/extract";
+import { extractYouTube, youtubeFollowPairs } from "../platforms/extract";
+import { observeJsonResponses } from "../platforms/observe";
 
 export default defineContentScript({
   matches: ["https://www.youtube.com/*"],
@@ -8,6 +9,11 @@ export default defineContentScript({
   world: "MAIN",
   main() {
     let latest: unknown = null;
+    const followedById = new Map<string, boolean>();
+    const remember = (data: unknown) => {
+      for (const pair of youtubeFollowPairs(data)) followedById.set(pair.id, pair.followed);
+    };
+    observeJsonResponses((url) => url.includes("youtube.com/youtubei/") && /reel|player|next/.test(url), remember);
     const publish = (player?: unknown) => {
       try {
         const id = youtubeShortId();
@@ -15,6 +21,7 @@ export default defineContentScript({
         const source = player ?? latest ?? (window as Window & { ytInitialPlayerResponse?: unknown }).ytInitialPlayerResponse;
         const extracted = extractYouTube(source);
         if (!extracted || extracted.id !== id) return;
+        if (followedById.has(extracted.id)) extracted.followed = followedById.get(extracted.id);
         window.postMessage({ source: "scrollplus", type: "item", item: { platform: "youtube", surface: "player", ...extracted } }, "*");
       } catch {
         /* leave the page alone */
@@ -23,6 +30,7 @@ export default defineContentScript({
     document.addEventListener("yt-navigate-finish", (event) => {
       const detail = (event as CustomEvent<{ response?: { playerResponse?: unknown } }>).detail;
       latest = detail?.response?.playerResponse ?? (window as Window & { ytInitialPlayerResponse?: unknown }).ytInitialPlayerResponse;
+      remember(detail?.response ?? latest);
       publish(latest);
     });
     window.addEventListener("message", (event) => {

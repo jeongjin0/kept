@@ -2,6 +2,31 @@ import { visibleVideo } from "../content/page";
 
 const AD_LABEL = /^(?:ad|sponsored|광고|스폰서\s*광고)$/i;
 
+export function followedFromFollowLabel(label: string): boolean | null {
+  const text = label.replace(/\s+/g, " ").trim().toLowerCase();
+  if (!text || text.length > 24) return null;
+  if (/^(following|팔로잉)$/.test(text)) return true;
+  if (/^(follow|팔로우)$/.test(text)) return false;
+  return null;
+}
+
+export function instagramFollowButtonFollowed(): boolean | null {
+  const video = visibleVideo();
+  if (!video) return null;
+  const player = video.getBoundingClientRect();
+  for (const node of document.querySelectorAll("button, [role='button']")) {
+    if (!(node instanceof HTMLElement)) continue;
+    const followed = followedFromFollowLabel(node.getAttribute("aria-label") || node.textContent || "");
+    if (followed == null) continue;
+    const rect = node.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) continue;
+    if (rect.bottom < player.top - 40 || rect.top > player.bottom + 120) continue;
+    if (rect.right < player.left - 320 || rect.left > player.right + 280) continue;
+    return followed;
+  }
+  return null;
+}
+
 // A visible disclosure protects advertisements independently of JSON ad flags.
 // Do not let an offscreen/sibling ad or a
 // caption that merely mentions advertising suppress ordinary Reel filtering.

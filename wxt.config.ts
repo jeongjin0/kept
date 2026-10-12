@@ -9,7 +9,7 @@ export default defineConfig({
     short_name: '__MSG_appName__',
     description: '__MSG_extDesc__',
     default_locale: 'en',
-    version: "0.5.1",
+    version: "0.5.2",
     minimum_chrome_version: "120",
     permissions: ['storage'],
     host_permissions: [

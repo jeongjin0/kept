@@ -2,7 +2,7 @@ import { defineContentScript } from "wxt/utils/define-content-script";
 import { startFilter } from "../content/controller";
 import { gridAnchors, moveUntilIdChanges, youtubeShortId } from "../content/page";
 import type { SkipReason } from "../content/engine";
-import { youtubeHasActiveAd } from "../platforms/youtube-player";
+import { youtubeHasActiveAd, youtubeSubscribeButtonFollowed } from "../platforms/youtube-player";
 
 export default defineContentScript({
   matches: ["https://www.youtube.com/*"],
@@ -18,7 +18,7 @@ export default defineContentScript({
       platform: "youtube",
       readActive: () => {
         const id = youtubeShortId();
-        return id ? { id, creatorId: null, kind: youtubeHasActiveAd() ? "ad" as const : undefined } : null;
+        return id ? { id, creatorId: null, kind: youtubeHasActiveAd() ? "ad" as const : undefined, followed: youtubeSubscribeButtonFollowed() } : null;
       },
       advance: (reason) => {
         const startsAtPress = moveStarts;
