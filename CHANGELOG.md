@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.1 – 2026-10-12
+
+- Keep accounts I follow is on in Settings. On TikTok, a video from a creator you already follow stays, even when it is under the like bar. Turn the switch off and those videos are judged like any other. An ad is still skipped when Skip ads is on.
+- ScrollPlus reads the relation field TikTok already put on the video. It does not save who you follow, and it asks for no new permission. If the page does not say, the video is judged by its likes.
+- YouTube and Instagram are not covered yet. The settings row carries the TikTok icon so that is plain. A signed-in check that relation 1 really means "I follow this account" is still open.
+- Updating from 0.5.0 turns the switch on. Nothing else about your settings moves.
+
+
 ## 0.5.0 – 2026-10-12
 
 - The presets are 100, 500 and 1,000 likes. Lenient, Balanced and Strict were 1,000, 5,000 and 20,000. Balanced, the default, skips videos under 500 likes. Updating from 0.4.x moves your settings once, by name: if you were on Balanced you are on Balanced, now at 500, and the same for Lenient and Strict. A rule of your own (a number that is none of the three, or comments or views turned on) stays exactly as it was.

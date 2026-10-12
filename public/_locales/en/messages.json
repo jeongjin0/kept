@@ -182,6 +182,9 @@
   "skipAds": {
     "message": "Skip ads"
   },
+  "keepFollowed": {
+    "message": "Keep accounts I follow"
+  },
   "chipAd": {
     "message": "Skipped · ad"
   },

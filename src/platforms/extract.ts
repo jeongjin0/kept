@@ -5,6 +5,18 @@ export interface ExtractedItem {
   creatorId: string | null;
   metrics: Metrics;
   kind: ItemKind;
+  // True when the page already says the viewer follows this creator. Null when it does not say.
+  followed?: boolean | null;
+}
+
+// TikTok puts the viewer's relationship on author.relation of the item the page already loaded.
+// 0 none, 1 the viewer follows, 2 the author follows the viewer, 3 both. Anything else is unknown.
+function followedFromRelation(value: unknown): boolean | null {
+  const relation = typeof value === "number" && Number.isFinite(value) ? value : typeof value === "string" && /^\d+$/.test(value) ? Number(value) : null;
+  if (relation == null) return null;
+  if (relation === 1 || relation === 3) return true;
+  if (relation === 0 || relation === 2) return false;
+  return null;
 }
 
 const SKIP_KEYS = new Set(["adPlacements", "playerAds", "adSlots"]);
@@ -81,6 +93,7 @@ export function extractTikTok(root: unknown): ExtractedItem[] {
       id,
       creatorId: unique,
       kind: parent.isAd === true || parent.is_ad === true ? "ad" : parent.imagePost != null ? "carousel" : "video",
+      followed: followedFromRelation(author?.relation),
       metrics: {
         views: parseCount(stats.playCount),
         likes: parseCount(stats.diggCount),

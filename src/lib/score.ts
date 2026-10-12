@@ -63,6 +63,7 @@ export interface Settings {
   showSkipChip: boolean;
   chipPosition: ChipPosition;
   skipAds: boolean;
+  keepFollowed: boolean;
   allowlist: AllowEntry[];
 }
 
@@ -108,6 +109,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showSkipChip: true,
   chipPosition: "top",
   skipAds: true,
+  keepFollowed: true,
   allowlist: [],
 };
 
@@ -153,11 +155,14 @@ export interface DecideInput {
   creatorId: string | null;
   metrics: Metrics | null;
   kind: ItemKind;
+  // True when the page already says the viewer follows this creator. Missing or null is not a follow.
+  followed?: boolean | null;
 }
 
 export type KeepReason =
   | "disabled"
   | "allowlist"
+  | "followed"
   | "ad"
   | "carousel"
   | "no-metrics"
@@ -171,11 +176,13 @@ export type Decision =
   | { action: "skip"; reason: "ad" };
 
 export function decide(input: DecideInput): Decision {
-  const { settings, platform, surface, creatorId, metrics, kind } = input;
+  const { settings, platform, surface, creatorId, metrics, kind, followed } = input;
   if (!settings.enabled || !settings.platforms[platform]) return { action: "keep", reason: "disabled" };
   if (isAllowlisted(settings, platform, creatorId)) return { action: "keep", reason: "allowlist" };
   // Ads are kept unless the user turned Skip ads on. Only the active player is skipped; ad cards in lists stay.
   if (kind === "ad") return settings.skipAds && surface === "player" ? { action: "skip", reason: "ad" } : { action: "keep", reason: "ad" };
+  // A creator the viewer already follows stays, even under the bar. An unknown relationship is judged by counts.
+  if (settings.keepFollowed && followed === true) return { action: "keep", reason: "followed" };
   if (kind === "carousel") return { action: "keep", reason: "carousel" };
   if (!metrics) return { action: "keep", reason: "no-metrics" };
   if (surface === "grid" && !settings.filterGrids) return { action: "keep", reason: "grid-off" };
@@ -238,6 +245,7 @@ export function normalizeSettings(value: unknown): Settings {
     showSkipChip: raw.showSkipChip !== false,
     chipPosition: CHIP_POSITIONS.find((position) => position === raw.chipPosition) ?? "top",
     skipAds: raw.skipAds !== false,
+    keepFollowed: raw.keepFollowed !== false,
     allowlist,
   };
 }

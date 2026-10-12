@@ -155,6 +155,19 @@ describe("engine and ads", () => {
     expect(box.reasons).toEqual(["below"]);
   });
 
+  it("keeps a low-like video from a followed creator, and skips it when that switch is off", async () => {
+    const kept = harness();
+    kept.show({ ...low("a"), platform: "tiktok", followed: true });
+    await kept.drain();
+    kept.flush(10000);
+    expect(kept.advances).toEqual([]);
+    const dropped = harness({ keepFollowed: false });
+    dropped.show({ ...low("b"), platform: "tiktok", followed: true });
+    await dropped.drain();
+    expect(dropped.advances).toEqual(["b"]);
+    expect(dropped.reasons).toEqual(["below"]);
+  });
+
   it("does not skip ordinary videos that pass because Skip ads is on", async () => {
     const box = harness({ skipAds: true });
     box.flush(10000);

@@ -4,8 +4,13 @@ import type { ExtractedItem } from "./extract";
 type Active = { id: string; creatorId: string | null };
 type Player = Omit<ExtractedItem, "metrics"> & { metrics: Metrics | null };
 
+function knownFollow(value: boolean | null | undefined): boolean | null {
+  return value === true || value === false ? value : null;
+}
+
 function sameItem(a: Player | undefined | null, b: Player): boolean {
   return a?.id === b.id && a.creatorId === b.creatorId && a.kind === b.kind
+    && knownFollow(a?.followed) === knownFollow(b.followed)
     && a.metrics?.likes === b.metrics?.likes && a.metrics?.comments === b.metrics?.comments
     && a.metrics?.views === b.metrics?.views && a.metrics?.shares === b.metrics?.shares
     && a.metrics?.saves === b.metrics?.saves;

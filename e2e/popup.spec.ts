@@ -144,6 +144,10 @@ test("settings accept typed numbers and mark the popup as custom", async () => {
     await expect(optionsAds).toHaveAttribute("aria-checked", "true");
     await optionsAds.click();
     await expect.poll(async () => (await stored(options)).skipAds).toBe(false);
+    const keepFollowed = options.getByRole("switch", { name: /Keep accounts I follow|팔로우 중인 계정은 유지/ });
+    await expect(keepFollowed).toHaveAttribute("aria-checked", "true");
+    await keepFollowed.click();
+    await expect.poll(async () => (await stored(options)).keepFollowed).toBe(false);
     const popupWithoutAds = await open(context, id, "popup.html");
     await expect(popupWithoutAds.getByRole("switch", { name: /Skip ads|광고 건너뛰기/ })).toHaveAttribute("aria-checked", "false");
     await popupWithoutAds.close();
@@ -159,6 +163,7 @@ test("settings accept typed numbers and mark the popup as custom", async () => {
     });
     // Reset puts ads back to being skipped, which is the default.
     await expect.poll(async () => (await stored(options)).skipAds).toBe(true);
+    await expect.poll(async () => (await stored(options)).keepFollowed).toBe(true);
   } finally {
     await context.close();
   }

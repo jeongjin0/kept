@@ -121,6 +121,7 @@ export function startFilter(adapter: Adapter): void {
       surface: "player",
       creatorId: cached?.creatorId ?? active.creatorId,
       metrics: cached?.metrics ?? null,
+      followed: cached?.followed ?? null,
       // The site's own ad flag outranks a guess from the layout (for example a photo card).
       kind: cached?.kind === "ad" ? "ad" : active.kind ?? cached?.kind ?? "video",
     };
@@ -156,6 +157,7 @@ export function startFilter(adapter: Adapter): void {
         creatorId: known.creatorId,
         metrics: known.metrics,
         kind: known.kind,
+        followed: known.followed ?? null,
       });
       if (decision.action === "skip") {
         card.element.setAttribute("hidden", "");
@@ -179,6 +181,7 @@ export function startFilter(adapter: Adapter): void {
         creatorId: data.item.creatorId ?? previous?.creatorId ?? null,
         metrics: data.item.metrics ?? previous?.metrics ?? null,
         kind: data.item.kind ?? previous?.kind ?? "video",
+        followed: data.item.followed === true || data.item.followed === false ? data.item.followed : previous?.followed ?? null,
       });
       showActive();
     }
