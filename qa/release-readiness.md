@@ -10,7 +10,7 @@ Checked on 2026-10-12 KST, macOS ARM64. Keep accounts I follow now covers YouTub
 | Popup and settings page | Unchanged height | The settings row no longer carries a TikTok icon, because all three sites are read. Popup height was not remeasured; the popup itself did not change |
 | Live signed-in pages | Not observed | The Chrome window on this machine was signed out of YouTube, TikTok and Instagram. YouTube Shorts showed a 구독 button and a login link. Instagram Reels redirected to the login page. The signed-in shapes are exercised on controlled pages. See [follow](follow.md) |
 | Package | Pass | npm run zip and node scripts/check-package.mjs. scrollplus-0.5.2-chrome.zip, 139,691 bytes. MV3, Chrome 120+, storage, the same three hosts |
-| Minimum Chrome 120 | Pending CI | The pull request runs the suite on Chrome 120 |
+| Minimum Chrome 120 | Pass | [CI](https://github.com/jeongjin0/scrollplus/actions/runs/38247427828) and [CI](https://github.com/jeongjin0/scrollplus/actions/runs/38247452753), both on the 0.5.2 commit. Chrome for Testing 120 and current Chromium. |
 | Chrome Web Store | Not submitted | Owner decision |
 
 ## Artifact
