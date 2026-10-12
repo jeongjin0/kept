@@ -20,6 +20,21 @@ describe("extractors", () => {
       item: { id: "99", author: { uniqueId: "@creator" }, stats: { playCount: 5000, diggCount: 100, commentCount: 2, shareCount: 1, collectCount: 3 } },
     });
     expect(items[0]).toMatchObject({ id: "99", creatorId: "creator", metrics: { views: 5000, likes: 100, comments: 2, shares: 1, saves: 3 } });
+    expect(items[0]?.followed).toBeNull();
+  });
+
+  it("reads whether the viewer follows a TikTok creator", () => {
+    const followed = (relation: unknown, authorKey: "author" | "authorInfo" = "author") => extractTikTok({
+      item: { id: "1", [authorKey]: { uniqueId: "a", relation }, stats: { diggCount: 1, playCount: 2 } },
+    })[0]?.followed;
+    expect(followed(0)).toBe(false);
+    expect(followed(1)).toBe(true);
+    expect(followed(2)).toBe(false);
+    expect(followed(3)).toBe(true);
+    expect(followed(undefined)).toBeNull();
+    expect(followed("1")).toBe(true);
+    expect(followed(9)).toBeNull();
+    expect(followed(1, "authorInfo")).toBe(true);
   });
 
   it("retains zero views and does not discard an independently known like count", () => {

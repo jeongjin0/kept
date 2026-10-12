@@ -7,6 +7,7 @@ export interface EngineItem {
   creatorId: string | null;
   metrics: Metrics | null;
   kind: ItemKind;
+  followed?: boolean | null;
 }
 
 export type ChipModel =
@@ -78,6 +79,7 @@ export function createEngine(deps: EngineDeps) {
       creatorId: item.creatorId,
       metrics: item.metrics,
       kind: item.kind,
+      followed: item.followed,
     });
   }
 
@@ -240,7 +242,7 @@ export function createEngine(deps: EngineDeps) {
       const changed = current?.id !== item.id;
       // A player can mount after its URL/counts, or replace a non-video card.
       // Reconsider that observation without clearing a user's session Undo.
-      if (!changed && current?.kind !== item.kind) finished.delete(item.id);
+      if (!changed && current && (current.kind !== item.kind || (item.followed === true && current.followed !== true))) finished.delete(item.id);
       current = item;
       if (changed) {
         seenAt = deps.now();

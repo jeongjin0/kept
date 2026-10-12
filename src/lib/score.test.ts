@@ -103,6 +103,20 @@ describe("decide", () => {
     expect(decide({ ...base, surface: "grid", settings: settings(), metrics: low }).reason).toBe("grid-off");
     expect(decide({ ...base, surface: "grid", settings: settings({ filterGrids: true }), metrics: low }).action).toBe("skip");
   });
+  it("keeps a creator the viewer follows, and still skips their ads", () => {
+    const low = metrics({ likes: 0 });
+    const followed = { ...base, platform: "tiktok" as const, followed: true as const };
+    expect(DEFAULT_SETTINGS.keepFollowed).toBe(true);
+    expect(decide({ ...followed, settings: settings(), metrics: low })).toEqual({ action: "keep", reason: "followed" });
+    expect(decide({ ...followed, settings: settings(), metrics: null })).toEqual({ action: "keep", reason: "followed" });
+    expect(decide({ ...followed, surface: "grid", settings: settings({ filterGrids: true }), metrics: low })).toEqual({ action: "keep", reason: "followed" });
+    expect(decide({ ...base, platform: "tiktok", followed: false, settings: settings(), metrics: low })).toMatchObject({ action: "skip", reason: "below" });
+    expect(decide({ ...base, platform: "tiktok", followed: null, settings: settings(), metrics: low })).toMatchObject({ action: "skip", reason: "below" });
+    expect(decide({ ...followed, settings: settings({ keepFollowed: false }), metrics: low })).toMatchObject({ action: "skip", reason: "below" });
+    expect(decide({ ...followed, kind: "ad", settings: settings(), metrics: low })).toEqual({ action: "skip", reason: "ad" });
+    expect(decide({ ...followed, settings: settings({ enabled: false }), metrics: low }).reason).toBe("disabled");
+    expect(decide({ ...followed, settings: settings({ allowlist: [{ platform: "tiktok", id: "channel" }] }), metrics: low }).reason).toBe("allowlist");
+  });
 });
 
 describe("presets and settings", () => {
@@ -132,6 +146,12 @@ describe("presets and settings", () => {
     expect(normalizeSettings({ skipAds: 0 }).skipAds).toBe(true);
     expect(normalizeSettings({ skipAds: true }).skipAds).toBe(true);
     expect(normalizeSettings({ skipAds: false }).skipAds).toBe(false);
+  });
+  it("keeps followed accounts unless the settings say false", () => {
+    expect(normalizeSettings(undefined).keepFollowed).toBe(true);
+    expect(normalizeSettings({ keepFollowed: false }).keepFollowed).toBe(false);
+    expect(normalizeSettings({ keepFollowed: "no" }).keepFollowed).toBe(true);
+    expect(normalizeSettings({ keepFollowed: 0 }).keepFollowed).toBe(true);
   });
   it("places the skip chip at the top unless the settings say otherwise", () => {
     expect(DEFAULT_SETTINGS.chipPosition).toBe("top");
@@ -202,6 +222,7 @@ describe("moving settings from 0.4.x to the 0.5.0 scale", () => {
     expect(moved.platforms).toEqual({ youtube: true, tiktok: false, instagram: true });
     expect(moved.allowlist).toEqual([{ platform: "youtube", id: "kept-creator" }]);
     expect(moved.chipPosition).toBe("top");
+    expect(moved.keepFollowed).toBe(true);
   });
   it("reads settings from the first versions and anything unreadable as the defaults", () => {
     expect(migrateSettings({ sensitivity: "strict" }).rule).toEqual(presetRule("strict"));

@@ -87,6 +87,20 @@ export function OptionsApp() {
           <h2>{t("behaviorTitle")}</h2>
           <div className="card">
             <Row icon="megaphone" title={t("skipAds")} on={settings.skipAds} label={t("skipAds")} onToggle={(next) => update((current) => ({ ...current, skipAds: next }))} />
+            <Row
+              icon="userCheck"
+              on={settings.keepFollowed}
+              label={t("keepFollowed")}
+              onToggle={(next) => update((current) => ({ ...current, keepFollowed: next }))}
+              title={
+                <>
+                  {t("keepFollowed")}
+                  <span className="covers" title={t("appliesTo", SITES.tiktok.name)} aria-label={t("appliesTo", SITES.tiktok.name)}>
+                    <Icon name="tiktok" size={12} />
+                  </span>
+                </>
+              }
+            />
             <Row icon="grid" title={t("filterGrids")} on={settings.filterGrids} label={t("filterGrids")} onToggle={(next) => update((current) => ({ ...current, filterGrids: next }))} />
             <Row icon="pill" title={t("showChip")} on={settings.showSkipChip} label={t("showChip")} onToggle={(next) => update((current) => ({ ...current, showSkipChip: next }))} />
             <div className={settings.showSkipChip ? "pad stack" : "pad stack off"}>
