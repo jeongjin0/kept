@@ -1,13 +1,15 @@
 :root {
-  --bg: #10110F;
-  --surface: #1A1B17;
-  --surface-2: #24251F;
-  --line: rgba(244, 241, 234, 0.08);
-  --line-strong: rgba(244, 241, 234, 0.18);
-  --text: #F4F1EA;
-  --muted: #A8A396;
-  --accent: #FF4D2E;
-  --accent-ink: #10110F;
+  --bg: #0D1414;
+  --surface: #131E1D;
+  --surface-2: #1C2B2A;
+  --line: rgba(238, 245, 244, 0.08);
+  --line-strong: rgba(238, 245, 244, 0.18);
+  --text: #EEF5F4;
+  --muted: #99ACAB;
+  --accent: #59C5BF;
+  --accent-hover: #6AD6CF;
+  --accent-rgb: 89, 197, 191;
+  --accent-ink: #031A19;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --t: 180ms;
   --font: ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo", "Segoe UI", sans-serif;
@@ -31,7 +33,7 @@ h1, h2, p { margin: 0; }
 .power { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-strong); background: transparent; color: var(--muted); display: grid; place-items: center; transition: background var(--t) var(--ease), color var(--t) var(--ease), border-color var(--t) var(--ease); }
 .power:hover { border-color: var(--text); color: var(--text); }
 .power.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.power.on:hover { background: #FF6446; border-color: #FF6446; color: var(--accent-ink); }
+.power.on:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: var(--accent-ink); }
 .power.wide { display: inline-flex; align-items: center; justify-content: center; width: auto; padding: 0 14px 0 11px; gap: 7px; border-radius: 99px; height: 36px; font-size: 13px; font-weight: 600; white-space: nowrap; }
 
 .hero { display: flex; flex-direction: column; justify-content: center; gap: 5px; height: 76px; padding: 0 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
@@ -52,7 +54,7 @@ h1, h2, p { margin: 0; }
 .stats-note { color: var(--muted); font-size: 12px; line-height: 1.5; }
 
 .presets { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); padding: 3px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
-.presets .thumb-slide { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / 3); border-radius: 11px; background: var(--surface-2); box-shadow: inset 0 0 0 1px rgba(255, 77, 46, 0.75); transition: transform var(--t) var(--ease), opacity var(--t) var(--ease); pointer-events: none; }
+.presets .thumb-slide { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / 3); border-radius: 11px; background: var(--surface-2); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.75); transition: transform var(--t) var(--ease), opacity var(--t) var(--ease); pointer-events: none; }
 .preset { position: relative; z-index: 1; height: 44px; border: 0; border-radius: 11px; background: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; transition: color var(--t) var(--ease); }
 .preset:hover { color: var(--text); }
 .preset strong { font-size: 13px; font-weight: 600; line-height: 1; }
@@ -93,7 +95,7 @@ h1, h2, p { margin: 0; }
 
 .link { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 6px 4px; border: 0; border-radius: 8px; background: none; font-size: 13px; font-weight: 500; transition: color var(--t) var(--ease); }
 .link:hover { color: var(--accent); }
-.badge { padding: 2px 7px; border-radius: 99px; background: rgba(255, 77, 46, 0.16); color: var(--accent); font-size: 11px; font-weight: 600; }
+.badge { padding: 2px 7px; border-radius: 99px; background: rgba(var(--accent-rgb), 0.16); color: var(--accent); font-size: 11px; font-weight: 600; }
 .github { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 13px 0 10px; border: 1px solid var(--line-strong); border-radius: 99px; color: var(--text); text-decoration: none; font-size: 12px; font-weight: 500; transition: border-color var(--t) var(--ease), background var(--t) var(--ease); }
 /* GitHub asks for its mark in white or black, unchanged. */
 .github .icon { color: #fff; }

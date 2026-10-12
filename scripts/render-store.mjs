@@ -9,8 +9,8 @@ const workBase = path.join(root, "qa/tmp");
 fs.mkdirSync(workBase, { recursive: true });
 const work = fs.mkdtempSync(path.join(workBase, "store-"));
 
-const NAME = 'Scroll<span style="color:#FF4D2E">Plus</span>';
-const MARK = '<svg viewBox="0 0 24 24" width="SIZE" height="SIZE"><rect width="24" height="24" rx="6.5" fill="#FF4D2E"/><path d="M7 18.2V8.6A1.6 1.6 0 0 1 8.6 7h6.8A1.6 1.6 0 0 1 17 8.6v9.6" fill="none" stroke="#10110F" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13.2" r="1.6" fill="#10110F"/></svg>';
+const NAME = 'Scroll<span style="color:#59C5BF">Plus</span>';
+const MARK = '<svg viewBox="0 0 32 32" width="SIZE" height="SIZE"><defs><linearGradient id="t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6ACBC5"/><stop offset="1" stop-color="#55BBB6"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#t)"/><rect x="0.6" y="0.6" width="30.8" height="30.8" rx="8.4" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.2"/><g transform="translate(-.4 0)"><path d="M7.6 11.2H13.2" fill="none" stroke="#031A19" stroke-width="3" stroke-linecap="round" opacity="0.4"/><path d="M5.6 16H13.2" fill="none" stroke="#031A19" stroke-width="3" stroke-linecap="round" opacity="0.72"/><path d="M9 20.8H13.2" fill="none" stroke="#031A19" stroke-width="3" stroke-linecap="round" opacity="0.4"/><path d="M16.4 8.4 27.4 16 16.4 23.6Z" fill="#031A19" stroke="#031A19" stroke-width="2.6" stroke-linejoin="round"/></g></svg>';
 
 // One entry per listing language. English is the default listing; Korean goes in store/screenshots/ko.
 const LANGS = {
@@ -127,13 +127,13 @@ async function captureChip(lang, cfg, dirOut) {
 
 const BASE_CSS = [
   "*{box-sizing:border-box;margin:0}",
-  "html,body{width:100%;height:100%;background:#10110F;color:#F4F1EA;font-family:ui-sans-serif,system-ui,-apple-system,'Apple SD Gothic Neo','Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}",
-  ".stage{position:relative;width:1280px;height:800px;background:radial-gradient(900px 600px at 82% 12%,rgba(255,77,46,.16),transparent 60%),#10110F}",
+  "html,body{width:100%;height:100%;background:#0D1414;color:#EEF5F4;font-family:ui-sans-serif,system-ui,-apple-system,'Apple SD Gothic Neo','Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}",
+  ".stage{position:relative;width:1280px;height:800px;background:radial-gradient(900px 600px at 82% 12%,rgba(89,197,191,.16),transparent 60%),#0D1414}",
   ".copy{position:absolute;left:96px;top:0;bottom:0;width:480px;display:flex;flex-direction:column;justify-content:center;gap:22px}",
-  ".brand{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:650;letter-spacing:-.02em;color:#F4F1EA}",
+  ".brand{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:650;letter-spacing:-.02em;color:#EEF5F4}",
   "h1{font-size:68px;line-height:1.05;font-weight:700;letter-spacing:-.04em;text-wrap:balance;word-break:keep-all}",
-  "h1 em{font-style:normal;color:#FF4D2E}",
-  "p{font-size:24px;line-height:1.4;color:#A8A396;max-width:440px;text-wrap:balance;word-break:keep-all}",
+  "h1 em{font-style:normal;color:#59C5BF}",
+  "p{font-size:24px;line-height:1.4;color:#99ACAB;max-width:440px;text-wrap:balance;word-break:keep-all}",
   ".shot{position:absolute;filter:drop-shadow(0 30px 60px rgba(0,0,0,.55))}",
   ".shot img{display:block;border-radius:22px}",
 ].join("");
@@ -145,11 +145,11 @@ function page(body, extra = "") {
 const brand = '<div class="brand">' + MARK.replaceAll("SIZE", "36") + "<span>" + NAME + "</span></div>";
 const copy = ([h1, p]) => '<div class="copy">' + brand + "<h1>" + h1 + "</h1><p>" + p + "</p></div>";
 
-const CARD_CSS = ".card{position:absolute;left:760px;top:64px;width:380px;height:672px;border-radius:30px;background:linear-gradient(160deg,#2A2B24,#171813 60%,#10110F);border:1px solid rgba(244,241,234,.08);box-shadow:0 30px 60px rgba(0,0,0,.55);overflow:hidden}" +
-  ".orb{position:absolute;left:-60px;top:70px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(255,77,46,.28),transparent 68%)}" +
-  ".blob{position:absolute;left:70px;top:150px;width:240px;height:240px;border-radius:44% 56% 52% 48% / 52% 44% 56% 48%;background:linear-gradient(145deg,rgba(244,241,234,.14),rgba(244,241,234,.03))}" +
-  ".acts{position:absolute;right:22px;bottom:178px;display:flex;flex-direction:column;gap:16px}.acts i{display:block;width:40px;height:40px;border-radius:50%;background:rgba(244,241,234,.12)}" +
-  ".who{position:absolute;left:28px;bottom:180px;display:flex;align-items:center;gap:10px}.who b{display:block;width:34px;height:34px;border-radius:50%;background:rgba(255,77,46,.55)}.who span{display:block;width:110px;height:10px;border-radius:5px;background:rgba(244,241,234,.2)}" +
+const CARD_CSS = ".card{position:absolute;left:760px;top:64px;width:380px;height:672px;border-radius:30px;background:linear-gradient(160deg,#1F2E2D,#111A19 60%,#0D1414);border:1px solid rgba(238,245,244,.08);box-shadow:0 30px 60px rgba(0,0,0,.55);overflow:hidden}" +
+  ".orb{position:absolute;left:-60px;top:70px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(89,197,191,.28),transparent 68%)}" +
+  ".blob{position:absolute;left:70px;top:150px;width:240px;height:240px;border-radius:44% 56% 52% 48% / 52% 44% 56% 48%;background:linear-gradient(145deg,rgba(238,245,244,.14),rgba(238,245,244,.03))}" +
+  ".acts{position:absolute;right:22px;bottom:178px;display:flex;flex-direction:column;gap:16px}.acts i{display:block;width:40px;height:40px;border-radius:50%;background:rgba(238,245,244,.12)}" +
+  ".who{position:absolute;left:28px;bottom:180px;display:flex;align-items:center;gap:10px}.who b{display:block;width:34px;height:34px;border-radius:50%;background:rgba(89,197,191,.55)}.who span{display:block;width:110px;height:10px;border-radius:5px;background:rgba(238,245,244,.2)}" +
   ".chipwrap{position:absolute;left:0;right:0;display:flex;justify-content:center}.chipwrap img{display:block}";
 
 async function render(lang, cfg) {
@@ -177,7 +177,7 @@ async function render(lang, cfg) {
   }
   const tile = await context.newPage();
   await tile.setViewportSize({ width: 440, height: 280 });
-  await tile.setContent('<!doctype html><meta charset="utf-8"><style>*{box-sizing:border-box;margin:0}html,body{width:440px;height:280px;background:radial-gradient(260px 200px at 90% 0%,rgba(255,77,46,.22),transparent 70%),#10110F;color:#F4F1EA;font-family:ui-sans-serif,system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;-webkit-font-smoothing:antialiased}.t{position:absolute;left:32px;right:32px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:16px}h2{font-size:46px;line-height:1.02;font-weight:700;letter-spacing:-.035em}p{font-size:17px;line-height:1.35;color:#A8A396;max-width:340px;text-wrap:balance;word-break:keep-all}p em{font-style:normal;color:#FF4D2E}</style><div class="t">' + MARK.replaceAll("SIZE", "48") + "<h2>" + NAME + "</h2><p>" + cfg.tile + "</p></div>");
+  await tile.setContent('<!doctype html><meta charset="utf-8"><style>*{box-sizing:border-box;margin:0}html,body{width:440px;height:280px;background:radial-gradient(260px 200px at 90% 0%,rgba(89,197,191,.22),transparent 70%),#0D1414;color:#EEF5F4;font-family:ui-sans-serif,system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;-webkit-font-smoothing:antialiased}.t{position:absolute;left:32px;right:32px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:16px}h2{font-size:46px;line-height:1.02;font-weight:700;letter-spacing:-.035em}p{font-size:17px;line-height:1.35;color:#99ACAB;max-width:340px;text-wrap:balance;word-break:keep-all}p em{font-style:normal;color:#59C5BF}</style><div class="t">' + MARK.replaceAll("SIZE", "48") + "<h2>" + NAME + "</h2><p>" + cfg.tile + "</p></div>");
   await tile.screenshot({ path: cfg.tileFile });
   const marquee = await context.newPage();
   await marquee.setViewportSize({ width: 1400, height: 560 });

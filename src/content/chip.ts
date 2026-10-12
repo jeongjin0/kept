@@ -11,21 +11,21 @@ const CSS = [
   ":host { all: initial; }",
   "*, *::before, *::after { box-sizing: border-box; }",
   // A dark body keeps the words readable on any video. The accent border and glow keep the chip itself visible on a dark one.
-  ".chip { position: relative; font: 600 15px/1.2 ui-sans-serif, system-ui, -apple-system, 'Apple SD Gothic Neo', 'Segoe UI', sans-serif; color: #F4F1EA; background: #10110F; border: 1.5px solid #FF4D2E; border-radius: 999px; padding: 8px 8px 8px 10px; display: flex; gap: 12px; align-items: center; box-shadow: 0 0 22px rgba(255, 77, 46, 0.5), 0 12px 30px rgba(0, 0, 0, 0.55); animation: in 120ms ease-out both; white-space: nowrap; }",
+  ".chip { position: relative; font: 600 15px/1.2 ui-sans-serif, system-ui, -apple-system, 'Apple SD Gothic Neo', 'Segoe UI', sans-serif; color: #EEF5F4; background: #0D1414; border: 1.5px solid #59C5BF; border-radius: 999px; padding: 8px 8px 8px 10px; display: flex; gap: 12px; align-items: center; box-shadow: 0 0 22px rgba(89, 197, 191, 0.4), 0 12px 30px rgba(0, 0, 0, 0.55); animation: in 120ms ease-out both; white-space: nowrap; }",
   // One ring that widens and fades when the chip appears, to catch the eye without moving the chip.
-  ".chip::after { content: ''; position: absolute; inset: -1.5px; border: 2px solid #FF4D2E; border-radius: inherit; pointer-events: none; animation: ping 700ms ease-out both; }",
+  ".chip::after { content: ''; position: absolute; inset: -1.5px; border: 2px solid #59C5BF; border-radius: inherit; pointer-events: none; animation: ping 700ms ease-out both; }",
   ".chip.leaving { animation: out 200ms ease-out both; }",
   ".chip.leaving::after { display: none; }",
   ".chip.stack { flex-direction: column; align-items: stretch; border-radius: 20px; padding: 14px; gap: 12px; white-space: normal; max-width: 300px; }",
-  ".dot { width: 28px; height: 28px; border-radius: 50%; background: #FF4D2E; color: #10110F; display: grid; place-items: center; flex: none; }",
+  ".dot { width: 28px; height: 28px; border-radius: 50%; background: #59C5BF; color: #031A19; display: grid; place-items: center; flex: none; }",
   ".dot svg { display: block; }",
   ".label { font-variant-numeric: tabular-nums; }",
   ".actions { display: flex; gap: 8px; }",
-  "button { font: inherit; font-weight: 600; color: #F4F1EA; background: rgba(244, 241, 234, 0.12); border: 0; border-radius: 999px; min-height: 34px; padding: 8px 15px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: background 180ms ease-out; }",
-  "button:hover { background: rgba(244, 241, 234, 0.18); }",
-  "button:focus-visible { outline: 2px solid #FF4D2E; outline-offset: 2px; }",
-  "button.primary { background: #FF4D2E; color: #10110F; }",
-  "button.primary:hover { background: #FF6446; }",
+  "button { font: inherit; font-weight: 600; color: #EEF5F4; background: rgba(238, 245, 244, 0.12); border: 0; border-radius: 999px; min-height: 34px; padding: 8px 15px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: background 180ms ease-out; }",
+  "button:hover { background: rgba(238, 245, 244, 0.18); }",
+  "button:focus-visible { outline: 2px solid #59C5BF; outline-offset: 2px; }",
+  "button.primary { background: #59C5BF; color: #031A19; }",
+  "button.primary:hover { background: #6AD6CF; }",
   "@keyframes in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }",
   "@keyframes ping { from { inset: -1.5px; opacity: 0.85; } to { inset: -11px; opacity: 0; } }",
   "@keyframes out { from { opacity: 1; } to { opacity: 0; } }",
@@ -171,7 +171,7 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
       if (model.mode === "skipped") {
         const dot = document.createElement("span");
         dot.className = "dot";
-        dot.append(svgIcon("forward", 12));
+        dot.append(svgIcon("streak", 16));
         const label = document.createElement("span");
         label.className = "label";
         label.textContent = skippedLabel(model);

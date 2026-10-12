@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.0 – 2026-10-13
+
+- New look. The accent is a calm teal instead of the orange-red, and the dark surfaces, text and borders share its hue. The old accent was about twice as saturated as the surfaces around it and shouted. The new one is picked at one lightness and one chroma, so no other hue would have looked stronger (the comparison is in [qa/color-study.md](qa/color-study.md)).
+- New mark. Three streaks of unequal strength run behind a play triangle: videos passed, and the next one. It replaces the door. The toolbar icon, the popup and settings header, the skip chip's dot and the store images use it.
+- How a video is judged and skipped is unchanged. Settings, storage and permissions are unchanged.
+
+
 ## 0.5.3 – 2026-10-12
 
 - Hardened the subscribe and follow buttons. A Short labelled "Subscribed to …" or "…구독중", and a Reel labelled "Following …" or "Unfollow", now counts. A caption that merely mentions subscribing still does not.
