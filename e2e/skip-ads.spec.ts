@@ -73,12 +73,13 @@ function page(site: Site, items: Item[], flag: "data" | "label"): string {
       + 'document.querySelector("[aria-label=\\"Previous reel\\"]").onclick=()=>{window.fixtureMoves--;show(index-1);};');
 }
 
-async function start(extension: Awaited<ReturnType<typeof launch>>, site: Site, flag: "data" | "label") {
+// ads: the Skip ads value to start from. Without it the page starts from the default, which is on.
+async function start(extension: Awaited<ReturnType<typeof launch>>, site: Site, flag: "data" | "label", ads?: boolean) {
   const { context, worker } = extension;
-  await worker.evaluate(async () => {
+  await worker.evaluate(async (skipAds) => {
     const { settings } = await chrome.storage.local.get("settings");
-    await chrome.storage.local.set({ settings: { ...settings, enabled: false } });
-  });
+    await chrome.storage.local.set({ settings: { ...settings, enabled: false, ...(skipAds === undefined ? {} : { skipAds }) } });
+  }, ads);
   await context.route("https://www." + HOSTS[site] + "/**", async (route) => {
     if (site === "tiktok" && new URL(route.request().url()).pathname === "/api/item_list") {
       await route.fulfill({ contentType: "application/json", body: JSON.stringify({ items: FEED.map((item) => ({ id: item.id, isAd: item.ad ? true : undefined, author: { uniqueId: "creator" }, stats: { diggCount: item.likes, playCount: 100000, commentCount: 100 } })) }) });
@@ -102,22 +103,19 @@ const fixtureId = (tab: Awaited<ReturnType<typeof start>>["tab"]) => tab.evaluat
 const count = (extension: Awaited<ReturnType<typeof launch>>) => extension.worker.evaluate(async () => (await chrome.storage.local.get("dailySkips")).dailySkips?.count ?? 0);
 
 for (const site of ["youtube", "tiktok", "instagram"] as const) {
-  test(site + ": an ad stays by default, is skipped once Skip ads is on, and Undo brings it back", async ({ extension }) => {
+  test(site + ": an ad is skipped by default, Undo brings it back, and the popup switch turns it off", async ({ extension }) => {
     const { context, id } = extension;
     const { tab, errors } = await start(extension, site, "data");
 
-    // Default: the ad with 125 likes sits under the 5,000 minimum and still stays.
-    await tab.waitForTimeout(3000);
-    expect(await fixtureId(tab), "ads stay by default").toBe(AD1);
-    expect(await count(extension)).toBe(0);
-
-    // The real popup switch turns it on and applies to the ad already on screen.
-    const popup = await open(context, id, "popup.html");
-    await popup.getByRole("switch", { name: /Skip ads|광고 건너뛰기/ }).click();
-    await expect.poll(async () => (await stored(popup)).skipAds).toBe(true);
+    // Default: Skip ads is on. The ad with 125 likes is skipped as soon as it is known to be one, and the chip says why.
     await expect.poll(() => fixtureId(tab)).toBe(NORMAL1);
     await expect(tab.locator("#scrollplus-chip-host")).toContainText(/Skipped · ad|넘김 · 광고/);
     expect(await count(extension)).toBe(1);
+
+    const popup = await open(context, id, "popup.html");
+    const adsSwitch = popup.getByRole("switch", { name: /Skip ads|광고 건너뛰기/ });
+    await expect(adsSwitch).toHaveAttribute("aria-checked", "true");
+    expect((await stored(popup)).skipAds).toBe(true);
 
     // The ordinary video after the ad stays, even though the ad's leftovers are still on the page
     // for a moment. Undo is still on offer for 2.5 seconds, so use it after watching for a while.
@@ -142,18 +140,39 @@ for (const site of ["youtube", "tiktok", "instagram"] as const) {
     await expect.poll(() => fixtureId(tab)).toBe(NORMAL2);
     await expect.poll(() => count(extension)).toBe(2);
 
-    // Switching it off again keeps ads once more.
-    await popup.getByRole("switch", { name: /Skip ads|광고 건너뛰기/ }).click();
+    // The real popup switch turns it off.
+    await adsSwitch.click();
+    await expect(adsSwitch).toHaveAttribute("aria-checked", "false");
     await expect.poll(async () => (await stored(popup)).skipAds).toBe(false);
+    expect(errors).toEqual([]);
+  });
+
+  test(site + ": an ad stays while Skip ads is switched off, and the popup switch applies to the ad on screen", async ({ extension }) => {
+    const { context, id } = extension;
+    const { tab, errors } = await start(extension, site, "data", false);
+
+    // Off: the ad with 125 likes sits under the 500 minimum and still stays.
+    await tab.waitForTimeout(3000);
+    expect(await fixtureId(tab), "ads stay while the switch is off").toBe(AD1);
+    expect(await count(extension)).toBe(0);
+
+    const popup = await open(context, id, "popup.html");
+    const adsSwitch = popup.getByRole("switch", { name: /Skip ads|광고 건너뛰기/ });
+    await expect(adsSwitch).toHaveAttribute("aria-checked", "false");
+    await adsSwitch.click();
+    await expect.poll(async () => (await stored(popup)).skipAds).toBe(true);
+    await expect.poll(() => fixtureId(tab)).toBe(NORMAL1);
+    await expect(tab.locator("#scrollplus-chip-host")).toContainText(/Skipped · ad|넘김 · 광고/);
+    expect(await count(extension)).toBe(1);
     expect(errors).toEqual([]);
   });
 }
 
 test("instagram: an ad known only by its visible disclosure is skipped when Skip ads is on, and kept when it is off", async ({ extension }) => {
   const { worker } = extension;
-  const { tab, errors } = await start(extension, "instagram", "label");
+  const { tab, errors } = await start(extension, "instagram", "label", false);
   await tab.waitForTimeout(3000);
-  expect(await fixtureId(tab), "ads stay by default").toBe(AD1);
+  expect(await fixtureId(tab), "ads stay while the switch is off").toBe(AD1);
   await worker.evaluate(async () => {
     const { settings } = await chrome.storage.local.get("settings");
     await chrome.storage.local.set({ settings: { ...settings, skipAds: true } });

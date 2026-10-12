@@ -14,17 +14,21 @@ Installed means on. No account, no setup.</p>
 
 Scroll like you always do. When a video has fewer likes than your minimum, ScrollPlus moves to the next one and tells you why. The Undo button appears for a few seconds; a video you restore stays for the browser session, including reloads and new tabs.
 
-The default is simple: **skip anything under 5,000 likes**. Pick a different level in the popup, or set your own numbers in Settings.
+The default is simple: **skip anything under 500 likes**. Pick a different level in the popup, or set your own numbers in Settings.
 
 | Preset | Skips videos under |
 | --- | --- |
-| Lenient | 1,000 likes |
-| Balanced (default) | 5,000 likes |
-| Strict | 20,000 likes |
+| Lenient | 100 likes |
+| Balanced (default) | 500 likes |
+| Strict | 1,000 likes |
 
-In Settings you can also turn on a minimum for comments or views, switch a site off, and keep creators you like. Numbers can be typed the way you say them: `5k`, `2만`, `1,000`.
+In Settings you can also turn on a minimum for comments or views, switch a site off, and keep creators you like. Numbers can be typed the way you say them: `500`, `5k`, `2만`, `1,000`.
 
-**Skip ads** is a switch in the popup, off by default. Ads stay unless you turn it on, whatever their like count. Once it is on, ScrollPlus also moves past an ad as soon as the site marks it as one, with the same reason chip ("Skipped · ad") and Undo. It only moves past the ad that fills the player. It does not block ad requests or hide anything in lists.
+**Skip ads** is a switch in the popup, on by default. ScrollPlus moves past an ad as soon as the site marks it as one, whatever its like count, with the same reason chip ("Skipped · ad") and Undo. Turn the switch off and ads stay. It only moves past the ad that fills the player. It does not block ad requests or hide anything in lists.
+
+**Time saved.** Under today's count the popup shows how much time the skips have saved so far, for example "≈ 1h 3m saved so far", and Settings adds the total number of skips. It is an estimate: each skip counts as about 3 seconds you would have spent on the video before swiping it away yourself, minus the time it stayed on screen. Settings explains the estimate. The figures are counted on your device, from the day you installed or updated to 0.5.0.
+
+**The skip chip** tells you why a video was skipped and has Undo. It sits at the top of the video, centred on it, with a border and glow so that it is seen on a dark video too. Settings can move it to the middle or to a lower place above the caption.
 
 A skip is the site's own Next control, pressed for you, so you see the usual slide to the next video. On YouTube Shorts a skipped video is on screen for about half a second, and it is muted meanwhile. That half second is YouTube's own pace between moves ([timing](qa/skip-timing.md)). On TikTok a skipped video is on screen for about 0.4 s, with its sound on: TikTok takes a mute made by a script as your own choice, so ScrollPlus leaves it alone ([timing](qa/skip-timing-tiktok.md)). Instagram Reels has not been measured.
 
@@ -40,7 +44,8 @@ ScrollPlus is a public beta, installed from a GitHub release for now (see below)
 - Tried on real feeds: YouTube Shorts (a 24-hour automated run on 0.3.5, with two page-reload recoveries), TikTok For You, and Instagram Reels in a signed-in browser. Instagram Reels is the newest and least exercised site.
 - Known issue: on YouTube Shorts the feed can occasionally stop responding to scroll and Next while the video keeps playing; reloading the page fixes it. In long automated runs this was YouTube's own request for more Shorts failing with a server error, and it also happens without ScrollPlus ([details](qa/soak.md#youtube-shorts-feed-stalls-youtubes-feed-request-fails)).
 - Skip pacing: measured on live YouTube Shorts, on signed-out TikTok For You and on signed-in Instagram Reels ([YouTube](qa/skip-timing.md), [TikTok](qa/skip-timing-tiktok.md), [Instagram](qa/skip-timing-instagram.md)). The median skipped video stays on screen for 0.31 s on TikTok (0.58 s on 0.4.1) and the median skipped reel for 0.32 s on Instagram (0.62 s on 0.4.2). The Instagram figures come from the built scripts run in the page behind a stand-in for chrome.storage, not from an installed extension.
-- Skip ads: checked on real YouTube Shorts ads (65 of 65 first-time ads skipped with it on, none with it off). On TikTok and Instagram it rests on the sites' own ad flags and was checked on controlled pages only ([details](qa/ads.md)).
+- Skip ads (on by default since 0.5.0): checked on real YouTube Shorts ads with 0.4.x (65 of 65 first-time ads skipped with it on, none with it off), and a live Shorts ad was skipped by the 0.5.0 build. On TikTok and Instagram it rests on the sites' own ad flags and was checked on controlled pages only ([details](qa/ads.md)).
+- Time saved is an estimate that rests on one assumption, 3 seconds for each video you would have swiped away yourself. It is not measured on you.
 - Not yet established: ordinary day-long use, and the Instagram advertisement guard on a live advertisement.
 
 Each claim is scoped in [release readiness](qa/release-readiness.md). More: [signed-in QA](qa/signed-in-smoke.md), [long feed QA](qa/soak.md), [UI audit](qa/ui-audit.md), [session Undo QA](qa/session-undo.md).
@@ -49,7 +54,7 @@ Each claim is scoped in [release readiness](qa/release-readiness.md). More: [sig
 
 It is not on the Chrome Web Store yet. The quickest way to try the current beta is the zip on the [GitHub beta releases page](https://github.com/jeongjin0/scrollplus/releases): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked.
 
-To update a beta, replace the contents of the unpacked folder you already loaded with the new ZIP's files, then click Reload on the ScrollPlus card in `chrome://extensions`. Keep only one copy enabled. Extension reloads clear temporary Undo choices.
+To update a beta, replace the contents of the unpacked folder you already loaded with the new ZIP's files, then click Reload on the ScrollPlus card in `chrome://extensions`. Keep only one copy enabled. Extension reloads clear temporary Undo choices. Updating from 0.4.x moves your settings once: each preset keeps its name (Balanced is 500 likes now, it was 5,000), a rule of your own stays as it is, and Skip ads turns on.
 
 To build it yourself:
 
@@ -79,7 +84,7 @@ The product rules are in [SPEC.md](SPEC.md). QA notes are in [qa/](qa). Contribu
 
 ## Privacy
 
-ScrollPlus reads the counts the page has already loaded and decides on your device. Settings and today's skip count stay in Chrome storage; Undo choices stay only in memory until browser restart or Reset. Nothing is collected or sent anywhere. See [PRIVACY.md](PRIVACY.md).
+ScrollPlus reads the counts the page has already loaded and decides on your device. Settings, today's skip count and the all-time total (how many skips, and how long those videos were on screen) stay in Chrome storage; Undo choices stay only in memory until browser restart or Reset. Nothing is collected or sent anywhere. See [PRIVACY.md](PRIVACY.md).
 
 ScrollPlus is not affiliated with YouTube, TikTok, Instagram, or GitHub. The GitHub mark in the popup and on the settings page only links to this repository.
 

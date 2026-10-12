@@ -22,7 +22,9 @@ export interface EngineDeps {
   now: () => number;
   advance: (reason: SkipReason) => Promise<boolean>;
   retreat: () => Promise<boolean>;
-  onSkipped: () => void;
+  // A skip went through. onScreenMs: how long the skipped video was the active one, from the moment it was first seen to the moment the
+  // site had moved on from it.
+  onSkipped: (onScreenMs: number) => void;
   setRule: (next: Rule) => void;
   isBlocked: () => boolean;
   render: (chip: ChipModel | null) => void;
@@ -132,6 +134,8 @@ export function createEngine(deps: EngineDeps) {
     const decision = judge(current);
     if (decision.action !== "skip") return;
     const now = deps.now();
+    // The next video can arrive while the site is still moving, and then seenAt is already its own.
+    const shownAt = seenAt;
     const gap = Math.max(advanceGapMs - (now - lastAdvanceAt), settleMs - (now - seenAt));
     if (gap > 0) {
       if (skipQueuedFor === item.id) return;
@@ -187,7 +191,7 @@ export function createEngine(deps: EngineDeps) {
     lastSkippedId = item.id;
     lastAdvanceAt = deps.now();
     consecutive += 1;
-    deps.onSkipped();
+    deps.onSkipped(Math.max(0, lastAdvanceAt - shownAt));
     if (consecutive >= SKIP_CAP) {
       paused = true;
       showPaused();

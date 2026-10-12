@@ -31,7 +31,18 @@ export type Rule = Record<Metric, Condition>;
 export type PresetName = "lenient" | "balanced" | "strict";
 export const PRESETS: PresetName[] = ["lenient", "balanced", "strict"];
 
+// Where the skip chip sits over the video, centred on it: high up, in the middle, or low but above the caption.
+export type ChipPosition = "top" | "middle" | "lower";
+export const CHIP_POSITIONS: ChipPosition[] = ["top", "middle", "lower"];
+
 export const PRESET_LIKES: Record<PresetName, number> = {
+  lenient: 100,
+  balanced: 500,
+  strict: 1000,
+};
+
+// Before 0.5.0 the presets were 1,000, 5,000 and 20,000 likes. Only the migration below reads these.
+const LEGACY_PRESET_LIKES: Record<PresetName, number> = {
   lenient: 1000,
   balanced: 5000,
   strict: 20000,
@@ -50,6 +61,7 @@ export interface Settings {
   platforms: Record<Platform, boolean>;
   filterGrids: boolean;
   showSkipChip: boolean;
+  chipPosition: ChipPosition;
   skipAds: boolean;
   allowlist: AllowEntry[];
 }
@@ -57,6 +69,10 @@ export interface Settings {
 export const REPO_URL = "https://github.com/jeongjin0/scrollplus";
 export const STORAGE_SETTINGS = "settings";
 export const STORAGE_DAILY = "dailySkips";
+export const STORAGE_TOTALS = "totalSkips";
+export const STORAGE_SCHEMA = "schema";
+// 1 (no marker): 0.4.x and earlier, presets of 1,000 / 5,000 / 20,000 likes and Skip ads off. 2: 0.5.0, presets of 100 / 500 / 1,000 and Skip ads on.
+export const SCHEMA_VERSION = 2;
 
 export function presetRule(name: PresetName, base?: Rule): Rule {
   return {
@@ -90,13 +106,21 @@ export const DEFAULT_SETTINGS: Settings = {
   platforms: { youtube: true, tiktok: true, instagram: true },
   filterGrids: false,
   showSkipChip: true,
-  skipAds: false,
+  chipPosition: "top",
+  skipAds: true,
   allowlist: [],
 };
 
 export interface DailySkips {
   day: string;
   count: number;
+}
+
+// Everything since the first skip counted by 0.5.0: how many skips, and for how long those videos were on screen before ScrollPlus moved on.
+export interface TotalSkips {
+  since: string;
+  count: number;
+  onScreenMs: number;
 }
 
 export function localDay(date = new Date()): string {
@@ -212,9 +236,24 @@ export function normalizeSettings(value: unknown): Settings {
     },
     filterGrids: raw.filterGrids === true,
     showSkipChip: raw.showSkipChip !== false,
-    skipAds: raw.skipAds === true,
+    chipPosition: CHIP_POSITIONS.find((position) => position === raw.chipPosition) ?? "top",
+    skipAds: raw.skipAds !== false,
     allowlist,
   };
+}
+
+// The one-time move from the 0.4.x settings to the 0.5.0 ones, run by the background worker when the schema marker is missing.
+// - A rule that is exactly a 0.4.x preset keeps its name, so Lenient stays Lenient and Strict stays Strict even though their numbers
+//   are 10x and 20x lower now. Without this a saved Lenient (1,000) would read as the new Strict and 5,000 and 20,000 as Custom.
+//   Any other rule is the person's own and stays as it is.
+// - Skip ads is on by default from 0.5.0. A saved "off" is also what a person who never touched the switch has, so it turns on once.
+export function migrateSettings(value: unknown): Settings {
+  const settings = normalizeSettings(value);
+  const saved = value && typeof value === "object" ? (value as Record<string, unknown>).rule : undefined;
+  const { likes, comments, views } = settings.rule;
+  // Only a rule that was saved as numbers is on the old scale. Settings from 0.1.x hold a word (sensitivity), which was read on the new one.
+  const legacy = saved && typeof saved === "object" && likes.on && !comments.on && !views.on ? PRESETS.find((name) => LEGACY_PRESET_LIKES[name] === likes.min) : undefined;
+  return { ...settings, rule: legacy ? presetRule(legacy, settings.rule) : settings.rule, skipAds: true };
 }
 
 export function emptyMetrics(): Metrics {

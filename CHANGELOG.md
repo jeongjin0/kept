@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0 – 2026-10-12
+
+- The presets are 100, 500 and 1,000 likes. Lenient, Balanced and Strict were 1,000, 5,000 and 20,000. Balanced, the default, skips videos under 500 likes. Updating from 0.4.x moves your settings once, by name: if you were on Balanced you are on Balanced, now at 500, and the same for Lenient and Strict. A rule of your own (a number that is none of the three, or comments or views turned on) stays exactly as it was.
+- Skip ads is on by default. It also turns on once for an install updated from 0.4.x, because a saved "off" cannot be told from a switch nobody touched. The switch in the popup turns it off again, and that stays.
+- The skip chip is easier to see. It sits at the top of the video, centred on it, and not at the bottom of the window where it covered the caption and, over a dark video, could not be told from the video. It has a dark body with an accent border and glow, larger text, larger buttons and a ring that widens when it appears. New in Settings: Skip chip position, Top (default), Middle or Lower (above the caption). The chip stays inside the window on a narrow one.
+- Time saved. The popup shows an estimate of the time the skips have saved so far, and Settings shows today's skips, the skips in all and the time saved, with how it is estimated: each skip counts as about 3 seconds you would have spent on the video before swiping it away yourself, less the time it stayed on screen (a slow skip saves nothing, it never takes time away). The 3 seconds is an assumption, not a measurement of you. The count starts when you install or update. New storage keys: `totalSkips` (start day, number of skips, summed time on screen) and `schema`. Reset keeps both. PRIVACY.md lists them. Nothing leaves the device.
+- How a video is judged and skipped is unchanged. The page scripts differ from 0.4.4's in the chip (its look and place) and in reporting, with each skip, how long that video was on screen.
+
 ## 0.4.4 – 2026-10-12
 
 - Settings opens in a tab of its own, from the popup's Settings link and from the extension's card on chrome://extensions. It used to open in the small dialog that chrome://extensions shows for an options page. The tab carries the ScrollPlus icon and a title in your language.

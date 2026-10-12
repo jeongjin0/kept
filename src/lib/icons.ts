@@ -1,6 +1,7 @@
 export type IconName =
   | "power" | "heart" | "comment" | "eye" | "youtube" | "tiktok" | "reels" | "sliders" | "github" | "grid"
-  | "pill" | "trash" | "plus" | "minus" | "reset" | "user" | "check" | "undo" | "forward" | "megaphone";
+  | "pill" | "trash" | "plus" | "minus" | "reset" | "user" | "check" | "undo" | "forward" | "megaphone"
+  | "clock" | "chipTop" | "chipMiddle" | "chipLower";
 
 export type Shape =
   | { t: "path"; d: string; fill?: boolean }
@@ -35,6 +36,11 @@ export const ICONS: Record<IconName, Shape[]> = {
   undo: [p("M5.4 3.2 2.8 5.8l2.6 2.6"), p("M3 5.8h6.2a3.5 3.5 0 0 1 0 7H6.4")],
   forward: [p("M3.6 3.8 9 8l-5.4 4.2V3.8Z"), p("M12.4 3.4v9.2")],
   megaphone: [p("M2.6 6.2h2.2l5.6-2.8v9.2L4.8 9.8H2.6a.8.8 0 0 1-.8-.8V7a.8.8 0 0 1 .8-.8Z"), p("M5 9.9l.8 2.9h1.8l-.6-2.4"), p("M12.6 6.4a2.6 2.6 0 0 1 0 3.2")],
+  clock: [c(8, 8, 5.8), p("M8 4.8V8l2.2 1.4")],
+  // A video with the chip drawn as a short bar: high up, in the middle, low.
+  chipTop: [r(3.6, 1.6, 8.8, 12.8, 2.2), p("M6.2 4.9h3.6")],
+  chipMiddle: [r(3.6, 1.6, 8.8, 12.8, 2.2), p("M6.2 8h3.6")],
+  chipLower: [r(3.6, 1.6, 8.8, 12.8, 2.2), p("M6.2 11.1h3.6")],
 };
 
 const NS = "http://www.w3.org/2000/svg";

@@ -3,6 +3,7 @@ import { incrementSkips, loadSettings, saveSettings } from "../lib/storage";
 import { loadUndoKeeps, rememberUndo, validVideoId, type UndoView } from "../lib/session-keep";
 import { createEngine, type EngineItem, type SkipReason } from "./engine";
 import { mountChip } from "./chip";
+import { mostVisibleVideo } from "./page";
 import type { ExtractedItem } from "../platforms/extract";
 
 export interface Adapter {
@@ -44,11 +45,14 @@ export function startFilter(adapter: Adapter): void {
   const sessionKeep = new Set<string>();
   const cache = new Map<string, ExtractedItem>();
   let pointerDown = false;
-  const chip = mountChip({
-    undo: () => engine.undo(),
-    keepGoing: () => engine.keepGoing(),
-    lower: () => engine.lower(),
-  });
+  const chip = mountChip(
+    {
+      undo: () => engine.undo(),
+      keepGoing: () => engine.keepGoing(),
+      lower: () => engine.lower(),
+    },
+    { position: () => settings.chipPosition, anchor: () => mostVisibleVideo() },
+  );
   const engine = createEngine({
     getSettings: () => settings,
     now: () => Date.now(),
@@ -57,8 +61,8 @@ export function startFilter(adapter: Adapter): void {
     ready: adapter.ready,
     advance: (reason) => adapter.advance(reason),
     retreat: () => adapter.retreat(),
-    onSkipped: () => {
-      void incrementSkips();
+    onSkipped: (onScreenMs) => {
+      void incrementSkips(onScreenMs);
     },
     setRule: (next) => {
       settings = { ...settings, rule: next };

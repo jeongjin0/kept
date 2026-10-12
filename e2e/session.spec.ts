@@ -13,19 +13,21 @@ test("concurrent Undo choices remain in memory only and Reset keeps saved creato
     expect(before.memory.items.youtube).toHaveLength(6);
     expect(before.memory.items.tiktok).toHaveLength(6);
     expect(before.memory.revision).toBe(12);
-    expect(Object.keys(before.local).sort()).toEqual(["dailySkips", "settings"]);
+    expect(Object.keys(before.local).sort()).toEqual(["dailySkips", "schema", "settings", "totalSkips"]);
     await app.evaluate(async () => {
       const data = await chrome.storage.local.get("settings");
       await chrome.storage.local.set({ settings: { ...data.settings, allowlist: [{ platform: "youtube", id: "saved-creator" }], rule: { ...data.settings.rule, likes: { on: true, min: 20000 } } } });
     });
     await app.getByRole("button", { name: /Reset to defaults|기본값으로 되돌리기/ }).click();
-    await expect.poll(async () => (await stored(app)).rule.likes.min).toBe(5000);
+    await expect.poll(async () => (await stored(app)).rule.likes.min).toBe(500);
     expect((await stored(app)).allowlist).toEqual([{ platform: "youtube", id: "saved-creator" }]);
     const after = await app.evaluate(async () => ({ memory: (await chrome.storage.session.get("undoKeeps")).undoKeeps, local: await chrome.storage.local.get(null) }));
     expect(after.memory.items).toEqual({});
     expect(after.memory.revision).toBe(13);
     expect(after.local.dailySkips).toEqual(before.local.dailySkips);
-    expect(Object.keys(after.local).sort()).toEqual(["dailySkips", "settings"]);
+    expect(Object.keys(after.local).sort()).toEqual(["dailySkips", "schema", "settings", "totalSkips"]);
+    // Reset is for settings. What the skips have added up to stays.
+    expect(after.local.totalSkips).toEqual(before.local.totalSkips);
   } finally { await context.close(); }
 });
 

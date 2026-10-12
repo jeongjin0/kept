@@ -108,7 +108,7 @@
     "message": "Could not reset. Try again."
   },
   "privacy": {
-    "message": "Settings and today's count stay here. Undo is temporary. Nothing is collected or sent."
+    "message": "Settings, your counts and the time saved stay here. Undo is temporary. Nothing is collected or sent."
   },
   "chipLikes": {
     "message": "Skipped · $COUNT$ likes",
@@ -184,5 +184,47 @@
   },
   "chipAd": {
     "message": "Skipped · ad"
+  },
+  "savedValue": {
+    "message": "≈ $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "3h 12m"
+      }
+    }
+  },
+  "savedLabel": {
+    "message": "saved so far"
+  },
+  "savedTitle": {
+    "message": "An estimate. Each skip counts as about 3 seconds you would have spent on the video before swiping it away yourself, minus the time it stayed on screen."
+  },
+  "statTotal": {
+    "message": "skipped in total"
+  },
+  "statSaved": {
+    "message": "time saved (est.)"
+  },
+  "statSince": {
+    "message": "Counted since $DATE$.",
+    "placeholders": {
+      "date": {
+        "content": "$1",
+        "example": "Oct 12"
+      }
+    }
+  },
+  "chipPositionTitle": {
+    "message": "Skip chip position"
+  },
+  "posTop": {
+    "message": "Top"
+  },
+  "posMiddle": {
+    "message": "Middle"
+  },
+  "posLower": {
+    "message": "Lower"
   }
 }

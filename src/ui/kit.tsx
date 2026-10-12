@@ -1,7 +1,8 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { ICONS, type IconName } from "../lib/icons";
 import { formatCount, parseCount, stepValue } from "../lib/numbers";
-import { PRESETS, PRESET_LIKES, type PresetName } from "../lib/score";
+import { PRESETS, PRESET_LIKES, type PresetName, type TotalSkips } from "../lib/score";
+import { formatDay, formatDuration, savedMs } from "../lib/saved";
 import { t } from "../lib/i18n";
 
 export function Icon(props: { name: IconName; size?: number }) {
@@ -174,11 +175,66 @@ export function GitHubLink(props: { href: string }) {
   );
 }
 
-export function Hero(props: { count: number }) {
+// The popup's top card: today's count, and under it what the skips have saved so far.
+export function Hero(props: { count: number; totals: TotalSkips }) {
   return (
     <div className="hero" aria-live="polite">
-      <span className="big">{props.count.toLocaleString()}</span>
-      <span className="hero-label">{t("skippedToday")}</span>
+      <div className="hero-top">
+        <span className="big">{props.count.toLocaleString()}</span>
+        <span className="hero-label">{t("skippedToday")}</span>
+      </div>
+      <div className="hero-saved" title={t("savedTitle")}>
+        <Icon name="clock" size={13} />
+        <b>{t("savedValue", formatDuration(savedMs(props.totals), "narrow"))}</b>
+        <span>{t("savedLabel")}</span>
+      </div>
+    </div>
+  );
+}
+
+// Settings page: today, all time, and the estimated time saved, with how the estimate is made.
+export function Stats(props: { count: number; totals: TotalSkips }) {
+  return (
+    <div className="stats-block">
+      <div className="stats" aria-live="polite">
+        <div className="stat">
+          <span className="big">{props.count.toLocaleString()}</span>
+          <span className="hero-label">{t("skippedToday")}</span>
+        </div>
+        <div className="stat">
+          <span className="big">{props.totals.count.toLocaleString()}</span>
+          <span className="hero-label">{t("statTotal")}</span>
+        </div>
+        <div className="stat saved">
+          <span className="big">{formatDuration(savedMs(props.totals), "narrow")}</span>
+          <span className="hero-label">{t("statSaved")}</span>
+        </div>
+      </div>
+      <p className="stats-note">{t("savedTitle")} {t("statSince", formatDay(props.totals.since))}</p>
+    </div>
+  );
+}
+
+export function Segmented<T extends string>(props: { value: T; options: Array<{ value: T; label: string; icon: IconName }>; label: string; disabled?: boolean; onChange: (next: T) => void }) {
+  const index = props.options.findIndex((option) => option.value === props.value);
+  const focusRef = useRef<Array<HTMLButtonElement | null>>([]);
+  function onKey(event: KeyboardEvent<HTMLDivElement>) {
+    if (props.disabled || (event.key !== "ArrowRight" && event.key !== "ArrowLeft")) return;
+    event.preventDefault();
+    const count = props.options.length;
+    const next = ((index < 0 ? 0 : index) + (event.key === "ArrowRight" ? 1 : count - 1)) % count;
+    props.onChange(props.options[next].value);
+    focusRef.current[next]?.focus();
+  }
+  return (
+    <div className={props.disabled ? "presets simple disabled" : "presets simple"} role="radiogroup" aria-label={props.label} aria-disabled={props.disabled || undefined} onKeyDown={onKey} style={{ gridTemplateColumns: "repeat(" + props.options.length + ", 1fr)" }}>
+      <span className="thumb-slide" style={{ width: "calc((100% - 6px) / " + props.options.length + ")", transform: "translateX(" + Math.max(index, 0) * 100 + "%)", opacity: index < 0 ? 0 : 1 }} />
+      {props.options.map((option, position) => (
+        <button key={option.value} ref={(node) => { focusRef.current[position] = node; }} type="button" role="radio" disabled={props.disabled} aria-checked={props.value === option.value} tabIndex={props.value === option.value || (index < 0 && position === 0) ? 0 : -1} className={props.value === option.value ? "preset on" : "preset"} onClick={() => props.onChange(option.value)}>
+          <Icon name={option.icon} size={16} />
+          <strong>{option.label}</strong>
+        </button>
+      ))}
     </div>
   );
 }

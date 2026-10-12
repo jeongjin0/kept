@@ -8,8 +8,10 @@ Persistent Chrome storage on this device holds only:
 
 - `settings`: the on/off switch, your rule (which of likes, comments, and views are on, and each minimum), per-site switches, the Skip ads option, grid option, chip option, and creator allowlist
 - `dailySkips`: today's date and how many videos were skipped today
+- `totalSkips`: the day counting started, how many videos were skipped in all, and, added up, for how long those videos were on screen before ScrollPlus moved on. The popup and Settings use it to estimate the time saved
+- `schema`: a number that marks which version of the settings is stored, so that an update moves old settings only once
 
-The daily count resets at local midnight. It does not store watch history or video ids. A creator you choose to keep is stored in `settings` until you remove it.
+The daily count resets at local midnight. The total does not reset unless you remove the extension. None of it is watch history: it holds no video ids, titles or creators, and no times of day, only two sums and a start date. It does not store watch history or video ids. A creator you choose to keep is stored in `settings` until you remove it.
 
 `undoKeeps` in `chrome.storage.session` temporarily remembers videos you choose to Undo, grouped by site, so they stay through reloads and new tabs. This is RAM only, not disk storage or watch history. It clears on browser restart, extension reload/update/disable, or Reset to defaults. Content scripts receive only their site's choices through the background worker; the storage area stays trusted-only. See [Chrome's session-storage documentation](https://developer.chrome.com/docs/extensions/reference/api/storage#property-session).
 

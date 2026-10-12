@@ -18,8 +18,8 @@ for (const platform of ["tiktok", "instagram"] as const) {
       await chrome.storage.local.set({ settings: { ...settings, enabled: false } });
     });
     const item = (index: number) => platform === "tiktok"
-      ? { id: String(100000 + index), author: { uniqueId: "fixture" }, stats: { diggCount: index ? 8000 : 6000, playCount: 100000, commentCount: 100 } }
-      : { code: "reel" + index, user: { username: "fixture" }, like_count: index ? 8000 : 6000, play_count: 100000, comment_count: 100 };
+      ? { id: String(100000 + index), author: { uniqueId: "fixture" }, stats: { diggCount: index ? 8000 : 900, playCount: 100000, commentCount: 100 } }
+      : { code: "reel" + index, user: { username: "fixture" }, like_count: index ? 8000 : 900, play_count: 100000, comment_count: 100 };
     const initial = JSON.stringify({ items: Array.from({ length: 5000 }, (_, i) => item(i)) });
     const more = JSON.stringify({ items: Array.from({ length: 500 }, (_, i) => item(5000 + i)) });
     const origin = `https://www.${platform}.com`;
@@ -60,7 +60,7 @@ for (const platform of ["tiktok", "instagram"] as const) {
       });
     });
     await page.goto(origin + (platform === "tiktok" ? "/foryou" : "/reel/reel0/"));
-    await expect.poll(() => page.evaluate(() => (window as any).bridgeProbe.likes)).toBe(6000);
+    await expect.poll(() => page.evaluate(() => (window as any).bridgeProbe.likes)).toBe(900);
     const warm = await page.evaluate(() => ({ ...(window as any).bridgeProbe }));
     await page.waitForTimeout(2500);
     const idle = await page.evaluate(() => ({ ...(window as any).bridgeProbe }));
@@ -75,21 +75,21 @@ for (const platform of ["tiktok", "instagram"] as const) {
       const node = document.getElementById("__UNIVERSAL_DATA_FOR_REHYDRATION__")!;
       const old = node.textContent!;
       const payload = JSON.parse(old);
-      if (platform === "tiktok") payload.items[0].stats.diggCount = 1000;
-      else payload.items[0].like_count = 1000;
+      if (platform === "tiktok") payload.items[0].stats.diggCount = 400;
+      else payload.items[0].like_count = 400;
       const next = JSON.stringify(payload);
       node.textContent = next;
       return { sameLength: old.length === next.length, samePrefix: old.slice(0, 40) === next.slice(0, 40) };
     }, platform);
     expect(replacement).toEqual({ sameLength: true, samePrefix: true });
-    await expect.poll(() => page.evaluate(() => (window as any).bridgeProbe.likes)).toBe(1000);
+    await expect.poll(() => page.evaluate(() => (window as any).bridgeProbe.likes)).toBe(400);
     await expect.poll(() => page.evaluate(() => (window as any).bridgeProbe.cacheItems)).toBe(warm.cacheItems + 501);
     await worker.evaluate(async () => {
       const { settings } = await chrome.storage.local.get("settings");
       await chrome.storage.local.set({ settings: { ...settings, enabled: true } });
     });
     await expect.poll(() => page.evaluate(() => (window as any).fixtureMoves)).toBe(1);
-    await expect(page.locator("#scrollplus-chip-host")).toContainText(/1[,.]?000|1K|1천/);
+    await expect(page.locator("#scrollplus-chip-host")).toContainText(/400|4백/);
     expect(errors).toEqual([]);
   });
 }

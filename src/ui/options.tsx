@@ -1,15 +1,17 @@
-import { COVERAGE, METRICS, PLATFORMS, REPO_URL, activePreset, presetRule, type Metric, type PresetName } from "../lib/score";
+import { CHIP_POSITIONS, COVERAGE, METRICS, PLATFORMS, REPO_URL, activePreset, presetRule, type ChipPosition, type Metric, type PresetName } from "../lib/score";
 import type { IconName } from "../lib/icons";
 import { t } from "../lib/i18n";
-import { GitHubLink, Hero, Icon, Mark, NumberStepper, PowerButton, PresetControl, Row, Tile, Wordmark } from "./kit";
+import { GitHubLink, Icon, Mark, NumberStepper, PowerButton, PresetControl, Row, Segmented, Stats, Tile, Wordmark } from "./kit";
 import { SITES, useFilterState } from "./state";
 
 const METRIC_ICON: Record<Metric, IconName> = { likes: "heart", comments: "comment", views: "eye" };
+const POSITION_ICON: Record<ChipPosition, IconName> = { top: "chipTop", middle: "chipMiddle", lower: "chipLower" };
 
 export function OptionsApp() {
-  const { settings, ready, skips, update, reset, resetting, resetFailed } = useFilterState();
+  const { settings, ready, skips, totals, update, reset, resetting, resetFailed } = useFilterState();
   const preset = activePreset(settings.rule);
   const labels: Record<PresetName, string> = { lenient: t("presetLenient"), balanced: t("presetBalanced"), strict: t("presetStrict") };
+  const positionLabels: Record<ChipPosition, string> = { top: t("posTop"), middle: t("posMiddle"), lower: t("posLower") };
 
   function setCondition(metric: Metric, change: { on?: boolean; min?: number }) {
     update((current) => ({ ...current, rule: { ...current.rule, [metric]: { ...current.rule[metric], ...change } } }));
@@ -26,7 +28,7 @@ export function OptionsApp() {
           <PowerButton on={settings.enabled} label={settings.enabled ? t("powerOn") : t("powerOff")} text={settings.enabled ? t("statusOn") : t("statusOff")} onChange={(enabled) => update((current) => ({ ...current, enabled }))} />
         </header>
 
-        <Hero count={skips} />
+        <Stats count={skips} totals={totals} />
 
         <section>
           <h2>{t("rulesTitle")}</h2>
@@ -87,6 +89,16 @@ export function OptionsApp() {
             <Row icon="megaphone" title={t("skipAds")} on={settings.skipAds} label={t("skipAds")} onToggle={(next) => update((current) => ({ ...current, skipAds: next }))} />
             <Row icon="grid" title={t("filterGrids")} on={settings.filterGrids} label={t("filterGrids")} onToggle={(next) => update((current) => ({ ...current, filterGrids: next }))} />
             <Row icon="pill" title={t("showChip")} on={settings.showSkipChip} label={t("showChip")} onToggle={(next) => update((current) => ({ ...current, showSkipChip: next }))} />
+            <div className={settings.showSkipChip ? "pad stack" : "pad stack off"}>
+              <span className="pad-title">{t("chipPositionTitle")}</span>
+              <Segmented
+                value={settings.chipPosition}
+                label={t("chipPositionTitle")}
+                disabled={!settings.showSkipChip}
+                options={CHIP_POSITIONS.map((value) => ({ value, label: positionLabels[value], icon: POSITION_ICON[value] }))}
+                onChange={(chipPosition) => update((current) => ({ ...current, chipPosition }))}
+              />
+            </div>
           </div>
         </section>
 

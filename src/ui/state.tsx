@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DEFAULT_SETTINGS, STORAGE_DAILY, STORAGE_SETTINGS, normalizeSettings, type Platform, type Settings } from "../lib/score";
+import { DEFAULT_SETTINGS, STORAGE_DAILY, STORAGE_SETTINGS, STORAGE_TOTALS, normalizeSettings, type Platform, type Settings, type TotalSkips } from "../lib/score";
 import type { IconName } from "../lib/icons";
-import { readSkipCount, saveSettings } from "../lib/storage";
+import { parseTotals } from "../lib/saved";
+import { readSkipCount, readTotals, saveSettings } from "../lib/storage";
 import { resetFilterSettings } from "../lib/session-keep";
 
 export interface ActiveState {
@@ -20,6 +21,7 @@ export function useFilterState() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [ready, setReady] = useState(false);
   const [skips, setSkips] = useState(0);
+  const [totals, setTotals] = useState<TotalSkips>(() => parseTotals(undefined));
   const [active, setActive] = useState<ActiveState | null>(null);
   const [resetting, setResetting] = useState(false);
   const [resetFailed, setResetFailed] = useState(false);
@@ -45,6 +47,9 @@ export function useFilterState() {
     void readSkipCount().then((count) => {
       if (alive) setSkips(count);
     });
+    void readTotals().then((next) => {
+      if (alive) setTotals(next);
+    });
     const listener = (changes: Record<string, chrome.storage.StorageChange>, area: string) => {
       if (area !== "local") return;
       if (changes[STORAGE_SETTINGS]) {
@@ -52,6 +57,7 @@ export function useFilterState() {
         setSettings(latest.current);
       }
       if (changes[STORAGE_DAILY]) refreshCount();
+      if (changes[STORAGE_TOTALS]) setTotals(parseTotals(changes[STORAGE_TOTALS].newValue));
     };
     chrome.storage.onChanged.addListener(listener);
     void askActive().then((next) => {
@@ -88,7 +94,7 @@ export function useFilterState() {
     finally { setResetting(false); }
   }, []);
 
-  return { settings, ready, skips, active, update, allowCurrent, reset, resetting, resetFailed };
+  return { settings, ready, skips, totals, active, update, allowCurrent, reset, resetting, resetFailed };
 }
 
 async function askActive(): Promise<ActiveState | null> {

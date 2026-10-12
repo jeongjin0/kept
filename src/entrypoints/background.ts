@@ -19,9 +19,13 @@ async function broadcast(snapshot: UndoSnapshot, settings?: Settings): Promise<v
 
 export default defineBackground(() => {
   let pending = Promise.resolve();
-  chrome.runtime.onInstalled.addListener(() => {
-    void ensureInstalledState();
-  });
+  // In the same line as the counting, so that a skip that arrives while the settings are being moved is not lost.
+  const ensureState = () => {
+    pending = pending.then(() => ensureInstalledState()).catch(() => {});
+  };
+  chrome.runtime.onInstalled.addListener(ensureState);
+  // Also on every start of the worker, so a move to a newer scale that was cut short is finished the next time it wakes.
+  ensureState();
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (sender.id !== chrome.runtime.id) return false;
     const trusted = sender.url?.startsWith(chrome.runtime.getURL("")) === true;
@@ -33,7 +37,7 @@ export default defineBackground(() => {
     if (message?.type !== "scrollplus:skipped" && message?.type !== "scrollplus:reset" && !sessionRequest) return false;
     pending = pending.then(async () => {
       if (message.type === "scrollplus:skipped") {
-        await recordSkip(); sendResponse({ ok: true }); return;
+        await recordSkip(message.onScreenMs); sendResponse({ ok: true }); return;
       }
       const snapshot = await readUndoSnapshot();
       if (message.type === "scrollplus:reset") {

@@ -1,5 +1,7 @@
 # Skip ads · 0.4.0
 
+> Since 0.5.0 Skip ads is on by default (an install updated from 0.4.x has it turned on once). How an ad is recognised and skipped is unchanged, so this report still describes it: the live YouTube figures below are from the 0.4.0 build, and one live Shorts ad was seen skipped by the 0.5.0 build (see [release readiness](release-readiness.md)). Where this report says "off by default", read "switched off".
+
 2026-10-11 KST. Skip ads is a switch in the popup and in Settings, off by default. Off, an ad stays whatever its like count. On, ScrollPlus moves past an ad that fills the player as soon as the site marks it as one. The rules are in [SPEC.md](../SPEC.md#ads). This report covers how each site marks an ad, what was measured on real YouTube Shorts, and what was not.
 
 ## An existing bug this fixed
