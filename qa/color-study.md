@@ -8,7 +8,7 @@ Nine hues were compared at one lightness and one chroma, so no candidate is stro
 
 ## Choice
 
-Teal, hue 190, lightness 0.76, chroma 0.10, is the default of 0.6.0.
+Teal, hue 190, lightness 0.76, chroma 0.10, is the default of 0.6.0. The owner picked it on 2026-10-13 from the nine candidates.
 
 | Role | Value | OKLCH |
 | --- | --- | --- |

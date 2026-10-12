@@ -6,13 +6,13 @@ Checked on 2026-10-13 KST, macOS ARM64. This candidate changes the look only: th
 | --- | --- | --- |
 | TypeScript | Pass | tsc --noEmit |
 | Unit tests | 110 passed | npm test |
-| Built-script browser tests | 66 run, flaky starts only | npx playwright test: 63 passed and 3 failed on the first run, and every failure was the browser failing to start with the extension or a timeout while the machine was busy. The three, run again, passed (two as part of their spec files, one alone). CI runs them on a clean machine |
+| Built-script browser tests | 66 passed in CI | Locally the first run had 63 passed and 3 browser start failures while the machine was busy; the three pass when run again. CI ran all 66 on a clean machine, twice |
 | Popup and settings page | Looked at | Korean and English popup, 426 px, no scroll. Settings at 1440 px and 420 px. See [ui review](ui-review.md) |
 | Live skip chip | Looked at | Signed-out YouTube Shorts, built extension, one skip chip with the new dot, centred on the video, readable over a bright title card |
 | Toolbar icon and store images | Looked at | public/icon 16, 32, 48 and 128 and the store images were rendered again from the new mark and colors |
 | Color | Studied | Nine hues at one lightness and chroma, [color study](color-study.md) |
 | Package | Pass | npm run zip and node scripts/check-package.mjs. scrollplus-0.6.0-chrome.zip, 145,128 bytes |
-| Minimum Chrome 120 | Pending CI | The pull request runs the suite on Chrome 120. The new tile gradient uses color-mix, available from Chrome 111 |
+| Minimum Chrome 120 | Pass | [CI](https://github.com/jeongjin0/scrollplus/actions/runs/38270907486) and [CI](https://github.com/jeongjin0/scrollplus/actions/runs/38270914697): typecheck, 110 unit tests, 66 browser tests on current Chromium and on Chrome for Testing 120. The tile gradient uses color-mix, available from Chrome 111 |
 | Chrome Web Store | Not submitted | Owner decision |
 
 ## Artifact
@@ -25,6 +25,6 @@ The 0.5.3 report is in [release readiness 0.5.3](release-readiness-053.md).
 
 ## Remaining gates
 
-1. The owner picks the hue. Teal is a recommendation from nine candidates, and the hue is one set of CSS variables.
+1. The owner picked teal from the nine candidates on 2026-10-13. The hue is one set of CSS variables if it changes.
 2. The chip over many kinds of video, and the accent on other displays, were not checked.
 3. The gates of 0.5.x stand: a signed-in check of subscribe and follow, a full day of use, a live Instagram ad.
