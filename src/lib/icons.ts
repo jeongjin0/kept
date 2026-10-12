@@ -1,6 +1,6 @@
 export type IconName =
   | "power" | "heart" | "comment" | "eye" | "youtube" | "tiktok" | "reels" | "sliders" | "github" | "grid"
-  | "pill" | "trash" | "plus" | "minus" | "reset" | "user" | "check" | "undo" | "forward" | "megaphone"
+  | "pill" | "trash" | "plus" | "minus" | "reset" | "user" | "check" | "undo" | "streak" | "megaphone"
   | "clock" | "chipTop" | "chipMiddle" | "chipLower" | "userCheck";
 
 export type Shape =
@@ -35,7 +35,8 @@ export const ICONS: Record<IconName, Shape[]> = {
   check: [p("m3.4 8.4 3 3 6.2-6.4")],
   userCheck: [c(5.8, 5.3, 2.15), p("M2.2 13.5c.35-2.15 1.7-3.4 3.6-3.4 1.05 0 1.95.38 2.55 1.05"), p("M10 9.7l1.55 1.55 2.85-3")],
   undo: [p("M5.4 3.2 2.8 5.8l2.6 2.6"), p("M3 5.8h6.2a3.5 3.5 0 0 1 0 7H6.4")],
-  forward: [p("M3.6 3.8 9 8l-5.4 4.2V3.8Z"), p("M12.4 3.4v9.2")],
+  // The mark: three streaks behind a play triangle.
+  streak: [p("M2.6 5.6h2.6"), p("M1.8 8h3.4"), p("M3.6 10.4h1.6"), p("M7.6 3.6 13.6 8l-6 4.4Z", true)],
   megaphone: [p("M2.6 6.2h2.2l5.6-2.8v9.2L4.8 9.8H2.6a.8.8 0 0 1-.8-.8V7a.8.8 0 0 1 .8-.8Z"), p("M5 9.9l.8 2.9h1.8l-.6-2.4"), p("M12.6 6.4a2.6 2.6 0 0 1 0 3.2")],
   clock: [c(8, 8, 5.8), p("M8 4.8V8l2.2 1.4")],
   // A video with the chip drawn as a short bar: high up, in the middle, low.

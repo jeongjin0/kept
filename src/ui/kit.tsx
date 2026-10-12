@@ -27,10 +27,21 @@ export function Wordmark() {
 export function Mark(props: { size?: number }) {
   const size = props.size ?? 22;
   return (
-    <svg className="mark" viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
-      <rect width="24" height="24" rx="7" fill="#FF4D2E" />
-      <path d="M7 18V8.6A1.6 1.6 0 0 1 8.6 7h6.8A1.6 1.6 0 0 1 17 8.6V18" fill="none" stroke="#10110F" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="12" cy="13" r="1.6" fill="#10110F" />
+    <svg className="mark" viewBox="0 0 32 32" width={size} height={size} aria-hidden="true">
+      <defs>
+        <linearGradient id="mark-tile" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" style={{ stopColor: "color-mix(in srgb, var(--accent), white 10%)" }} />
+          <stop offset="1" style={{ stopColor: "color-mix(in srgb, var(--accent), black 5%)" }} />
+        </linearGradient>
+      </defs>
+      <rect width="32" height="32" rx="9" fill="url(#mark-tile)" />
+      {size > 22 ? <rect x="0.6" y="0.6" width="30.8" height="30.8" rx="8.4" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1.2" /> : null}
+      <g transform="translate(-.4 0)" style={{ stroke: "var(--accent-ink)", fill: "none" }} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M7.6 11.2H13.2" opacity="0.38" />
+        <path d="M5.6 16H13.2" opacity="0.7" />
+        <path d="M9 20.8H13.2" opacity="0.38" />
+        <path d="M16.4 8.4 27.4 16 16.4 23.6Z" strokeWidth="2.6" style={{ fill: "var(--accent-ink)" }} />
+      </g>
     </svg>
   );
 }

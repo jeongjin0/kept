@@ -1,0 +1,80 @@
+{
+ "viewport": {
+  "w": 1440,
+  "h": 900
+ },
+ "video": {
+  "x": 565.875,
+  "y": 64,
+  "w": 452,
+  "h": 804
+ },
+ "controls": [
+  {
+   "sel": "ytd-masthead",
+   "els": [
+    {
+     "x": 0,
+     "y": 0,
+     "w": 1440,
+     "h": 56
+    }
+   ]
+  },
+  {
+   "sel": "#masthead-container",
+   "els": [
+    {
+     "x": 0,
+     "y": 0,
+     "w": 1440,
+     "h": 56
+    }
+   ]
+  },
+  {
+   "sel": "#navigation-button-up",
+   "els": [
+    {
+     "x": 1360,
+     "y": 422,
+     "w": 56,
+     "h": 56
+    }
+   ]
+  },
+  {
+   "sel": "#navigation-button-down",
+   "els": [
+    {
+     "x": 1360,
+     "y": 494,
+     "w": 56,
+     "h": 56
+    }
+   ]
+  },
+  {
+   "sel": "#actions",
+   "els": [
+    {
+     "x": 0,
+     "y": 0,
+     "w": 0,
+     "h": 0
+    }
+   ]
+  },
+  {
+   "sel": "yt-reel-metapanel-view-model",
+   "els": [
+    {
+     "x": 581.875,
+     "y": 744,
+     "w": 420.25,
+     "h": 108
+    }
+   ]
+  }
+ ]
+}
