@@ -30,7 +30,7 @@ In Settings you can also turn on a minimum for comments or views, switch a site 
 
 **The skip chip** tells you why a video was skipped and has Undo. It sits at the top of the video, centred on it, with a border and glow so that it is seen on a dark video too. Settings can move it to the middle or to a lower place above the caption.
 
-A skip is the site's own Next control, pressed for you, so you see the usual slide to the next video. On YouTube Shorts a skipped video is on screen for about half a second, and it is muted meanwhile. That half second is YouTube's own pace between moves ([timing](qa/skip-timing.md)). On TikTok a skipped video is on screen for about 0.4 s, with its sound on: TikTok takes a mute made by a script as your own choice, so ScrollPlus leaves it alone ([timing](qa/skip-timing-tiktok.md)). Instagram Reels has not been measured.
+A skip is the site's own Next control, pressed for you, so you see the usual slide to the next video. On YouTube Shorts a skipped video is on screen for about half a second, and it is muted meanwhile. That half second is YouTube's own pace between moves ([timing](qa/skip-timing.md)). On TikTok a skipped video is on screen for about 0.4 s, with its sound on: TikTok takes a mute made by a script as your own choice, so ScrollPlus leaves it alone ([timing](qa/skip-timing-tiktok.md)). On Instagram Reels it is about 0.3 s, measured signed in with the built scripts run in the page ([timing](qa/skip-timing-instagram.md)).
 
 If a count is missing, the video stays. Photo posts stay too. It never skips on a guess, never hides a feed, and stops after six skips in a row so you can decide to keep going or lower the bar.
 
