@@ -10,7 +10,7 @@ Checked on 2026-10-12 KST, macOS ARM64. This pass hardens the subscribe and foll
 | Popup and settings | Looked at | Korean and English popup, 426 px, no scroll. Settings at 1440 px and 420 px. The follow row fits at 420 px. See [ui review](ui-review.md) |
 | Live chip | Looked at | Signed-out YouTube Shorts, built extension, one skip chip "넘김 · 광고" centred on the video. Not a signed-in follow check |
 | Package | Pass | npm run zip and node scripts/check-package.mjs. scrollplus-0.5.3-chrome.zip, 139,866 bytes |
-| Minimum Chrome 120 | Pending CI | The pull request runs the suite on Chrome 120 |
+| Minimum Chrome 120 | Pass | [CI](https://github.com/jeongjin0/scrollplus/actions/runs/38251222810) and [CI](https://github.com/jeongjin0/scrollplus/actions/runs/38251242208). Chrome for Testing 120 and current Chromium. |
 | Chrome Web Store | Not submitted | Owner decision |
 
 ## Artifact
