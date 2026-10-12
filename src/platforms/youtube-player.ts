@@ -7,15 +7,14 @@ export function youtubeHasActiveAd(): boolean {
   return document.querySelector("ytd-reel-video-renderer[is-ads-overlay]") != null;
 }
 
-// The visible Shorts subscribe button. Exact labels only, in the two interface languages,
-// so a caption that mentions subscribing is not a subscription.
+// The visible Shorts subscribe button, in the two interface languages.
+// A long caption that merely mentions subscribing does not count.
 export function followedFromSubscribeLabel(label: string): boolean | null {
   const text = label.replace(/\s+/g, " ").trim().toLowerCase();
-  if (!text) return null;
+  if (!text || text.length > 80) return null;
   if (/unsubscribe|구독\s*취소|구독취소/.test(text)) return true;
-  if (/^(subscribed|구독중|구독됨)$/.test(text)) return true;
-  if (/^(subscribe|구독)$/.test(text)) return false;
-  if (/^subscribe to\b/.test(text)) return false;
+  if (/(?:^|[^a-z])subscribed(?:[^a-z]|$)|구독중|구독됨/.test(text)) return true;
+  if (/^(?:subscribe|구독)$/.test(text) || /^subscribe to\b/.test(text)) return false;
   return null;
 }
 

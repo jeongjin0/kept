@@ -81,11 +81,16 @@ describe("extractors", () => {
     expect(followedFromSubscribeLabel("Unsubscribe from 땡초")).toBe(true);
     expect(followedFromSubscribeLabel("Subscribe to 땡초")).toBe(false);
     expect(followedFromSubscribeLabel("이 영상은 구독하면 좋아요")).toBeNull();
+    expect(followedFromSubscribeLabel("Subscribed to 땡초상영관")).toBe(true);
+    expect(followedFromSubscribeLabel("땡초상영관 구독중")).toBe(true);
+    expect(followedFromSubscribeLabel("subscribers")).toBeNull();
     expect(followedFromFollowLabel("팔로우")).toBe(false);
     expect(followedFromFollowLabel("팔로잉")).toBe(true);
     expect(followedFromFollowLabel("Follow")).toBe(false);
     expect(followedFromFollowLabel("Following")).toBe(true);
     expect(followedFromFollowLabel("Followers")).toBeNull();
+    expect(followedFromFollowLabel("Following creator")).toBe(true);
+    expect(followedFromFollowLabel("Unfollow")).toBe(true);
   });
 
   it("retains zero views and does not discard an independently known like count", () => {

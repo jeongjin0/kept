@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.3 – 2026-10-12
+
+- Hardened the subscribe and follow buttons. A Short labelled "Subscribed to …" or "…구독중", and a Reel labelled "Following …" or "Unfollow", now counts. A caption that merely mentions subscribing still does not.
+- YouTube reads the subscription flag from the player and the current reel response only. The large sequence and next responses are left alone, and an unchanged video is not sent across to the filter again.
+- Instagram looks for the follow button beside the reel, instead of every button on the page.
+
+
 ## 0.5.2 – 2026-10-12
 
 - Keep accounts I follow now covers YouTube and Instagram as well as TikTok. A Short from a channel you subscribe to, and a Reel from an account you follow, stay even under the like bar. The switch was already on.

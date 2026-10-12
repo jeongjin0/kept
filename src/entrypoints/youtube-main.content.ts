@@ -10,10 +10,11 @@ export default defineContentScript({
   main() {
     let latest: unknown = null;
     const followedById = new Map<string, boolean>();
+    let lastKey = "";
     const remember = (data: unknown) => {
       for (const pair of youtubeFollowPairs(data)) followedById.set(pair.id, pair.followed);
     };
-    observeJsonResponses((url) => url.includes("youtube.com/youtubei/") && /reel|player|next/.test(url), remember);
+    observeJsonResponses((url) => /\/youtubei\/v1\/player(?:\?|$)|\/youtubei\/v1\/reel\/reel_item_watch/.test(url), remember);
     const publish = (player?: unknown) => {
       try {
         const id = youtubeShortId();
@@ -21,7 +22,11 @@ export default defineContentScript({
         const source = player ?? latest ?? (window as Window & { ytInitialPlayerResponse?: unknown }).ytInitialPlayerResponse;
         const extracted = extractYouTube(source);
         if (!extracted || extracted.id !== id) return;
-        if (followedById.has(extracted.id)) extracted.followed = followedById.get(extracted.id);
+        const remembered = followedById.get(extracted.id);
+        extracted.followed = extracted.followed === true || remembered === true ? true : remembered === false || extracted.followed === false ? false : null;
+        const key = extracted.id + ":" + extracted.metrics.likes + ":" + extracted.metrics.views + ":" + extracted.metrics.comments + ":" + String(extracted.followed);
+        if (key === lastKey) return;
+        lastKey = key;
         window.postMessage({ source: "scrollplus", type: "item", item: { platform: "youtube", surface: "player", ...extracted } }, "*");
       } catch {
         /* leave the page alone */

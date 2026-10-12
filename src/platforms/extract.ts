@@ -27,6 +27,18 @@ function booleanOrNull(value: unknown): boolean | null {
 // subscribe button's store key, or on the older subscribeButtonRenderer.subscribed flag.
 // A document that names one video and one answer is that video's answer. Anything unclear stays unknown.
 export function youtubeFollowPairs(root: unknown): Array<{ id: string; followed: boolean }> {
+  if (root && typeof root === "object") {
+    const cached = followPairCache.get(root);
+    if (cached) return cached;
+  }
+  const pairs = collectYouTubeFollowPairs(root);
+  if (root && typeof root === "object") followPairCache.set(root, pairs);
+  return pairs;
+}
+
+const followPairCache = new WeakMap<object, Array<{ id: string; followed: boolean }>>();
+
+function collectYouTubeFollowPairs(root: unknown): Array<{ id: string; followed: boolean }> {
   const states = new Map<string, boolean>();
   const orphans: boolean[] = [];
   const videoIds: string[] = [];
