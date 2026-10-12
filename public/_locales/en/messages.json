@@ -35,7 +35,7 @@
   "settings": {
     "message": "Settings"
   },
-  "star": {
+  "github": {
     "message": "GitHub"
   },
   "signedOut": {
@@ -164,7 +164,7 @@
       }
     }
   },
-  "starTitle": {
+  "githubTitle": {
     "message": "Star this project on GitHub"
   },
   "keepError": {

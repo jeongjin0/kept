@@ -77,9 +77,10 @@ h1, h2, p { margin: 0; }
 .link { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 6px 4px; border: 0; border-radius: 8px; background: none; font-size: 13px; font-weight: 500; transition: color var(--t) var(--ease); }
 .link:hover { color: var(--accent); }
 .badge { padding: 2px 7px; border-radius: 99px; background: rgba(255, 77, 46, 0.16); color: var(--accent); font-size: 11px; font-weight: 600; }
-.star { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 99px; color: var(--text); text-decoration: none; font-size: 12px; font-weight: 500; transition: border-color var(--t) var(--ease), background var(--t) var(--ease); }
-.star .icon { color: var(--accent); }
-.star:hover { border-color: var(--accent); background: var(--surface); }
+.github { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 13px 0 10px; border: 1px solid var(--line-strong); border-radius: 99px; color: var(--text); text-decoration: none; font-size: 12px; font-weight: 500; transition: border-color var(--t) var(--ease), background var(--t) var(--ease); }
+/* GitHub asks for its mark in white or black, unchanged. */
+.github .icon { color: #fff; }
+.github:hover { border-color: var(--accent); background: var(--surface); }
 .action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; border: 1px solid var(--line-strong); border-radius: 12px; background: transparent; font-size: 13px; font-weight: 500; transition: border-color var(--t) var(--ease), background var(--t) var(--ease); }
 .action:hover:not(:disabled) { border-color: var(--accent); background: var(--surface); }
 .action:disabled { color: var(--muted); }
@@ -107,7 +108,7 @@ h1, h2, p { margin: 0; }
 .page .switch { height: 34px; }
 .page .switch::before { top: 7px; }
 .page .switch .thumb { top: 9px; }
-.page .star, .page .link, .page .icon-button { min-height: 34px; }
+.page .github, .page .link, .page .icon-button { min-height: 34px; }
 .page .tile { width: 34px; height: 34px; border-radius: 10px; }
 .page .preset { height: 52px; }
 .page .preset strong { font-size: 14px; }

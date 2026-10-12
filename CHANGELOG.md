@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.4 – 2026-10-12
+
+- Settings opens in a tab of its own, from the popup's Settings link and from the extension's card on chrome://extensions. It used to open in the small dialog that chrome://extensions shows for an options page. The tab carries the ScrollPlus icon and a title in your language.
+- The GitHub button shows GitHub's mark in white in place of a star. Its tooltip still says "Star this project on GitHub"; the button itself only says GitHub.
+- GitHub's mark comes from Octicons (MIT). The notice ships in the package as THIRD_PARTY_NOTICES.txt, and the README, the store listing and SPEC.md now say that ScrollPlus is not affiliated with GitHub either.
+- Skipping is unchanged. The only source file the YouTube, TikTok and Instagram scripts share with these pages that changed is the icon table, so their bundles differ from 0.4.3's in that table (the star is out, the GitHub mark is in, and no page draws either) and in the short names the minifier picked.
+
 ## 0.4.3 – 2026-10-11
 
 - Instagram Reels skips are faster. A skipped reel was on screen for a median 0.62 s (mean 0.78 s) and now stays for 0.32 s (mean 0.52 s), measured live in a signed-in browser at a strict bar (80-second runs: four of 0.4.2, three of 0.4.3). The first skip of a row went from 0.31 s to 0.21 s and a skip that follows a skip from 0.64 s to 0.35 s. Between two skips ScrollPlus waited 450 ms, which Reels does not need, because it takes a press while it is still scrolling: none of the 669 presses measured was ignored, at any wait. The wait is 100 ms now, ScrollPlus looks at the feed while it scrolls instead of every 400 ms, and it presses as soon as the reel is on screen enough to be moved on from. What was measured, and the numbers tried, are in [skip timing on Instagram](qa/skip-timing-instagram.md).

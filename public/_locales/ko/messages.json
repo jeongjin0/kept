@@ -35,7 +35,7 @@
   "settings": {
     "message": "세부 설정"
   },
-  "star": {
+  "github": {
     "message": "GitHub"
   },
   "signedOut": {
@@ -164,7 +164,7 @@
       }
     }
   },
-  "starTitle": {
+  "githubTitle": {
     "message": "GitHub에서 별표 남기기"
   },
   "keepError": {

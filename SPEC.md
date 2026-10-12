@@ -2,7 +2,7 @@
 
 This file is the product spec. Implement it. Do not add features that are not written here. If a rule is missing, leave the behavior out and record the gap in qa/gaps.md. Read this file before coding and again before calling the work done.
 
-Status: 0.4.3 beta. On Instagram Reels a skipped reel is on screen for a median 0.32 s instead of 0.62 s (live, signed in, 20,000-like bar, the built Instagram scripts run in the page behind a stand-in for chrome.storage; qa/skip-timing-instagram.md): ScrollPlus waits 100 ms instead of 450 ms between skips, looks at the feed while it scrolls, and presses as soon as the reel is on screen enough. On TikTok the wait after a video arrives is 180 ms instead of 150 ms, because TikTok answers a press made sooner than about 0.16 s after an arrival 0.1 s late: the median skipped video is on screen for 0.31 s instead of 0.38 s (qa/skip-timing-tiktok.md). A person who scrolls Reels with a wheel or trackpad was not simulated. 0.4.2: on TikTok a skipped video is on screen for 0.48 s on average instead of 1.03 s (live, signed out, 20,000-like bar): ScrollPlus no longer presses a Next control that TikTok keeps disabled until it has the next video, waits 150 ms after a video arrives instead of 450 ms between skips, and leaves TikTok's sound alone because TikTok takes a mute made by a script as the person's own choice. A row of skips shows one chip. 0.4.1: on YouTube a Short that follows another skip is on screen for about 0.5 s instead of 0.8 s, a press the site does not act on is pressed again after 0.7 s instead of 2 s, and a Short that is being skipped is muted. Why the first skip stays at about half a second is in qa/skip-timing.md. A Skip ads switch, off by default, moves past an ad that fills the player on YouTube Shorts, TikTok and Instagram Reels. While grid filtering is off, pages are not rescanned for links. Instagram keeps disclosed advertisements and non-video cards. TikTok/Instagram publish only changed rows and active-player data; unchanged embedded payloads are not reparsed. Undo now survives reloads and new tabs for the browser session; Reset clears those temporary choices. Bounded 0.3.5 signed-in default filtering and TikTok Undo/reload/Reset were observed in Aside Chromium 153; earlier 0.3.3/0.3.4 paths retain their own package scope. The exact-0.3.5 automated 24-hour YouTube run completed with two reviewed page-reload recoveries. Current Instagram Undo/reload, broader signed-in Google Chrome, positive-path live Following and ordinary human day-use remain open. See qa/session-undo.md and qa/release-readiness.md. Decisions below are locked.
+Status: 0.4.4 beta. Settings opens in a tab of its own instead of the small dialog that chrome://extensions shows for an options page, and the GitHub button carries GitHub's mark in white instead of a star. Skipping is unchanged: the YouTube, TikTok and Instagram scripts differ from those of 0.4.3 only in the icon table they share with the popup. 0.4.3: On Instagram Reels a skipped reel is on screen for a median 0.32 s instead of 0.62 s (live, signed in, 20,000-like bar, the built Instagram scripts run in the page behind a stand-in for chrome.storage; qa/skip-timing-instagram.md): ScrollPlus waits 100 ms instead of 450 ms between skips, looks at the feed while it scrolls, and presses as soon as the reel is on screen enough. On TikTok the wait after a video arrives is 180 ms instead of 150 ms, because TikTok answers a press made sooner than about 0.16 s after an arrival 0.1 s late: the median skipped video is on screen for 0.31 s instead of 0.38 s (qa/skip-timing-tiktok.md). A person who scrolls Reels with a wheel or trackpad was not simulated. 0.4.2: on TikTok a skipped video is on screen for 0.48 s on average instead of 1.03 s (live, signed out, 20,000-like bar): ScrollPlus no longer presses a Next control that TikTok keeps disabled until it has the next video, waits 150 ms after a video arrives instead of 450 ms between skips, and leaves TikTok's sound alone because TikTok takes a mute made by a script as the person's own choice. A row of skips shows one chip. 0.4.1: on YouTube a Short that follows another skip is on screen for about 0.5 s instead of 0.8 s, a press the site does not act on is pressed again after 0.7 s instead of 2 s, and a Short that is being skipped is muted. Why the first skip stays at about half a second is in qa/skip-timing.md. A Skip ads switch, off by default, moves past an ad that fills the player on YouTube Shorts, TikTok and Instagram Reels. While grid filtering is off, pages are not rescanned for links. Instagram keeps disclosed advertisements and non-video cards. TikTok/Instagram publish only changed rows and active-player data; unchanged embedded payloads are not reparsed. Undo now survives reloads and new tabs for the browser session; Reset clears those temporary choices. Bounded 0.3.5 signed-in default filtering and TikTok Undo/reload/Reset were observed in Aside Chromium 153; earlier 0.3.3/0.3.4 paths retain their own package scope. The exact-0.3.5 automated 24-hour YouTube run completed with two reviewed page-reload recoveries. Current Instagram Undo/reload, broader signed-in Google Chrome, positive-path live Following and ordinary human day-use remain open. See qa/session-undo.md and qa/release-readiness.md. Decisions below are locked.
 
 ## Product
 
@@ -33,7 +33,7 @@ The locale files hold two strings: extName is the manifest name and the store ti
 - Local directory: /Users/jeongjin/Developer/edgethink/kept (keeps its old name)
 - Public GitHub repo: github.com/jeongjin0/scrollplus
 - License: MIT
-- Version: 0.4.3
+- Version: 0.4.4
 - Do not put this project in the Obsidian vault
 - Do not submit it to the Chrome Web Store
 
@@ -181,6 +181,8 @@ Popup contains only:
 
 If Instagram metrics are unavailable because the user is signed out, the popup says "Instagram is signed out. Nothing is hidden." Korean: "인스타그램에 로그인되어 있지 않습니다. 숨기지 않습니다." Do not show this as a modal on instagram.com.
 
+The options page opens in a tab of its own (open_in_tab), from the popup's Settings link and from the extension's card on chrome://extensions, and not in the small dialog that chrome://extensions shows for an options page. Its tab has the ScrollPlus icon and the title "ScrollPlus · Settings" / "ScrollPlus · 세부 설정". The content is one centred column, at most 600px wide.
+
 Options, top to bottom:
 
 - Wordmark and the power button with an On / Off label
@@ -196,7 +198,7 @@ Changes apply immediately. There is no save button. The toolbar icon has no numb
 
 Escape cancels a numeric edit. An invalid number is not saved and gets an inline error. At narrow widths, a rule's number field moves below its label and switch. Saved creators already show as kept when the popup reopens.
 
-The GitHub button shows a star icon and the word GitHub, with the tooltip "Star this project on GitHub" / "GitHub에서 별표 남기기". The interface never says "Star us". It opens the public repo in a new tab and appears in the popup and the options page. It is never injected into a host site.
+The GitHub button shows GitHub's own mark in white (Octicons mark-github, MIT, credited in public/THIRD_PARTY_NOTICES.txt) and the word GitHub, with the tooltip "Star this project on GitHub" / "GitHub에서 별표 남기기". The interface never says "Star us". It opens the public repo in a new tab and appears in the popup and the options page. It is never injected into a host site. The mark is used only to link to the repository, unchanged and in white, as GitHub's logo guidelines allow, and nothing implies that GitHub is behind ScrollPlus or endorses it.
 
 ## Visual system
 
@@ -204,9 +206,9 @@ The GitHub button shows a star icon and the word GitHub, with the tooltip "Star 
 - Surface #1A1B17, raised surface #24251F
 - Text #F4F1EA
 - Muted text #A8A396
-- Accent #FF4D2E, used for the mark, "Plus" in the wordmark, the on state, the active preset, the star, and the skip chip
+- Accent #FF4D2E, used for the mark, "Plus" in the wordmark, the on state, the active preset, and the skip chip
 
-Cards have 14px corners. Controls are at least 32px tall in the popup and 34px in options. Every control has a visible keyboard focus ring and an accessible name. Icons are one set, drawn on a 16px grid with a 1.5px stroke. No purple gradients, glassmorphism, or runtime web fonts. UI text uses ui-sans-serif.
+Cards have 14px corners. Controls are at least 32px tall in the popup and 34px in options. Every control has a visible keyboard focus ring and an accessible name. Icons are one set, drawn on a 16px grid with a 1.5px stroke. The GitHub mark is GitHub's own filled mark on the same grid and is never recoloured. No purple gradients, glassmorphism, or runtime web fonts. UI text uses ui-sans-serif.
 
 Motion is ease-out, about 180ms. The preset highlight slides between choices. The skip chip fades in over 120ms and out over 200ms. No bounce. Reduced motion shortens every transition.
 
@@ -243,7 +245,7 @@ A fetch observer must call the original fetch and return the original response u
 
 PRIVACY.md states that the extension does not collect, transmit, or sell user data, lists the storage keys, and gives the GitHub repo as the contact. The same statement belongs in the options page and store/listing.md.
 
-README and the store listing say the extension is not affiliated with YouTube, TikTok, or Instagram.
+README and the store listing say the extension is not affiliated with YouTube, TikTok, Instagram, or GitHub.
 
 ## Implementation
 

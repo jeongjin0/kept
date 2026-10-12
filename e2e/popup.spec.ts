@@ -25,7 +25,7 @@ test(`popup fits in ${language} at 1x and 2x, even with the optional rows`, asyn
           plain,
           full: popup.getBoundingClientRect().height,
           fits: scrolling.scrollHeight <= scrolling.clientHeight + 1,
-          star: document.querySelector("a.star")?.getAttribute("href"),
+          github: document.querySelector("a.github")?.getAttribute("href"),
           text: document.body.innerText,
         };
       });
@@ -33,7 +33,7 @@ test(`popup fits in ${language} at 1x and 2x, even with the optional rows`, asyn
       expect(box?.plain).toBeLessThanOrEqual(480);
       expect(box?.full).toBeLessThanOrEqual(480);
       expect(box?.fits).toBe(true);
-      expect(box?.star).toBe("https://github.com/jeongjin0/scrollplus");
+      expect(box?.github).toBe("https://github.com/jeongjin0/scrollplus");
       expect(box?.text).toMatch(/ScrollPlus/);
       await page.close();
     }
@@ -73,6 +73,21 @@ test("a fresh install already skips under 5K likes, and the popup changes the ru
   }
 });
 
+test("Settings opens in a tab of its own, not in the small dialog of chrome://extensions", async () => {
+  const { context, id } = await launch("en");
+  try {
+    const popup = await open(context, id, "popup.html");
+    expect(await popup.evaluate(() => chrome.runtime.getManifest().options_ui)).toMatchObject({ open_in_tab: true, page: "options.html" });
+    const [tab] = await Promise.all([context.waitForEvent("page"), popup.getByRole("button", { name: /Settings/ }).click()]);
+    await tab.waitForLoadState();
+    expect(tab.url()).toBe("chrome-extension://" + id + "/options.html");
+    await expect(tab).toHaveTitle("ScrollPlus · Settings");
+    await expect(tab.locator("a.github")).toHaveAttribute("href", "https://github.com/jeongjin0/scrollplus");
+  } finally {
+    await context.close();
+  }
+});
+
 test("Escape cancels a number edit and invalid input leaves the previous value", async () => {
   const { context, id } = await launch("en");
   try {
@@ -103,7 +118,7 @@ test("settings accept typed numbers and mark the popup as custom", async () => {
     const options = await open(context, id, "options.html");
     await expect(options.locator("body")).toContainText(/Rules|기준/);
     await expect(options.locator("body")).toContainText(/Nothing is collected or sent|수집하거나 전송하지 않습니다/);
-    await expect(options.locator("a.star")).toHaveAttribute("href", "https://github.com/jeongjin0/scrollplus");
+    await expect(options.locator("a.github")).toHaveAttribute("href", "https://github.com/jeongjin0/scrollplus");
 
     const likes = options.getByRole("textbox", { name: /Minimum Likes|좋아요 최소 개수/ });
     await likes.click();

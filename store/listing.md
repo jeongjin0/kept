@@ -26,7 +26,7 @@ Ads stay by default. Turn on Skip ads in the popup and ScrollPlus also moves pas
 
 Every skip tells you why, for example "Skipped · 312 likes" or "Skipped · ad", with an Undo. Restored videos stay for the browser session, including reloads and new tabs; this choice stays only in memory. If a count is missing, the video stays, and so do photo posts. After six skips in a row it stops and asks, so a quiet feed never turns into a runaway one.
 
-ScrollPlus is not affiliated with YouTube, TikTok, or Instagram. Counts stay on your device. The extension does not collect or transmit data. Open source, MIT: https://github.com/jeongjin0/scrollplus
+ScrollPlus is not affiliated with YouTube, TikTok, Instagram, or GitHub. Counts stay on your device. The extension does not collect or transmit data. Open source, MIT: https://github.com/jeongjin0/scrollplus
 
 Single purpose: skip YouTube Shorts, TikTok videos, and Instagram Reels the user does not want to see: those with too few likes and, if the user turns it on, ads. It uses counts and ad markers already on the page.
 
@@ -50,6 +50,6 @@ ScrollPlus는 좋아요가 설정한 기준보다 적은 숏폼 영상을 자동
 
 넘길 때마다 이유가 표시됩니다. 예: "넘김 · 좋아요 312", "넘김 · 광고" 그리고 되돌리기 버튼이 나옵니다. 되돌린 영상은 새로고침하거나 새 탭에서 열어도 브라우저를 종료할 때까지 유지되며, 이 선택은 메모리에만 남습니다. 수치를 읽지 못하면 영상은 그대로 두고, 사진 게시물도 건드리지 않습니다. 연속으로 여섯 번 넘기면 멈추고 물어봅니다.
 
-ScrollPlus는 YouTube, TikTok, Instagram과 관계가 없습니다. 수치는 기기 안에서만 쓰며, 수집하거나 전송하지 않습니다. 오픈소스(MIT): https://github.com/jeongjin0/scrollplus
+ScrollPlus는 YouTube, TikTok, Instagram, GitHub와 관계가 없습니다. 수치는 기기 안에서만 쓰며, 수집하거나 전송하지 않습니다. 오픈소스(MIT): https://github.com/jeongjin0/scrollplus
 
 단일 목적: 보고 싶지 않은 유튜브 쇼츠, 틱톡, 인스타그램 릴스를 넘깁니다. 좋아요가 적은 영상과, 사용자가 켠 경우 광고가 대상입니다. 페이지에 이미 있는 수치와 광고 표시를 사용합니다.

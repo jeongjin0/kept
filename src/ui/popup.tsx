@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PLATFORMS, REPO_URL, activePreset, isAllowlisted, presetRule, type PresetName } from "../lib/score";
 import { t } from "../lib/i18n";
-import { Hero, Icon, Mark, PowerButton, PresetControl, Row, StarLink, Wordmark } from "./kit";
+import { GitHubLink, Hero, Icon, Mark, PowerButton, PresetControl, Row, Wordmark } from "./kit";
 import { SITES, useFilterState } from "./state";
 
 export function PopupApp() {
@@ -57,7 +57,7 @@ export function PopupApp() {
           {t("settings")}
           {preset ? null : <span className="badge">{t("custom")}</span>}
         </button>
-        <StarLink href={REPO_URL} />
+        <GitHubLink href={REPO_URL} />
       </footer>
     </div>
   );

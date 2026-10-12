@@ -81,8 +81,8 @@ The product rules are in [SPEC.md](SPEC.md). QA notes are in [qa/](qa). Contribu
 
 ScrollPlus reads the counts the page has already loaded and decides on your device. Settings and today's skip count stay in Chrome storage; Undo choices stay only in memory until browser restart or Reset. Nothing is collected or sent anywhere. See [PRIVACY.md](PRIVACY.md).
 
-ScrollPlus is not affiliated with YouTube, TikTok, or Instagram.
+ScrollPlus is not affiliated with YouTube, TikTok, Instagram, or GitHub. The GitHub mark in the popup and on the settings page only links to this repository.
 
 ## License
 
-[MIT](LICENSE). If it saves you some scrolling, a ⭐ on this repo helps other people find it.
+[MIT](LICENSE). If it saves you some scrolling, a ⭐ on this repo helps other people find it. The GitHub mark is GitHub's own, from [Octicons](https://github.com/primer/octicons) (MIT); see [public/THIRD_PARTY_NOTICES.txt](public/THIRD_PARTY_NOTICES.txt).

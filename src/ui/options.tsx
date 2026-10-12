@@ -1,7 +1,7 @@
 import { COVERAGE, METRICS, PLATFORMS, REPO_URL, activePreset, presetRule, type Metric, type PresetName } from "../lib/score";
 import type { IconName } from "../lib/icons";
 import { t } from "../lib/i18n";
-import { Hero, Icon, Mark, NumberStepper, PowerButton, PresetControl, Row, StarLink, Tile, Wordmark } from "./kit";
+import { GitHubLink, Hero, Icon, Mark, NumberStepper, PowerButton, PresetControl, Row, Tile, Wordmark } from "./kit";
 import { SITES, useFilterState } from "./state";
 
 const METRIC_ICON: Record<Metric, IconName> = { likes: "heart", comments: "comment", views: "eye" };
@@ -118,7 +118,7 @@ export function OptionsApp() {
               <Icon name="reset" size={14} />
               {t("reset")}
             </button>
-            <StarLink href={REPO_URL} />
+            <GitHubLink href={REPO_URL} />
           </div>
           {resetFailed ? <p className="lead" role="alert">{t("resetFailed")}</p> : null}
           <p className="privacy">{t("privacy")}</p>

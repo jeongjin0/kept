@@ -165,11 +165,11 @@ export function NumberStepper(props: { value: number; disabled?: boolean; label:
   );
 }
 
-export function StarLink(props: { href: string }) {
+export function GitHubLink(props: { href: string }) {
   return (
-    <a className="star" href={props.href} target="_blank" rel="noreferrer" title={t("starTitle")}>
-      <Icon name="star" size={14} />
-      {t("star")}
+    <a className="github" href={props.href} target="_blank" rel="noreferrer" title={t("githubTitle")}>
+      <Icon name="github" size={16} />
+      {t("github")}
     </a>
   );
 }
