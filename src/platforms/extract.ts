@@ -19,6 +19,68 @@ function followedFromRelation(value: unknown): boolean | null {
   return null;
 }
 
+function booleanOrNull(value: unknown): boolean | null {
+  return value === true || value === false ? value : null;
+}
+
+// YouTube puts the viewer's subscription on subscriptionStateEntity.subscribed, keyed by the
+// subscribe button's store key, or on the older subscribeButtonRenderer.subscribed flag.
+// A document that names one video and one answer is that video's answer. Anything unclear stays unknown.
+export function youtubeFollowPairs(root: unknown): Array<{ id: string; followed: boolean }> {
+  const states = new Map<string, boolean>();
+  const orphans: boolean[] = [];
+  const videoIds: string[] = [];
+  const buttonKeys: string[] = [];
+  const direct: Array<{ id: string; followed: boolean }> = [];
+  walk(root, (key, val, parent) => {
+    if (key === "videoId" && typeof val === "string" && val) videoIds.push(val);
+    if ((key === "subscribeStateEntityStoreKey" || key === "stateEntityStoreKey") && typeof val === "string" && val) buttonKeys.push(val);
+    if (key === "subscriptionStateEntity" && val && typeof val === "object") {
+      const entity = val as Record<string, unknown>;
+      const followed = booleanOrNull(entity.subscribed);
+      if (followed == null) return;
+      const entityKey = typeof entity.key === "string" ? entity.key : typeof parent.entityKey === "string" ? parent.entityKey : "";
+      if (entityKey) states.set(entityKey, followed);
+      else orphans.push(followed);
+    }
+    if (key === "subscribeButtonRenderer" && val && typeof val === "object") {
+      const followed = booleanOrNull((val as Record<string, unknown>).subscribed);
+      const id = typeof parent.videoId === "string" ? parent.videoId : "";
+      if (followed != null) direct.push({ id, followed });
+    }
+  });
+  const unique = [...new Set(videoIds)];
+  const subject = unique.length === 1 ? unique[0] : "";
+  const out: Array<{ id: string; followed: boolean }> = [];
+  for (const item of direct) {
+    const id = item.id || subject;
+    if (id) out.push({ id, followed: item.followed });
+  }
+  if (subject) {
+    const matched = buttonKeys.map((key) => states.get(key)).filter((value): value is boolean => value != null);
+    const values = matched.length ? matched : [...states.values(), ...orphans];
+    if (values.length > 0 && values.every((value) => value === values[0])) out.push({ id: subject, followed: values[0] });
+  }
+  return out;
+}
+
+export function youtubeFollowed(root: unknown, videoId: string): boolean | null {
+  const hits = youtubeFollowPairs(root).filter((pair) => pair.id === videoId);
+  if (hits.length === 0) return null;
+  return hits.every((pair) => pair.followed === hits[0].followed) ? hits[0].followed : null;
+}
+
+function instagramFollowed(parent: Record<string, unknown>, user: Record<string, unknown> | undefined): boolean | null {
+  const friendship = parent.friendship_status as Record<string, unknown> | undefined;
+  const userFriendship = user?.friendship_status as Record<string, unknown> | undefined;
+  const values = [friendship?.following, userFriendship?.following, user?.is_following, parent.is_following];
+  for (const value of values) {
+    const followed = booleanOrNull(value);
+    if (followed != null) return followed;
+  }
+  return null;
+}
+
 const SKIP_KEYS = new Set(["adPlacements", "playerAds", "adSlots"]);
 
 export function parseCount(value: unknown): number | null {
@@ -73,7 +135,7 @@ export function extractYouTube(player: unknown): ExtractedItem | null {
   metrics.likes = likes[0] ?? null;
   metrics.comments = comments[0] ?? null;
   const creatorId = typeof details?.channelId === "string" ? details.channelId : null;
-  return { id, creatorId, metrics, kind: "video" };
+  return { id, creatorId, metrics, kind: "video", followed: youtubeFollowed(player, id) };
 }
 
 export function extractTikTok(root: unknown): ExtractedItem[] {
@@ -125,6 +187,7 @@ export function extractInstagram(root: unknown): ExtractedItem[] {
       id,
       creatorId: username,
       kind: parent.is_ad === true || parent.isAd === true ? "ad" : carousel ? "carousel" : "video",
+      followed: instagramFollowed(parent, user),
       metrics: { views, likes, comments, shares: null, saves: null },
     });
   });

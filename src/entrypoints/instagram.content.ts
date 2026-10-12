@@ -3,6 +3,7 @@ import { startFilter } from "../content/controller";
 import { gridAnchors, instagramReelId, moveUntilIdChanges, visibleVideo } from "../content/page";
 import type { SkipReason } from "../content/engine";
 import { instagramHasVisibleAd } from "../platforms/instagram-player";
+import { instagramFollowButtonFollowed } from "../platforms/instagram-player";
 
 function requestMove(key: "ArrowDown" | "ArrowUp", reason?: SkipReason): boolean {
   // A count never moves on from an ad or a photo card. Only the ad rule may leave an ad.
@@ -30,7 +31,7 @@ export default defineContentScript({
         // Keep non-video feed cards, including image advertisements. Preserve an
         // active identity so a preceding skip's Undo chip survives this card.
         const kind = !visibleVideo() ? "carousel" as const : instagramHasVisibleAd() ? "ad" as const : undefined;
-        return { id, creatorId: null, kind };
+        return { id, creatorId: null, kind, followed: instagramFollowButtonFollowed() };
       },
       advance: (reason) => moveUntilIdChanges(() => requestMove("ArrowDown", reason), instagramReelId),
       retreat: () => moveUntilIdChanges(() => requestMove("ArrowUp"), instagramReelId),

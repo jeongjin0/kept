@@ -6,3 +6,28 @@
 export function youtubeHasActiveAd(): boolean {
   return document.querySelector("ytd-reel-video-renderer[is-ads-overlay]") != null;
 }
+
+// The visible Shorts subscribe button. Exact labels only, in the two interface languages,
+// so a caption that mentions subscribing is not a subscription.
+export function followedFromSubscribeLabel(label: string): boolean | null {
+  const text = label.replace(/\s+/g, " ").trim().toLowerCase();
+  if (!text) return null;
+  if (/unsubscribe|구독\s*취소|구독취소/.test(text)) return true;
+  if (/^(subscribed|구독중|구독됨)$/.test(text)) return true;
+  if (/^(subscribe|구독)$/.test(text)) return false;
+  if (/^subscribe to\b/.test(text)) return false;
+  return null;
+}
+
+export function youtubeSubscribeButtonFollowed(): boolean | null {
+  const reel = document.querySelector("ytd-reel-video-renderer[is-active]") ?? document.querySelector("ytd-reel-video-renderer");
+  if (!(reel instanceof HTMLElement)) return null;
+  const legacy = reel.querySelector("ytd-subscribe-button-renderer");
+  if (legacy) return legacy.hasAttribute("subscribed");
+  for (const button of reel.querySelectorAll("button")) {
+    const label = button.getAttribute("aria-label") || button.textContent || "";
+    const followed = followedFromSubscribeLabel(label);
+    if (followed != null) return followed;
+  }
+  return null;
+}

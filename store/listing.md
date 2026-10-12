@@ -24,7 +24,7 @@ Want a different level? Open the popup and pick Lenient (under 100 likes), Balan
 
 Ads are skipped by default: ScrollPlus moves past ads that YouTube Shorts, TikTok, and Instagram Reels mark as ads. Turn off Skip ads in the popup to keep them. It only moves past the ad that fills the player; it does not block ad requests or hide anything in lists.
 
-On TikTok, videos from accounts you already follow stay, even under the like bar. The switch is on in Settings and can be turned off. ScrollPlus reads that from the page and does not keep a follow list. YouTube and Instagram are still judged only by likes and ads.
+Videos from channels you subscribe to and accounts you follow stay, even under the like bar, on YouTube, TikTok and Instagram. The switch is on in Settings and can be turned off. ScrollPlus reads that from the page and does not keep a follow list.
 
 The popup also shows an estimate of the time the skips have saved you, compared with swiping each video away yourself.
 
@@ -32,7 +32,7 @@ Every skip tells you why, for example "Skipped · 312 likes" or "Skipped · ad",
 
 ScrollPlus is not affiliated with YouTube, TikTok, Instagram, or GitHub. Counts stay on your device. The extension does not collect or transmit data. Open source, MIT: https://github.com/jeongjin0/scrollplus
 
-Single purpose: skip YouTube Shorts, TikTok videos, and Instagram Reels the user does not want to see: those with too few likes and ads (Skip ads is a switch that is on by default). It uses counts and ad markers already on the page. On TikTok it also keeps videos from accounts the user already follows, while that switch is on.
+Single purpose: skip YouTube Shorts, TikTok videos, and Instagram Reels the user does not want to see: those with too few likes and ads (Skip ads is a switch that is on by default). It uses counts and ad markers already on the page. It also keeps videos from accounts the user already subscribes to or follows, while that switch is on.
 
 ## Korean
 
@@ -52,7 +52,7 @@ ScrollPlus는 좋아요가 설정한 기준보다 적은 숏폼 영상을 자동
 
 광고도 기본으로 넘깁니다. 유튜브 쇼츠, 틱톡, 인스타그램 릴스가 광고로 표시한 영상을 넘기며, 팝업에서 광고 건너뛰기를 끄면 그대로 둡니다. 화면을 채운 광고만 넘기며, 광고 요청을 막거나 목록의 광고를 숨기지는 않습니다.
 
-틱톡에서는 이미 팔로우한 계정의 영상을 좋아요 기준 아래여도 남깁니다. 세부 설정의 스위치가 기본으로 켜져 있고, 끌 수 있습니다. 페이지에 있는 표시만 읽으며 팔로우 목록은 저장하지 않습니다. 유튜브와 인스타그램은 아직 좋아요와 광고만 봅니다.
+유튜브에서 구독한 채널, 틱톡과 인스타그램에서 팔로우한 계정의 영상은 좋아요 기준 아래여도 남깁니다. 세부 설정의 스위치가 기본으로 켜져 있고, 끌 수 있습니다. 페이지에 있는 표시만 읽으며 팔로우 목록은 저장하지 않습니다.
 
 팝업에는 지금까지 넘긴 영상으로 아낀 시간이 추정치로 표시됩니다. 직접 영상을 보다가 넘기는 경우와 비교한 값입니다.
 
@@ -60,4 +60,4 @@ ScrollPlus는 좋아요가 설정한 기준보다 적은 숏폼 영상을 자동
 
 ScrollPlus는 YouTube, TikTok, Instagram, GitHub와 관계가 없습니다. 수치는 기기 안에서만 쓰며, 수집하거나 전송하지 않습니다. 오픈소스(MIT): https://github.com/jeongjin0/scrollplus
 
-단일 목적: 보고 싶지 않은 유튜브 쇼츠, 틱톡, 인스타그램 릴스를 넘깁니다. 좋아요가 적은 영상과 광고(광고 건너뛰기는 기본으로 켜져 있는 스위치)가 대상입니다. 페이지에 이미 있는 수치와 광고 표시를 사용합니다. 틱톡에서는 팔로우한 계정의 영상을 남기는 스위치도 있습니다.
+단일 목적: 보고 싶지 않은 유튜브 쇼츠, 틱톡, 인스타그램 릴스를 넘깁니다. 좋아요가 적은 영상과 광고(광고 건너뛰기는 기본으로 켜져 있는 스위치)가 대상입니다. 페이지에 이미 있는 수치와 광고 표시를 사용합니다. 구독·팔로우한 계정의 영상을 남기는 스위치도 있습니다.

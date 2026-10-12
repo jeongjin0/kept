@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.2 – 2026-10-12
+
+- Keep accounts I follow now covers YouTube and Instagram as well as TikTok. A Short from a channel you subscribe to, and a Reel from an account you follow, stay even under the like bar. The switch was already on.
+- YouTube is read from the subscription flag on the video the page loaded, and from the subscribe button on the Short (구독중 / Subscribed). Instagram is read from the follow flag on the reel, and from the button beside it (팔로잉 / Following). TikTok is unchanged.
+- If the page does not say, the video is judged by its likes. An ad is still skipped when Skip ads is on. Nothing about who you follow is stored.
+
+
 ## 0.5.1 – 2026-10-12
 
 - Keep accounts I follow is on in Settings. On TikTok, a video from a creator you already follow stays, even when it is under the like bar. Turn the switch off and those videos are judged like any other. An ad is still skipped when Skip ads is on.

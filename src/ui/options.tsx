@@ -92,14 +92,7 @@ export function OptionsApp() {
               on={settings.keepFollowed}
               label={t("keepFollowed")}
               onToggle={(next) => update((current) => ({ ...current, keepFollowed: next }))}
-              title={
-                <>
-                  {t("keepFollowed")}
-                  <span className="covers" title={t("appliesTo", SITES.tiktok.name)} aria-label={t("appliesTo", SITES.tiktok.name)}>
-                    <Icon name="tiktok" size={12} />
-                  </span>
-                </>
-              }
+              title={t("keepFollowed")}
             />
             <Row icon="grid" title={t("filterGrids")} on={settings.filterGrids} label={t("filterGrids")} onToggle={(next) => update((current) => ({ ...current, filterGrids: next }))} />
             <Row icon="pill" title={t("showChip")} on={settings.showSkipChip} label={t("showChip")} onToggle={(next) => update((current) => ({ ...current, showSkipChip: next }))} />

@@ -144,7 +144,7 @@ test("settings accept typed numbers and mark the popup as custom", async () => {
     await expect(optionsAds).toHaveAttribute("aria-checked", "true");
     await optionsAds.click();
     await expect.poll(async () => (await stored(options)).skipAds).toBe(false);
-    const keepFollowed = options.getByRole("switch", { name: /Keep accounts I follow|팔로우 중인 계정은 유지/ });
+    const keepFollowed = options.getByRole("switch", { name: /Keep accounts I follow|구독·팔로우 중인 계정은 유지/ });
     await expect(keepFollowed).toHaveAttribute("aria-checked", "true");
     await keepFollowed.click();
     await expect.poll(async () => (await stored(options)).keepFollowed).toBe(false);
