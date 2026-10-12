@@ -17,7 +17,7 @@ const LANGS = {
   en: {
     ui: "en", locale: "en-US", dropKo: true,
     shots: path.join(root, "store/screenshots"), tileFile: path.join(root, "store/tile.png"), marqueeFile: path.join(root, "store/marquee.png"),
-    popup: ["Low-like videos <em>skip themselves.</em>", "Ready on install. Pick a like minimum, and skip ads if you want."],
+    popup: ["Low-like videos <em>skip themselves.</em>", "Ready on install. Ads skip too, and the popup counts the time you save."],
     options: ["Your numbers, <em>your rules.</em>", "Pick a preset or type your own. Likes, comments, views."],
     chip: ["Skipped. <em>Undo</em> in one tap.", "Every skip tells you why, and you can take it back."],
     tile: "Skips Shorts, Reels &amp; TikToks <em>with too few likes.</em>",
@@ -25,7 +25,7 @@ const LANGS = {
   ko: {
     ui: "ko", locale: "ko-KR", dropKo: false,
     shots: path.join(root, "store/screenshots/ko"), tileFile: path.join(root, "store/tile-ko.png"), marqueeFile: path.join(root, "store/marquee-ko.png"),
-    popup: ["좋아요 적은 영상은 <em>알아서 넘어가요.</em>", "설치하면 바로 켜져요. 좋아요 기준을 고르고, 광고도 넘길 수 있어요."],
+    popup: ["좋아요 적은 영상은 <em>알아서 넘어가요.</em>", "설치하면 바로 켜져요. 광고도 넘기고, 아낀 시간을 세어 줘요."],
     options: ["내 기준, <em>내 숫자.</em>", "프리셋을 고르거나 직접 입력하세요. 좋아요, 댓글, 조회수."],
     chip: ["넘김. <em>되돌리기</em>는 한 번에.", "넘기는 이유가 보여요. 몇 초 동안 되돌릴 수 있어요."],
     tile: "좋아요 적은 쇼츠·릴스·틱톡을 <em>알아서 넘겨요.</em>",
@@ -62,7 +62,11 @@ async function capture(lang, cfg, dirOut) {
   await popup.setViewportSize({ width: 320, height: 480 });
   await popup.goto("chrome-extension://" + id + "/popup.html");
   await popup.waitForSelector(".ready");
-  await popup.evaluate(() => chrome.storage.local.set({ dailySkips: { day: new Date().toLocaleDateString("sv"), count: 18 } }));
+  // The figures the popup and the settings page show in the images: 18 today, 1,482 in all, and about an hour saved.
+  await popup.evaluate(() => chrome.storage.local.set({
+    dailySkips: { day: new Date().toLocaleDateString("sv"), count: 18 },
+    totalSkips: { since: new Date(Date.now() - 7 * 864e5).toLocaleDateString("sv"), count: 1482, onScreenMs: 622440 },
+  }));
   await popup.reload();
   await popup.waitForSelector(".ready");
   await popup.waitForTimeout(400);
@@ -79,7 +83,8 @@ async function capture(lang, cfg, dirOut) {
 async function captureChip(lang, cfg, dirOut) {
   const messages = JSON.parse(fs.readFileSync(path.join(root, "public/_locales", lang, "messages.json"), "utf8"));
   const browser = await chromium.launch();
-  const context = await browser.newContext({ deviceScaleFactor: 2, locale: cfg.locale, viewport: { width: 640, height: 240 } });
+  // Reduced motion: the chip is drawn at rest, without the ring that widens while it appears.
+  const context = await browser.newContext({ deviceScaleFactor: 2, locale: cfg.locale, viewport: { width: 900, height: 320 }, reducedMotion: "reduce" });
   // The fixture page is not an extension page, so give it the same message lookup chrome.i18n would.
   await context.addInitScript(({ messages, ui }) => {
     window.chrome = {
@@ -113,10 +118,11 @@ async function captureChip(lang, cfg, dirOut) {
   });
   await page.waitForTimeout(260);
   const box = await page.locator("#scrollplus-chip-host").boundingBox();
-  const pad = 36;
+  // The glow and the shadow reach 40 px or so from the chip.
+  const pad = 56;
   await page.screenshot({ path: path.join(dirOut, "chip.png"), omitBackground: true, clip: { x: box.x - pad, y: box.y - pad, width: box.width + pad * 2, height: box.height + pad * 2 } });
   await browser.close();
-  return { w: box.width + pad * 2, h: box.height + pad * 2 };
+  return { w: box.width + pad * 2, h: box.height + pad * 2, pad, inner: box.width };
 }
 
 const BASE_CSS = [
@@ -144,7 +150,7 @@ const CARD_CSS = ".card{position:absolute;left:760px;top:64px;width:380px;height
   ".blob{position:absolute;left:70px;top:150px;width:240px;height:240px;border-radius:44% 56% 52% 48% / 52% 44% 56% 48%;background:linear-gradient(145deg,rgba(244,241,234,.14),rgba(244,241,234,.03))}" +
   ".acts{position:absolute;right:22px;bottom:178px;display:flex;flex-direction:column;gap:16px}.acts i{display:block;width:40px;height:40px;border-radius:50%;background:rgba(244,241,234,.12)}" +
   ".who{position:absolute;left:28px;bottom:180px;display:flex;align-items:center;gap:10px}.who b{display:block;width:34px;height:34px;border-radius:50%;background:rgba(255,77,46,.55)}.who span{display:block;width:110px;height:10px;border-radius:5px;background:rgba(244,241,234,.2)}" +
-  ".chipwrap{position:absolute;left:0;right:0;bottom:44px;display:flex;justify-content:center}.chipwrap img{display:block}";
+  ".chipwrap{position:absolute;left:0;right:0;display:flex;justify-content:center}.chipwrap img{display:block}";
 
 async function render(lang, cfg) {
   const dirOut = path.join(work, lang);
@@ -155,11 +161,14 @@ async function render(lang, cfg) {
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
   const stage = await context.newPage();
-  const chipW = Math.round(chipBox.w * 1.3);
+  // The chip is shown about 330 px wide in a 380 px card, where the skip chip sits by default: near the top of the video.
+  const chipScale = 330 / chipBox.inner;
+  const chipW = Math.round(chipBox.w * chipScale);
+  const chipTop = Math.round(64 - chipBox.pad * chipScale);
   const jobs = [
     { file: "popup.png", html: page(copy(cfg.popup) + '<div class="shot" style="left:700px;top:96px"><img src="' + uri(path.join(dirOut, "popup.png")) + '" width="480"></div>') },
     { file: "options.png", html: page(copy(cfg.options) + '<div class="shot" style="left:640px;top:0;width:560px;height:800px;overflow:hidden;border-radius:0 0 22px 22px"><img src="' + uri(path.join(dirOut, "options-full.png")) + '" width="560" style="border-radius:0;margin-top:56px"></div>') },
-    { file: "chip.png", html: page(copy(cfg.chip) + '<div class="card"><div class="orb"></div><div class="blob"></div><div class="acts"><i></i><i></i><i></i></div><div class="who"><b></b><span></span></div><div class="chipwrap"><img src="' + uri(path.join(dirOut, "chip.png")) + '" width="' + chipW + '"></div></div>', CARD_CSS) },
+    { file: "chip.png", html: page(copy(cfg.chip) + '<div class="card"><div class="orb"></div><div class="blob"></div><div class="acts"><i></i><i></i><i></i></div><div class="who"><b></b><span></span></div><div class="chipwrap" style="top:' + chipTop + 'px"><img src="' + uri(path.join(dirOut, "chip.png")) + '" width="' + chipW + '"></div></div>', CARD_CSS) },
   ];
   for (const job of jobs) {
     await stage.setContent(job.html);

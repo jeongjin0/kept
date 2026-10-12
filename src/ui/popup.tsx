@@ -5,7 +5,7 @@ import { GitHubLink, Hero, Icon, Mark, PowerButton, PresetControl, Row, Wordmark
 import { SITES, useFilterState } from "./state";
 
 export function PopupApp() {
-  const { settings, ready, skips, active, update, allowCurrent } = useFilterState();
+  const { settings, ready, skips, totals, active, update, allowCurrent } = useFilterState();
   const [kept, setKept] = useState(false);
   const [keepError, setKeepError] = useState(false);
   const creatorKept = kept || Boolean(active?.creatorId && active.platform && isAllowlisted(settings, active.platform, active.creatorId));
@@ -23,7 +23,7 @@ export function PopupApp() {
         <PowerButton on={settings.enabled} label={settings.enabled ? t("powerOn") : t("powerOff")} onChange={(enabled) => update((current) => ({ ...current, enabled }))} />
       </header>
       <div className="body">
-        <Hero count={skips} />
+        <Hero count={skips} totals={totals} />
         <PresetControl value={preset} labels={labels} onChange={(name) => update((current) => ({ ...current, rule: presetRule(name, current.rule) }))} />
         <div className="card">
           <Row icon="megaphone" title={t("skipAds")} on={settings.skipAds} label={t("skipAds")} onToggle={(next) => update((current) => ({ ...current, skipAds: next }))} />

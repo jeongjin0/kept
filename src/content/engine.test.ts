@@ -24,6 +24,7 @@ function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAd
   const chips: string[] = [];
   const models: unknown[] = [];
   let skips = 0;
+  const skipMs: number[] = [];
   let blocked = false;
   let latest = "";
   let calls = 0;
@@ -44,8 +45,9 @@ function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAd
       retreats.push(latest);
       return true;
     },
-    onSkipped: () => {
+    onSkipped: (ms) => {
       skips += 1;
+      skipMs.push(ms);
     },
     setRule: (next) => {
       settings.rule = next;
@@ -102,6 +104,7 @@ function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAd
     retreats,
     chips,
     models,
+    skipMs,
     get skips() { return skips; },
     get calls() { return calls; },
     setBlocked(value: boolean) { blocked = value; },
@@ -116,7 +119,7 @@ const good = { views: 900000, likes: 40000, comments: 200, shares: 10, saves: nu
 
 describe("engine and ads", () => {
   it("keeps an ad that has few likes while Skip ads is off", async () => {
-    const box = harness();
+    const box = harness({ skipAds: false });
     box.show(ad("a", low("a").metrics));
     await box.drain();
     box.flush(10000);
@@ -186,7 +189,7 @@ describe("engine and ads", () => {
   });
 
   it("applies the setting to the ad already on screen when it is switched on", async () => {
-    const box = harness();
+    const box = harness({ skipAds: false });
     box.flush(10000);
     box.show(ad("a"));
     await box.drain();
@@ -426,7 +429,7 @@ describe("engine", () => {
     box.flush(10000);
     box.engine.lower();
     await box.drain();
-    expect(box.settings.rule.likes.min).toBe(2000);
+    expect(box.settings.rule.likes.min).toBe(200);
     expect(box.advances).toHaveLength(6);
     expect(box.chips.at(-1)).toBe("none");
   });
@@ -602,6 +605,45 @@ describe("settling before a move", () => {
     box.flush(1000);
     await box.drain();
     expect(box.advances).toEqual([]);
+  });
+});
+
+describe("time on screen reported with a skip", () => {
+  it("reports how long the skipped video was the active one", async () => {
+    const box = harness({}, true, undefined, { advanceGapMs: 0, settleMs: 300 });
+    box.flush(10000);
+    box.show(low("a"));
+    await box.drain();
+    box.flush(300);
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+    expect(box.skipMs).toEqual([300]);
+  });
+
+  it("measures the skipped video, not the next one that arrives while the site is still moving", async () => {
+    const box = harness({}, true, (show) => show({ ...low("b"), metrics: good }), { advanceGapMs: 0, settleMs: 300 });
+    box.flush(10000);
+    box.show(low("a"));
+    await box.drain();
+    box.flush(300);
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+    expect(box.skipMs).toEqual([300]);
+  });
+
+  it("reports each skip of a row on its own", async () => {
+    const box = harness({}, true, undefined, { advanceGapMs: 0, settleMs: 200 });
+    box.flush(10000);
+    box.show(low("a"));
+    box.flush(200);
+    await box.drain();
+    box.flush(50);
+    box.show(low("b"));
+    box.flush(200);
+    await box.drain();
+    expect(box.advances).toEqual(["a", "b"]);
+    // Not 450: the time of one skip is not added to the next.
+    expect(box.skipMs).toEqual([200, 200]);
   });
 });
 

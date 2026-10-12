@@ -16,7 +16,8 @@ for (const layout of ["wide", "compact", "letterbox"] as const) {
     const { context, worker } = extension;
     await worker.evaluate(async () => {
       const { settings } = await chrome.storage.local.get("settings");
-      await chrome.storage.local.set({ settings: { ...settings, enabled: false } });
+      // Skip ads is on by default. These pages are about an advertisement that stays, so it is switched off here.
+      await chrome.storage.local.set({ settings: { ...settings, enabled: false, skipAds: false } });
     });
     await context.route("https://www.instagram.com/**", route => route.fulfill({
       contentType: "text/html",
@@ -54,7 +55,7 @@ for (const layout of ["wide", "compact", "letterbox"] as const) {
       await chrome.storage.local.set({ settings: { ...settings, enabled: true } });
     });
     await page.waitForTimeout(3200);
-    expect(await page.evaluate(() => (window as any).fixtureId), "advertisement must stay below the default 5000 minimum").toBe("advert");
+    expect(await page.evaluate(() => (window as any).fixtureId), "advertisement must stay below the default 500 minimum while Skip ads is off").toBe("advert");
     expect(await page.evaluate(() => (window as any).fixtureMoves)).toBe(0);
     expect((await worker.evaluate(() => chrome.storage.local.get("dailySkips"))).dailySkips?.count ?? 0).toBe(0);
     await page.getByRole("button", { name: "Next reel", exact: true }).click();

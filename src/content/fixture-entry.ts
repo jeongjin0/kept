@@ -11,11 +11,14 @@ let settings: Settings = {
 };
 let advances = 0;
 let retreats = 0;
-const chip = mountChip({
-  undo: () => engine.undo(),
-  keepGoing: () => engine.keepGoing(),
-  lower: () => engine.lower(),
-});
+const chip = mountChip(
+  {
+    undo: () => engine.undo(),
+    keepGoing: () => engine.keepGoing(),
+    lower: () => engine.lower(),
+  },
+  { position: () => settings.chipPosition, anchor: () => document.querySelector("video") },
+);
 const engine = createEngine({
   getSettings: () => settings,
   now: () => Date.now(),

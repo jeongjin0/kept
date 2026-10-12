@@ -24,6 +24,25 @@ export function visibleVideo(eligible: (video: HTMLVideoElement) => boolean = ()
   return bestRatio >= 0.6 ? best : null;
 }
 
+// The video whose column the skip chip is centred on: the one with the most of itself inside the window. Unlike visibleVideo it does not
+// ask for 60% of it, because the chip appears while a feed such as TikTok's is still scrolling to the next video, and all of the videos
+// of a feed share one column.
+export function mostVisibleVideo(): HTMLVideoElement | null {
+  let best: HTMLVideoElement | null = null;
+  let bestArea = 0;
+  for (const video of document.querySelectorAll("video")) {
+    const rect = video.getBoundingClientRect();
+    const width = Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0);
+    const height = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+    if (width <= 0 || height <= 0) continue;
+    if (width * height > bestArea) {
+      bestArea = width * height;
+      best = video;
+    }
+  }
+  return best;
+}
+
 export function tiktokActive(): { id: string; creatorId: string | null } | null {
   const fromUrl = location.pathname.match(/@([^/]+)\/video\/(\d+)/);
   if (fromUrl) return { creatorId: fromUrl[1], id: fromUrl[2] };

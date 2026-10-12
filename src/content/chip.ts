@@ -1,26 +1,35 @@
 import { svgIcon } from "../lib/icons";
 import { formatCount } from "../lib/numbers";
 import { t } from "../lib/i18n";
+import type { ChipPosition } from "../lib/score";
 import type { ChipModel } from "./engine";
+
+// A video is never closer to the window's edge than this many px when the chip is centred on it.
+const EDGE_GAP_PX = 8;
 
 const CSS = [
   ":host { all: initial; }",
   "*, *::before, *::after { box-sizing: border-box; }",
-  ".chip { font: 500 14px/1.2 ui-sans-serif, system-ui, -apple-system, 'Apple SD Gothic Neo', 'Segoe UI', sans-serif; color: #F4F1EA; background: #10110F; border: 1px solid rgba(244, 241, 234, 0.2); border-radius: 999px; padding: 7px 7px 7px 9px; display: flex; gap: 10px; align-items: center; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45); animation: in 120ms ease-out both; white-space: nowrap; }",
+  // A dark body keeps the words readable on any video. The accent border and glow keep the chip itself visible on a dark one.
+  ".chip { position: relative; font: 600 15px/1.2 ui-sans-serif, system-ui, -apple-system, 'Apple SD Gothic Neo', 'Segoe UI', sans-serif; color: #F4F1EA; background: #10110F; border: 1.5px solid #FF4D2E; border-radius: 999px; padding: 8px 8px 8px 10px; display: flex; gap: 12px; align-items: center; box-shadow: 0 0 22px rgba(255, 77, 46, 0.5), 0 12px 30px rgba(0, 0, 0, 0.55); animation: in 120ms ease-out both; white-space: nowrap; }",
+  // One ring that widens and fades when the chip appears, to catch the eye without moving the chip.
+  ".chip::after { content: ''; position: absolute; inset: -1.5px; border: 2px solid #FF4D2E; border-radius: inherit; pointer-events: none; animation: ping 700ms ease-out both; }",
   ".chip.leaving { animation: out 200ms ease-out both; }",
-  ".chip.stack { flex-direction: column; align-items: stretch; border-radius: 18px; padding: 14px; gap: 12px; white-space: normal; max-width: 280px; }",
-  ".dot { width: 24px; height: 24px; border-radius: 50%; background: #FF4D2E; color: #10110F; display: grid; place-items: center; flex: none; }",
+  ".chip.leaving::after { display: none; }",
+  ".chip.stack { flex-direction: column; align-items: stretch; border-radius: 20px; padding: 14px; gap: 12px; white-space: normal; max-width: 300px; }",
+  ".dot { width: 28px; height: 28px; border-radius: 50%; background: #FF4D2E; color: #10110F; display: grid; place-items: center; flex: none; }",
   ".dot svg { display: block; }",
   ".label { font-variant-numeric: tabular-nums; }",
   ".actions { display: flex; gap: 8px; }",
-  "button { font: inherit; font-weight: 600; color: #F4F1EA; background: rgba(244, 241, 234, 0.1); border: 0; border-radius: 999px; padding: 7px 13px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: background 180ms ease-out; }",
+  "button { font: inherit; font-weight: 600; color: #F4F1EA; background: rgba(244, 241, 234, 0.12); border: 0; border-radius: 999px; min-height: 34px; padding: 8px 15px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: background 180ms ease-out; }",
   "button:hover { background: rgba(244, 241, 234, 0.18); }",
   "button:focus-visible { outline: 2px solid #FF4D2E; outline-offset: 2px; }",
   "button.primary { background: #FF4D2E; color: #10110F; }",
   "button.primary:hover { background: #FF6446; }",
-  "@keyframes in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }",
+  "@keyframes in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }",
+  "@keyframes ping { from { inset: -1.5px; opacity: 0.85; } to { inset: -11px; opacity: 0; } }",
   "@keyframes out { from { opacity: 1; } to { opacity: 0; } }",
-  "@media (prefers-reduced-motion: reduce) { .chip, .chip.leaving { animation-duration: 1ms; } }",
+  "@media (prefers-reduced-motion: reduce) { .chip, .chip.leaving, .chip::after { animation-duration: 1ms; } }",
 ].join("\n");
 
 function button(label: string, onClick: () => void, icon?: Parameters<typeof svgIcon>[0], primary = false): HTMLButtonElement {
@@ -45,20 +54,27 @@ function skippedLabel(model: Extract<ChipModel, { mode: "skipped" }>): string {
   return t("chipLikes", count);
 }
 
-export function mountChip(actions: { undo: () => void; keepGoing: () => void; lower: () => void }) {
+export interface ChipOptions {
+  // Where the chip sits. Defaults to "top".
+  position?: () => ChipPosition;
+  // The video the chip is centred on, when one is on screen. Without it the chip is centred on the window.
+  anchor?: () => HTMLElement | null;
+}
+
+export function mountChip(actions: { undo: () => void; keepGoing: () => void; lower: () => void }, options: ChipOptions = {}) {
   let host: HTMLDivElement | null = null;
   let root: HTMLDivElement | null = null;
   let leaveTimer: number | null = null;
+  let placeTimer: number | null = null;
   let previousModel = "null";
+  // The centre of the video's column the last time a video was found. A feed that swaps its video elements has none for a moment.
+  let lastCentre: number | null = null;
 
   function ensure(): void {
     if (host && root) return;
     host = document.createElement("div");
     host.id = "scrollplus-chip-host";
     host.style.position = "fixed";
-    host.style.left = "50%";
-    host.style.bottom = "32px";
-    host.style.transform = "translateX(-50%)";
     host.style.zIndex = "2147483646";
     const shadow = host.attachShadow({ mode: "open" });
     const style = document.createElement("style");
@@ -66,6 +82,47 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     root = document.createElement("div");
     shadow.append(style, root);
     (document.documentElement ?? document.body).append(host);
+    window.addEventListener("resize", () => { lastCentre = null; place(); }, { passive: true });
+  }
+
+  // Centred on the video's column, high up, in the middle, or low but above the caption. The height is measured from the window,
+  // not from the video: while TikTok scrolls to the next video its box is still moving, but its column is not.
+  function place(): void {
+    if (!host) return;
+    const position = options.position?.() ?? "top";
+    let box: DOMRect | null = null;
+    try {
+      box = options.anchor?.()?.getBoundingClientRect() ?? null;
+    } catch {
+      box = null;
+    }
+    const width = document.documentElement.clientWidth || window.innerWidth;
+    const height = window.innerHeight;
+    let center: number;
+    if (box && box.width > 0 && box.right > 0 && box.left < width) {
+      center = box.left + box.width / 2;
+      lastCentre = center;
+    } else {
+      center = lastCentre ?? width / 2;
+    }
+    // Measure from the window's edge, where the chip has all the room it can use, and not from wherever it was left before.
+    host.style.left = "0px";
+    const half = host.getBoundingClientRect().width / 2;
+    center = Math.min(Math.max(center, half + EDGE_GAP_PX), Math.max(half + EDGE_GAP_PX, width - half - EDGE_GAP_PX));
+    host.style.left = Math.round(center) + "px";
+    host.style.transform = position === "middle" ? "translate(-50%, -50%)" : "translateX(-50%)";
+    host.style.top = position === "top" ? Math.round(Math.min(140, Math.max(24, height * 0.18))) + "px" : position === "middle" ? "50%" : "auto";
+    host.style.bottom = position === "lower" ? Math.round(Math.min(220, Math.max(24, height * 0.28))) + "px" : "auto";
+  }
+
+  // Place the chip now, and once more a moment later: the video of a feed that is still swapping players may not be there yet.
+  function settle(): void {
+    place();
+    if (placeTimer != null) window.clearTimeout(placeTimer);
+    placeTimer = window.setTimeout(() => {
+      placeTimer = null;
+      place();
+    }, 250);
   }
 
   function clearLeave() {
@@ -93,6 +150,7 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
         const label = shown.querySelector(".label");
         if (label) {
           label.textContent = skippedLabel(model);
+          settle();
           return;
         }
       }
@@ -129,6 +187,7 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
         chip.append(label, row);
       }
       root.replaceChildren(chip);
+      settle();
     },
   };
 }

@@ -118,7 +118,7 @@ for (const platform of platforms) {
     expect(await revisit.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
     await revisit.close();
     await app.getByRole("radio", { name: /Strict|엄격/ }).click();
-    await expect.poll(async () => (await stored(app)).rule.likes.min).toBe(20000);
+    await expect.poll(async () => (await stored(app)).rule.likes.min).toBe(1000);
     await page.waitForTimeout(600);
     expect(await page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
     // Observe the short-lived Undo while Reset is in flight, before action tracing returns.

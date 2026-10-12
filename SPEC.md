@@ -2,7 +2,7 @@
 
 This file is the product spec. Implement it. Do not add features that are not written here. If a rule is missing, leave the behavior out and record the gap in qa/gaps.md. Read this file before coding and again before calling the work done.
 
-Status: 0.4.4 beta. Settings opens in a tab of its own instead of the small dialog that chrome://extensions shows for an options page, and the GitHub button carries GitHub's mark in white instead of a star. Skipping is unchanged: the YouTube, TikTok and Instagram scripts differ from those of 0.4.3 only in the icon table they share with the popup. 0.4.3: On Instagram Reels a skipped reel is on screen for a median 0.32 s instead of 0.62 s (live, signed in, 20,000-like bar, the built Instagram scripts run in the page behind a stand-in for chrome.storage; qa/skip-timing-instagram.md): ScrollPlus waits 100 ms instead of 450 ms between skips, looks at the feed while it scrolls, and presses as soon as the reel is on screen enough. On TikTok the wait after a video arrives is 180 ms instead of 150 ms, because TikTok answers a press made sooner than about 0.16 s after an arrival 0.1 s late: the median skipped video is on screen for 0.31 s instead of 0.38 s (qa/skip-timing-tiktok.md). A person who scrolls Reels with a wheel or trackpad was not simulated. 0.4.2: on TikTok a skipped video is on screen for 0.48 s on average instead of 1.03 s (live, signed out, 20,000-like bar): ScrollPlus no longer presses a Next control that TikTok keeps disabled until it has the next video, waits 150 ms after a video arrives instead of 450 ms between skips, and leaves TikTok's sound alone because TikTok takes a mute made by a script as the person's own choice. A row of skips shows one chip. 0.4.1: on YouTube a Short that follows another skip is on screen for about 0.5 s instead of 0.8 s, a press the site does not act on is pressed again after 0.7 s instead of 2 s, and a Short that is being skipped is muted. Why the first skip stays at about half a second is in qa/skip-timing.md. A Skip ads switch, off by default, moves past an ad that fills the player on YouTube Shorts, TikTok and Instagram Reels. While grid filtering is off, pages are not rescanned for links. Instagram keeps disclosed advertisements and non-video cards. TikTok/Instagram publish only changed rows and active-player data; unchanged embedded payloads are not reparsed. Undo now survives reloads and new tabs for the browser session; Reset clears those temporary choices. Bounded 0.3.5 signed-in default filtering and TikTok Undo/reload/Reset were observed in Aside Chromium 153; earlier 0.3.3/0.3.4 paths retain their own package scope. The exact-0.3.5 automated 24-hour YouTube run completed with two reviewed page-reload recoveries. Current Instagram Undo/reload, broader signed-in Google Chrome, positive-path live Following and ordinary human day-use remain open. See qa/session-undo.md and qa/release-readiness.md. Decisions below are locked.
+Status: 0.5.0 beta. The presets are 100, 500 and 1,000 likes (they were 1,000, 5,000 and 20,000), and an install of 0.4.x keeps the preset it had, by name. Skip ads is on from the start. The skip chip sits at the top of the video, centred on it, with a dark body, an accent border and a glow, so that it is seen on a dark video as well, and Settings can move it to the middle or to a place low on the video above the caption. The popup shows an estimate of the time the skips have saved, and Settings shows today, the total and that estimate, with how it is made. The skipping itself is unchanged. 0.4.4: Settings opens in a tab of its own instead of the small dialog that chrome://extensions shows for an options page, and the GitHub button carries GitHub's mark in white instead of a star. Skipping is unchanged: the YouTube, TikTok and Instagram scripts differ from those of 0.4.3 only in the icon table they share with the popup. 0.4.3: On Instagram Reels a skipped reel is on screen for a median 0.32 s instead of 0.62 s (live, signed in, 20,000-like bar, the built Instagram scripts run in the page behind a stand-in for chrome.storage; qa/skip-timing-instagram.md): ScrollPlus waits 100 ms instead of 450 ms between skips, looks at the feed while it scrolls, and presses as soon as the reel is on screen enough. On TikTok the wait after a video arrives is 180 ms instead of 150 ms, because TikTok answers a press made sooner than about 0.16 s after an arrival 0.1 s late: the median skipped video is on screen for 0.31 s instead of 0.38 s (qa/skip-timing-tiktok.md). A person who scrolls Reels with a wheel or trackpad was not simulated. 0.4.2: on TikTok a skipped video is on screen for 0.48 s on average instead of 1.03 s (live, signed out, 20,000-like bar): ScrollPlus no longer presses a Next control that TikTok keeps disabled until it has the next video, waits 150 ms after a video arrives instead of 450 ms between skips, and leaves TikTok's sound alone because TikTok takes a mute made by a script as the person's own choice. A row of skips shows one chip. 0.4.1: on YouTube a Short that follows another skip is on screen for about 0.5 s instead of 0.8 s, a press the site does not act on is pressed again after 0.7 s instead of 2 s, and a Short that is being skipped is muted. Why the first skip stays at about half a second is in qa/skip-timing.md. A Skip ads switch, off by default, moves past an ad that fills the player on YouTube Shorts, TikTok and Instagram Reels. While grid filtering is off, pages are not rescanned for links. Instagram keeps disclosed advertisements and non-video cards. TikTok/Instagram publish only changed rows and active-player data; unchanged embedded payloads are not reparsed. Undo now survives reloads and new tabs for the browser session; Reset clears those temporary choices. Bounded 0.3.5 signed-in default filtering and TikTok Undo/reload/Reset were observed in Aside Chromium 153; earlier 0.3.3/0.3.4 paths retain their own package scope. The exact-0.3.5 automated 24-hour YouTube run completed with two reviewed page-reload recoveries. Current Instagram Undo/reload, broader signed-in Google Chrome, positive-path live Following and ordinary human day-use remain open. See qa/session-undo.md and qa/release-readiness.md. Decisions below are locked.
 
 ## Product
 
@@ -33,7 +33,7 @@ The locale files hold two strings: extName is the manifest name and the store ti
 - Local directory: /Users/jeongjin/Developer/edgethink/kept (keeps its old name)
 - Public GitHub repo: github.com/jeongjin0/scrollplus
 - License: MIT
-- Version: 0.4.4
+- Version: 0.5.0
 - Do not put this project in the Obsidian vault
 - Do not submit it to the Chrome Web Store
 
@@ -57,7 +57,7 @@ A rule is a list of conditions. Each condition is one count the page shows, an o
 
 | Condition | Default | Default minimum | Shown by |
 | --- | --- | --- | --- |
-| Likes | on | 5,000 | YouTube, TikTok, Instagram |
+| Likes | on | 500 | YouTube, TikTok, Instagram |
 | Comments | off | 100 | TikTok, Instagram |
 | Views | off | 100,000 | YouTube, TikTok, Instagram |
 
@@ -67,7 +67,7 @@ Skip a video when any turned-on condition has a known count that is under its mi
 - A count equal to the minimum passes.
 - If the creator is allowlisted, keep the video.
 - If the platform is off or the master switch is off, keep the video.
-- Photo carousels and items with no metrics are kept. Ads are kept too unless Skip ads is on (see Ads).
+- Photo carousels and items with no metrics are kept. Ads are skipped by default and kept when Skip ads is off (see Ads).
 
 ### Presets
 
@@ -75,19 +75,19 @@ A preset sets Likes to a fixed minimum, turns Likes on, and turns Comments and V
 
 | Preset | Korean | Skip when likes are under |
 | --- | --- | --- |
-| Lenient | 느슨 | 1,000 |
-| Balanced | 기본 | 5,000 |
-| Strict | 엄격 | 20,000 |
+| Lenient | 느슨 | 100 |
+| Balanced | 기본 | 500 |
+| Strict | 엄격 | 1,000 |
 
 The popup and options show the active preset. Any rule that matches no preset is shown as Custom. The presets show their like count inside the control.
 
 ### Numbers
 
-Counts are shown short in the interface language: 5K and 20K in English, 5천 and 2만 in Korean. Fields accept what people type: 5000, 5,000, 5k, 2만, 3천. The plus and minus buttons step through round numbers: 5, 10, 20, 50, 100, 200, 500, 1K, 2K, 5K, 10K, 20K, 50K, 100K, and up to 10M.
+Counts are shown short in the interface language: 500 and 1K in English, 500 and 1천 in Korean. Fields accept what people type: 5000, 5,000, 5k, 2만, 3천. The plus and minus buttons step through round numbers: 5, 10, 20, 50, 100, 200, 500, 1K, 2K, 5K, 10K, 20K, 50K, 100K, and up to 10M.
 
 ### Ads
 
-Skip ads is a switch, off by default. Off, an ad is kept whatever its counts: an ad that shows 125 likes stays. On, an ad that fills the player is skipped as soon as it is known to be one, without waiting for counts and without looking at them. The chip says "Skipped · ad" / "넘김 · 광고" with Undo, and Undo keeps that ad for the browser session like any other skip.
+Skip ads is a switch, on by default. On, an ad that fills the player is skipped as soon as it is known to be one, without waiting for counts and without looking at them. The chip says "Skipped · ad" / "넘김 · 광고" with Undo, and Undo keeps that ad for the browser session like any other skip. Off, an ad is kept whatever its counts: an ad that shows 125 likes stays.
 
 - Only the active player is judged. Ad cards in lists and grids are never hidden, even with Skip ads and filterGrids both on.
 - The usual keeps apply first: the master switch, a site that is off, and a creator the user kept.
@@ -112,18 +112,28 @@ On install, write these defaults and apply them immediately. The extension must 
     {
       "enabled": true,
       "rule": {
-        "likes":    { "on": true,  "min": 5000 },
+        "likes":    { "on": true,  "min": 500 },
         "comments": { "on": false, "min": 100 },
         "views":    { "on": false, "min": 100000 }
       },
       "platforms": { "youtube": true, "tiktok": true, "instagram": true },
       "filterGrids": false,
       "showSkipChip": true,
-      "skipAds": false,
+      "chipPosition": "top",
+      "skipAds": true,
       "allowlist": []
     }
 
-Settings from 0.1.x that hold a sensitivity map to the matching preset. Settings saved before 0.4.0 have no skipAds and read as off. Anything unreadable falls back to the defaults.
+Settings from 0.1.x that hold a sensitivity map to the matching preset. A setting that is missing reads as its default: Skip ads on, the chip at the top. Anything unreadable falls back to the defaults.
+
+### Updating from 0.4.x
+
+0.5.0 changes what the presets mean and turns Skip ads on. Settings saved by 0.4.x are moved once, by the background worker, when it finds no schema marker. The marker is the storage key schema, which is 2 from 0.5.0 on. It is written in the same call as the moved settings, so the move never runs twice, and a fresh install gets the defaults and the marker. The worker checks for it when it starts, not only when the extension is installed or updated.
+
+- A rule that is exactly a 0.4.x preset (Likes on, Comments and Views off, and 1,000, 5,000 or 20,000 likes) becomes the preset of the same name: Lenient, Balanced or Strict. The spare minimums for Comments and Views are kept. Without this a saved Lenient would read as the new Strict, and a saved 5,000 or 20,000 as Custom.
+- Any other rule is the person's own and stays as it is.
+- Skip ads turns on. A saved "off" is also what a person who never touched the switch has, so the two cannot be told apart. It can be turned off again in the popup, and that stays.
+- Everything else is kept: the allowlist, the sites, grids, the chip, the master switch and today's count. The total of skips and saved time starts at 0 (see Time saved).
 
 Rule and power changes re-evaluate the current video immediately. Undo still keeps its video for the session. A deliberate Continue or Lower action renews the decision window after a long pause; known counts that arrived on time remain usable after writing a comment.
 
@@ -148,9 +158,28 @@ This applies to the active vertical player only.
 - If the next control does not exist, stop and leave the current video. Do not loop.
 - The extension's only host-page UI is the chip. No banner, no sidebar, and no restyling of YouTube, TikTok, or Instagram.
 
-When a skip happens and showSkipChip is on, the chip says why, with the count that missed: "Skipped · 454 likes" / "넘김 · 좋아요 454", plus "Undo" / "되돌리기", for 2.5 seconds. Comments and views read the same way, and an ad skipped by Skip ads reads "Skipped · ad" / "넘김 · 광고". Undo moves back one item and keeps the skipped id for the browser session, even when the engine already sees the next video. Undo does not write the creator allowlist. Repeated polling never replaces a focused chip button. A skip that follows a skip changes the words of the chip that is already shown instead of showing a new one.
+When a skip happens and showSkipChip is on, the chip (see The skip chip) says why, with the count that missed: "Skipped · 454 likes" / "넘김 · 좋아요 454", plus "Undo" / "되돌리기", for 2.5 seconds. Comments and views read the same way, and an ad skipped by Skip ads reads "Skipped · ad" / "넘김 · 광고". Undo moves back one item and keeps the skipped id for the browser session, even when the engine already sees the next video. Undo does not write the creator allowlist. Repeated polling never replaces a focused chip button. A skip that follows a skip changes the words of the chip that is already shown instead of showing a new one.
 
 A session keep-set is memory only, shared across reloads and tabs by platform. Use trusted-only chrome.storage.session through a background message broker, and commit before retreating. Do not persist video ids to disk. Browser restart, extension reload/update/disable and Reset clear the temporary choices. Older delayed messages must not restore choices cleared by Reset.
+
+## The skip chip
+
+The chip is the only thing ScrollPlus adds to a site. It must be seen on any video, bright or dark, and must not sit on what a person reads.
+
+- Position, from the chipPosition setting: top (default), middle or lower. The chip is centred on the video that is on screen, and on the window when there is none. Top is 18% of the window's height down, at most 140 px: below the player controls of YouTube Shorts and clear of the caption. Middle is the centre of the window. Lower is 28% of the window's height up from the bottom, at most 220 px: above the caption on all three sites, though it can still meet a video's own subtitles. The height is measured from the window and not from the video, because TikTok's video is still scrolling when the chip appears while its column is not. The chip stays 8 px inside the window's edges. It is placed again when its words change, 250 ms after it appears (a feed that swaps its video players may have none for a moment) and when the window is resized. When no video is found it is centred on the column seen last, and on the window when none was seen yet. The column is that of the video with the most of itself inside the window.
+- Bottom, 32 px from the window's edge as in 0.4.4, is gone: it sat on the caption, and on a dark video the dark chip could not be told from the video.
+- Look: see Visual system.
+- The chip is shown for 2.5 seconds, and a skip that follows a skip changes its words instead of showing a new chip. The pause chip ("The next ones are under your bar.") has the same look and the same place.
+
+## Time saved
+
+The popup and Settings show what the skips have saved, as an estimate, compared with a person who sees a video they do not want and swipes it away themselves.
+
+- Each skip counts as 3 seconds of that person's time, less the time the skipped video was on screen. Three seconds is a cautious figure. In 2026 watch histories donated by 16,981 TikTok users (wrapped.vantezzen.io/state-of-the-feed) the median swipe came after 6 seconds and about a third of all videos were gone within 3 seconds, and those include videos people liked. It is not measured on the person using ScrollPlus, and the interface says it is an estimate.
+- The time on screen is measured by the page script, from the moment the skipped video was first seen as the active one to the moment the site had moved on from it (about 0.3 to 0.6 s on the three sites, see the skip timing reports in qa/). It travels with the skip message, and the background worker, which already counts the skips one at a time, adds it to the total.
+- The time of one skip is limited to the 3 seconds, so a slow skip saves nothing and does not take away from the others. A skip whose time is not known saves nothing.
+- The total is stored in chrome.storage.local as totalSkips: since (the day the count started, the day of the install or of the update to 0.5.0), count and onScreenMs. Time saved = count x 3 s - onScreenMs. Reset does not clear it. Today's count is separate and starts over at midnight.
+- It is shown rounded down: "47 sec", "12 min", "3 hr 12 min" (from 100 hours on, the hours alone), in the popup in the narrow form "47s", "12m", "3h 12m". Korean: 47초, 12분, 3시간 12분.
 
 ## Allowlist
 
@@ -171,7 +200,7 @@ The popup is 320 wide and no taller than 480. It does not scroll, including when
 Popup contains only:
 
 - The app mark and the name, and a round power button for the master switch
-- Today's skip count, large, with the label "skipped today" / "오늘 넘김"
+- Today's skip count, large, with the label "skipped today" / "오늘 넘김", and under it the estimated time saved in the accent color with a clock icon: "≈ 1h 3m saved so far" / "약 1시간 3분 아낌". Its tooltip says it is an estimate and how it is made
 - The preset control: Lenient, Balanced, Strict, each showing its like count
 - One row with a switch, "Skip ads" / "광고 건너뛰기", with a megaphone icon, in its own card under the presets
 - Three site rows, each with an original icon, the site name, and a switch. No other text in the row.
@@ -186,10 +215,10 @@ The options page opens in a tab of its own (open_in_tab), from the popup's Setti
 Options, top to bottom:
 
 - Wordmark and the power button with an On / Off label
-- Today's skip count
+- Three figures in one card: skipped today, skipped in total and the estimated time saved. Under it a note says how the estimate is made and since when the total counts. At narrow widths the figures stack.
 - Rules: the preset control, then one row each for Likes, Comments, and Views. Each row has an icon, the name, a stepper with plus, minus, and a typeable number, and a switch. Comments shows the TikTok and Reels icons, because YouTube does not show comment counts. A turned-off row is dimmed and its stepper is disabled.
 - Sites: the three site rows
-- Behavior: skip ads, also filter lists and grids, and show the skip chip
+- Behavior: skip ads, also filter lists and grids, and show the skip chip. Under them, "Skip chip position" with three choices, each with a small picture of a video and where the chip sits: Top, Middle, Lower. It is dimmed and disabled while the chip is off.
 - Creators to keep: the list with a remove button, or an empty state
 - Reset to defaults, which clears temporary Undo choices and keeps the allowlist and today's count, and the GitHub button. Disable Reset while pending; report a failure inline rather than claiming success.
 - A one-line privacy statement
@@ -210,7 +239,9 @@ The GitHub button shows GitHub's own mark in white (Octicons mark-github, MIT, c
 
 Cards have 14px corners. Controls are at least 32px tall in the popup and 34px in options. Every control has a visible keyboard focus ring and an accessible name. Icons are one set, drawn on a 16px grid with a 1.5px stroke. The GitHub mark is GitHub's own filled mark on the same grid and is never recoloured. No purple gradients, glassmorphism, or runtime web fonts. UI text uses ui-sans-serif.
 
-Motion is ease-out, about 180ms. The preset highlight slides between choices. The skip chip fades in over 120ms and out over 200ms. No bounce. Reduced motion shortens every transition.
+The skip chip has a dark body (#10110F) with cream text (#F4F1EA) at 15px and weight 600, a 1.5px accent border, an accent glow (0 0 22px at 50%) and a 28px accent dot. The dark body keeps the words readable on a bright video, and the border and the glow keep the chip itself visible on a dark one. Its buttons are at least 34px tall. When the chip appears, one accent ring widens and fades over 700ms.
+
+Motion is ease-out, about 180ms. The preset highlight slides between choices. The skip chip fades in over 120ms (from 96% to full size) and out over 200ms. No bounce. Reduced motion shortens every transition.
 
 The app mark is a rounded square in the accent color with a door-like frame and a dot. It is recognizable at 16px. Generate 16, 32, 48, and 128 sizes from that mark with scripts/render-icons.mjs.
 
@@ -231,7 +262,7 @@ Permissions:
 
 No all-urls permission, and no tabs, cookies, webRequest, history, or identity permission.
 
-Persist only settings and a daily skip count in chrome.storage.local. Reset the count at local midnight. Keep Undo video ids only in chrome.storage.session RAM, without exposing that storage area to content scripts. Do not persist watch history or video ids to disk.
+Persist only settings, the schema marker, a daily skip count and an all-time total (how many skips, and for how long those videos were on screen) in chrome.storage.local. Reset the daily count at local midnight. Keep Undo video ids only in chrome.storage.session RAM, without exposing that storage area to content scripts. Do not persist watch history or video ids to disk.
 
 The background worker serializes counter writes across tabs. An open options page refreshes its counter at local midnight.
 
@@ -243,7 +274,7 @@ Read metrics the page has already loaded. Do not call private APIs yourself.
 
 A fetch observer must call the original fetch and return the original response untouched. Errors in the extension must not break the host page.
 
-PRIVACY.md states that the extension does not collect, transmit, or sell user data, lists the storage keys, and gives the GitHub repo as the contact. The same statement belongs in the options page and store/listing.md.
+PRIVACY.md states that the extension does not collect, transmit, or sell user data, lists the storage keys (settings, schema, dailySkips, totalSkips), and gives the GitHub repo as the contact. The same statement belongs in the options page and store/listing.md.
 
 README and the store listing say the extension is not affiliated with YouTube, TikTok, Instagram, or GitHub.
 
@@ -287,9 +318,9 @@ Single purpose: skip YouTube Shorts, TikTok videos, and Instagram Reels the user
 
 The work is done only when all of these are true:
 
-1. npm test passes. Tests cover the rule: minimums, equal-to-minimum, missing counts, any-condition-fails, allowlist, ads, carousels, grids, presets, Custom detection, and old settings. They also cover the number helpers.
+1. npm test passes. Tests cover the rule: minimums, equal-to-minimum, missing counts, any-condition-fails, allowlist, ads, carousels, grids, presets, Custom detection, and old settings. They also cover the number helpers, the move of 0.4.x settings (each preset keeps its name, a rule of the person's own stays, and it never runs twice) and the time-saved arithmetic.
 2. Playwright fixture tests prove a skip with its reason chip, the 6-skip pause, undo, and fail-open when metrics are missing.
-3. Playwright tests on the built extension prove the defaults on a fresh profile, preset changes, site and power switches, typed numbers, Custom detection, and Reset.
+3. Playwright tests on the built extension prove the defaults on a fresh profile (Balanced, 500 likes, Skip ads on), preset changes, site and power switches, typed numbers, Custom detection, Reset, the move from a 0.4.4 profile, the time saved in both languages, and the chip's position.
 4. The production build is green, the unpacked extension loads, and a zip exists.
 5. qa/live-smoke.md records a dated YouTube Shorts run with the shipped defaults. Signed-in claims must cite actual live evidence, browser/version and tested paths; fixtures do not establish signed-in compatibility. qa/signed-in-smoke.md records the current scoped Reels and For You checks.
 6. The popup fits without scrolling at 1x and 2x, in English and Korean.
