@@ -12,7 +12,7 @@ Checked on 2026-10-12 KST, macOS ARM64. This candidate keeps a TikTok video when
 | Live signed-in TikTok | Not observed | The only capture is signed out, and both authors had relation 0. The values 1 and 3 are the published meaning of that field, not something seen on an account that follows someone. See [follow](follow.md) |
 | YouTube and Instagram | Not covered | Signed-out YouTube had no subscribed boolean. Signed-out Instagram redirects to login |
 | Package | Pass | npm run zip and node scripts/check-package.mjs. scrollplus-0.5.1-chrome.zip, 138,387 bytes. MV3, Chrome 120+, storage, the same three hosts. Both locales have the same keys |
-| Minimum Chrome 120 | Pending CI | The pull request runs the suite on Chrome 120 |
+| Minimum Chrome 120 | Pass | [CI](https://github.com/jeongjin0/scrollplus/actions/runs/38224357106) and [CI](https://github.com/jeongjin0/scrollplus/actions/runs/38224340908), both on the 0.5.1 commit. Chrome for Testing 120 and current Chromium. |
 | Chrome Web Store | Not submitted | Owner decision |
 
 ## Remaining gates
