@@ -3,9 +3,9 @@ import { launch } from "./extension";
 
 const test = base.extend<{ extension: Awaited<ReturnType<typeof launch>> }>({
   extension: [async ({}, use) => {
-    const extension = await launch();
+    const extension = await launch(undefined, undefined, true);
     try { await use(extension); }
-    finally { await extension.context.close(); }
+    finally { await extension.close(); }
   }, { timeout: 30000 }],
 });
 
@@ -84,10 +84,19 @@ for (const platform of ["tiktok", "instagram"] as const) {
     expect(replacement).toEqual({ sameLength: true, samePrefix: true });
     await expect.poll(() => page.evaluate(() => (window as any).bridgeProbe.likes)).toBe(400);
     await expect.poll(() => page.evaluate(() => (window as any).bridgeProbe.cacheItems)).toBe(warm.cacheItems + 501);
+    const feedTabId = await worker.evaluate(async () => {
+      const tab = (await chrome.tabs.query({})).find(tab => tab.url?.includes("/foryou") || tab.url?.includes("/reel/reel0/"))!;
+      await chrome.tabs.create({ windowId: tab.windowId, url: "about:blank", active: true });
+      return tab.id!;
+    });
+    await expect.poll(() => page.evaluate(() => document.hidden)).toBe(true);
     await worker.evaluate(async () => {
       const { settings } = await chrome.storage.local.get("settings");
       await chrome.storage.local.set({ settings: { ...settings, enabled: true } });
     });
+    await page.waitForTimeout(1500);
+    expect(await page.evaluate(() => (window as any).fixtureMoves), "hidden tabs must not advance after settings change").toBe(0);
+    await worker.evaluate(id => chrome.tabs.update(id, { active: true }), feedTabId);
     await expect.poll(() => page.evaluate(() => (window as any).fixtureMoves)).toBe(1);
     await expect(page.locator("#scrollplus-chip-host")).toContainText(/400|4백/);
     expect(errors).toEqual([]);

@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-13",
+  "browser": "Chromium 153.0.8010.12, macOS ARM64",
+  "scope": "routed Instagram fixture; native visibility; not live CPU percentage",
+  "scripts": 100,
+  "idleWindowMs": 2500,
+  "baseline": {
+    "version": "0.7.1 published ZIP",
+    "idleScriptReads": 300
+  },
+  "candidate": {
+    "scripts": 100,
+    "idleWindowMs": 2500,
+    "idleReads": 0,
+    "changedAndInsertedReads": 2,
+    "hiddenWindowMs": 2500,
+    "hiddenScriptSeconds": 0
+  },
+  "localFullSuite": {
+    "tests": 70,
+    "failed": 0,
+    "retries": 0,
+    "scope": "before final late-count reset; final change requires CI"
+  },
+  "unitTests": 125
+}

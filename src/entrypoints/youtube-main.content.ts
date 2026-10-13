@@ -2,6 +2,7 @@ import { defineContentScript } from "wxt/utils/define-content-script";
 import { youtubeShortId } from "../content/page";
 import { extractYouTube, youtubeFollowPairs } from "../platforms/extract";
 import { observeJsonResponses } from "../platforms/observe";
+import { visiblePoll } from "../lib/visible-poll";
 
 export default defineContentScript({
   matches: ["https://www.youtube.com/*"],
@@ -16,6 +17,7 @@ export default defineContentScript({
     };
     observeJsonResponses((url) => /\/youtubei\/v1\/player(?:\?|$)|\/youtubei\/v1\/reel\/reel_item_watch/.test(url), remember);
     const publish = (player?: unknown) => {
+      if (document.hidden) return;
       try {
         const id = youtubeShortId();
         if (!id) return;
@@ -39,13 +41,13 @@ export default defineContentScript({
       publish(latest);
     });
     window.addEventListener("message", (event) => {
-      if (event.source !== window) return;
+      if (event.source !== window || document.hidden) return;
       const data = event.data as { source?: string; type?: string; key?: string } | null;
       if (!data || data.source !== "scrollplus" || data.type !== "advance" || (data.key !== "ArrowUp" && data.key !== "ArrowDown")) return;
       const selector = data.key === "ArrowUp" ? "#navigation-button-up button" : "#navigation-button-down button";
       const button = document.querySelector(selector);
       if (button instanceof HTMLElement) button.click();
     });
-    window.setInterval(() => publish(), 500);
+    visiblePoll(() => publish(), 500);
   },
 });

@@ -3,6 +3,7 @@ import { tiktokActive, tiktokControl } from "../content/page";
 import { extractTikTok } from "../platforms/extract";
 import { createEmbeddedReader, createItemBridge } from "../platforms/item-bridge";
 import { observeJsonResponses } from "../platforms/observe";
+import { visiblePoll } from "../lib/visible-poll";
 
 export default defineContentScript({
   matches: ["https://www.tiktok.com/*"],
@@ -22,7 +23,7 @@ export default defineContentScript({
     };
     document.addEventListener("DOMContentLoaded", readEmbedded);
     window.addEventListener("message", (event) => {
-      if (event.source !== window) return;
+      if (event.source !== window || document.hidden) return;
       const data = event.data as { source?: string; type?: string; key?: string } | null;
       if (!data || data.source !== "scrollplus" || data.type !== "advance" || (data.key !== "ArrowUp" && data.key !== "ArrowDown")) return;
       try {
@@ -31,7 +32,7 @@ export default defineContentScript({
         /* leave the page alone */
       }
     });
-    window.setInterval(() => {
+    visiblePoll(() => {
       readEmbedded();
       bridge.publish();
     }, 700);

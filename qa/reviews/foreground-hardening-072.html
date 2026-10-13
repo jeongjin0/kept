@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ScrollPlus 0.7.2 · 동작과 성능 점검</title>
+<style>
+:root{color-scheme:dark;--bg:#0d1414;--panel:#131e1d;--line:#253635;--text:#eef5f4;--muted:#99acab;--accent:#59c5bf}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif}
+main{max-width:1060px;margin:auto;padding:48px 24px 80px}a{color:var(--accent)}header{margin-bottom:32px}.eyebrow{font-size:13px;color:var(--accent);letter-spacing:.04em}h1{font-size:clamp(28px,5vw,42px);line-height:1.25;letter-spacing:-1.4px;margin:12px 0}p{color:var(--muted);margin:0 0 16px}h2{font-size:21px;letter-spacing:-.5px;margin:0 0 12px}h3{font-size:17px;margin:0 0 8px}
+.link{display:inline-block;padding:10px 17px;border:1px solid var(--line);border-radius:999px;text-decoration:none;margin:4px 8px 0 0}.primary{background:var(--accent);color:#031a19;border-color:var(--accent);font-weight:650}.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px;margin-bottom:20px}.compare{display:flex;align-items:center;gap:28px;flex-wrap:wrap;padding:12px 0 20px}.number{font-size:68px;line-height:1.1;font-weight:650;letter-spacing:-3px}.after{color:var(--accent)}.caption{display:block;font-size:13px;color:var(--muted);margin-top:8px}.arrow{color:var(--muted);font-size:28px}.note{font-size:13px;color:var(--muted);margin-bottom:0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{padding:20px;background:var(--panel);border:1px solid var(--line);border-radius:16px}.card p{font-size:14px;margin:0}.status{display:inline-block;color:var(--accent);font-size:12px;margin-bottom:7px}.screens{display:grid;grid-template-columns:320px minmax(0,1fr);gap:24px;align-items:start}figure{margin:0}img{width:100%;height:auto;display:block;border-radius:12px}figcaption{font-size:13px;color:var(--muted);margin-top:10px}section+section{margin-top:28px}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line)}td:first-child,th:first-child{padding-left:0}td:last-child{text-align:right}th{color:var(--muted);font-weight:500}.checks{font-size:14px}.checks p:last-child{margin-bottom:0}:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+@media(max-width:700px){main{padding:28px 18px 60px}.grid,.screens{grid-template-columns:1fr}.panel{padding:20px}.screens figure:first-child{max-width:320px}.number{font-size:58px}}
+</style>
+<main>
+<header><span class="eyebrow">SCROLLPLUS · 0.7.2 BETA · 2026.10.13</span><h1>보는 탭에서만 넘기고,<br>불필요한 작업을 줄였습니다.</h1><p>화면은 그대로. 탭 전환, 연속 넘김, 늦은 데이터와 입력 취소를 점검했습니다.</p><a class="link primary" href="https://github.com/jeongjin0/scrollplus/releases/tag/v0.7.2">0.7.2 베타 다운로드</a><a class="link" href="https://github.com/jeongjin0/scrollplus/blob/main/qa/foreground-hardening-072.md">QA 상세 기록</a></header>
+<section class="panel"><h2>인스타그램 데이터 재조회</h2><p>변하지 않은 스크립트를 반복해서 읽던 작업을 없앴습니다.</p><div class="compare"><div><span class="number">300</span><span class="caption">0.7.1 · 반복 읽기</span></div><span class="arrow" aria-label="에서">→</span><div><span class="number after">0</span><span class="caption">0.7.2 · 반복 읽기</span></div></div><p class="note">동일한 통제 페이지의 JSON 스크립트 100개를 2.5초 동안 측정했습니다. 수정·추가한 스크립트는 각각 한 번씩 읽었습니다. 실제 사이트 전체 CPU 개선율을 뜻하지 않습니다.</p></section>
+<section><h2>확인하고 고친 동작</h2><div class="grid">
+<article class="card"><span class="status">세 사이트 확인</span><h3>백그라운드 자동 넘김 중지</h3><p>다른 탭을 보는 동안 피드를 넘기지 않습니다. 돌아오면 바로 확인하고, 여섯 번 연속 넘김 제한은 유지합니다.</p></article>
+<article class="card"><span class="status">회귀 검사 통과</span><h3>유지한 영상에서 연속 횟수 초기화</h3><p>되돌린 영상, 유지한 제작자, 다시 방문한 영상과 늦게 도착한 지표 때문에 유지된 영상이 이전 넘김 횟수를 이어받지 않습니다.</p></article>
+<article class="card"><span class="status">회귀 검사 통과</span><h3>꺼진 뒤 알림이 되살아나는 문제 수정</h3><p>이미 시작된 이동이 늦게 끝나도 옛 알림이 다시 나타나지 않습니다. 실제로 넘긴 횟수는 한 번만 집계합니다.</p></article>
+<article class="card"><span class="status">회귀 검사 통과</span><h3>취소한 제스처 뒤 필터 복구</h3><p>포인터 입력이 취소되거나 창을 벗어나도 필터가 계속 멈춰 있지 않습니다. 통과한 영상 사이의 넘김 이유도 별개로 표시합니다.</p></article>
+</div></section>
+<section class="panel"><h2>검증 범위</h2><table><tbody><tr><td>단위 검사</td><td>125개</td></tr><tr><td>브라우저 전체 검사</td><td>70개 · CI에서 최종 확인</td></tr><tr><td>최소 지원 버전</td><td>Chrome 120 · CI 필수</td></tr><tr><td>권한·기본값</td><td>기존과 동일</td></tr></tbody></table><div class="checks"><p style="margin-top:16px">실제 유튜브에서 광고 넘김을 관찰했습니다. 틱톡은 짧은 구간에 기준 아래 영상이 없었고, 사이트 오류 한 건은 확장을 끈 비교에서도 재현됐습니다.</p><p>인스타그램 로그인 피드와 하루 실사용은 이번 검사 범위에 포함되지 않습니다. Chrome Web Store는 미제출이며 GitHub 베타입니다.</p></div></section>
+<section class="panel"><h2>현재 화면</h2><p>시계 아이콘과 시간 수치만 표시합니다. 팝업은 426px 높이입니다.</p><div class="screens"><figure><img src="../screenshots/review-072/popup-ko.png" alt="ScrollPlus 팝업"><figcaption>현재 팝업</figcaption></figure><figure><img src="../screenshots/review-072/options-1440-ko.png" alt="ScrollPlus 세부 설정"><figcaption>세부 설정 · 1440px 캡처</figcaption></figure></div></section>
+<section class="panel"><h2>실제 유튜브 광고 넘김</h2><figure><img src="../screenshots/review-072/youtube-ad.png" alt="유튜브 쇼츠 왼쪽 여백에 광고 넘김과 되돌리기 표시"><figcaption>최종 런타임 빌드의 로그아웃 피드. 넘김 표시는 영상 왼쪽 여백에 있습니다.</figcaption></figure></section>
+<footer class="note"><a href="../review-071/">이전 화면 리뷰</a> · <a href="https://github.com/jeongjin0/scrollplus">GitHub</a></footer>
+</main>
+</html>

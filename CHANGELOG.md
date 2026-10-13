@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.2 – 2026-10-13
+
+- Hidden tabs no longer auto-skip or repeatedly scan the active player and grids. Returning checks the feed immediately. The six-skip safety pause is preserved.
+- Instagram reads embedded payloads when their script is inserted or its text changes, instead of scanning all scripts every 800 ms. Same-length replacements and changes to a text node remain supported.
+- A kept video, including Undo choices and revisits, ends a consecutive skip run. A passing video separates reason lists, so unrelated skips are not grouped together.
+- An in-flight move that finishes after disable, leaving the feed or switching tabs cannot bring back an old notification. Actual successful moves are still counted once.
+- A cancelled pointer gesture no longer leaves filtering stuck. Window blur and tab switches also clear the gesture. Defaults, UI appearance, permissions and storage keys are unchanged.
+- Live smoke and soak tools now check the current 500-like defaults and report low-like samples against the tested minimum, rather than requiring the obsolete 5,000-like bar. Historical soak packages retain their versioned expectations.
+
 ## 0.7.1 – 2026-10-13
 
 - Removed the time-saved explanation and labels from the popup and Settings. Both show only a clock icon and the time value; Settings keeps the date the count began.
