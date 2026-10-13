@@ -282,7 +282,7 @@ Read metrics the page has already loaded. Do not call private APIs yourself.
 
 A fetch observer must call the original fetch and return the original response untouched. Errors in the extension must not break the host page.
 
-PRIVACY.md states that the extension does not collect, transmit, or sell user data, lists the storage keys (settings, schema, dailySkips, totalSkips), and gives the GitHub repo as the contact. The same statement belongs in the options page and store/listing.md.
+PRIVACY.md states that page data is processed locally and not transmitted to the developer or third parties, sold or used for advertising. It discloses the page-memory cache, local keys (settings, schema, dailySkips, totalSkips), session-only Undo choices, retention/removal and Limited Use, with the GitHub repository/issues as contact. Store declarations must cover local data handling too; no-server operation alone does not justify leaving every data category unchecked. The options page and store listing describe the same local-only operation.
 
 README and the store listing say the extension is not affiliated with YouTube, TikTok, Instagram, or GitHub.
 
