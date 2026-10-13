@@ -37,7 +37,7 @@ test("fixture skips, pauses, undoes, and fails open without console errors", asy
   expect(errors).toEqual([]);
 });
 
-test("the skip chip is centred on the video, high up by default, and Settings' position moves it", async ({ page }) => {
+test("the skip chip sits beside the video by default, lists a row of skips, and Settings can put it over the video", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto("/player.html");
   const video = (await page.locator("#stage").boundingBox())!;
@@ -52,19 +52,30 @@ test("the skip chip is centred on the video, high up by default, and Settings' p
       if (position) app.settings.chipPosition = position;
       app.show({ id, metrics });
     }, { position, id: "weak" + shown, metrics: { ...low, likes } });
-    // A skip that follows a skip changes the words of the chip that is already there, so wait for the move itself.
+    // A skip that follows a skip adds a line to the chip that is already there, so wait for the move itself.
     await expect(page.locator("#advances")).toHaveText(String(shown));
     await expect(page.locator("#scrollplus-chip-host")).toContainText("Skipped · " + likes + " likes");
     await page.waitForTimeout(150);
     return (await page.locator("#scrollplus-chip-host").boundingBox())!;
   }
 
-  // The default is the top: centred on the video, 18% of the window down (130 of 720 px).
-  const top = await chipBox();
+  // The default is beside the video: its right edge 16 px from the video's left edge, and its middle at the middle of the window (360 px).
+  // None of the video is covered.
+  const side = await chipBox();
+  expect(side.x + side.width).toBeCloseTo(video.x - 16, 0);
+  expect(side.y + side.height / 2).toBeCloseTo(360, 0);
+  expect(side.width).toBeCloseTo(228, 0);
+  expect(side.x + side.width).toBeLessThanOrEqual(video.x);
+
+  // The other three put it over the video, centred on its column. Top: 18% of the window down (130 of 720 px). This is the second skip in a
+  // row: it adds a line to the same chip, and the chip lists the reasons newest first, with no head and no mark.
+  const top = await chipBox("top");
   expect(top.x + top.width / 2).toBeCloseTo(videoCentre, 0);
   expect(top.y).toBeCloseTo(130, 0);
+  const rows = await page.locator("#scrollplus-chip-host").evaluate((host) => Array.from(host.shadowRoot!.querySelectorAll(".r")).map((node) => node.textContent));
+  expect(rows).toEqual(["Skipped · 11 likes", "Skipped · 10 likes"]);
+  expect(await page.locator("#scrollplus-chip-host").evaluate((host) => getComputedStyle(host.shadowRoot!.querySelector(".head")!).display)).toBe("none");
 
-  // The other two, in the window of a laptop. The chip of the first skip is still up, so this also checks that it moves when it is updated.
   const middle = await chipBox("middle");
   expect(middle.x + middle.width / 2).toBeCloseTo(videoCentre, 0);
   expect(middle.y + middle.height / 2).toBeCloseTo(360, 0);
@@ -73,6 +84,33 @@ test("the skip chip is centred on the video, high up by default, and Settings' p
   expect(lower.x + lower.width / 2).toBeCloseTo(videoCentre, 0);
   // 28% of the window up from the bottom (202 of 720 px).
   expect(lower.y + lower.height).toBeCloseTo(720 - 202, 0);
+});
+
+test("with little room beside the video the chip shrinks to a pill, and with none it goes over the video", async ({ page }) => {
+  // A window of 560 px with the video at 140 to 440: a card fits on neither side (88 px on the left, 42 px on the right of the buttons),
+  // a pill of 52 px fits on the left.
+  await page.setViewportSize({ width: 560, height: 720 });
+  await page.goto("/player.html");
+  await page.evaluate(() => { (document.querySelector("#stage") as HTMLElement).style.left = "140px"; });
+  const video = (await page.locator("#stage").boundingBox())!;
+  const host = page.locator("#scrollplus-chip-host");
+  await page.evaluate((metrics) => (window as any).__scrollplus.show({ id: "pill1", metrics }), low);
+  await expect(page.locator("#advances")).toHaveText("1");
+  await expect.poll(async () => (await host.boundingBox())?.width ?? 0).toBeCloseTo(52, 0);
+  const pill = (await host.boundingBox())!;
+  expect(pill.x + pill.width).toBeCloseTo(video.x - 16, 0);
+  // Undo is still there, as the pill's button.
+  await expect(page.getByRole("button", { name: "Undo" })).toBeVisible();
+
+  // With no room at all (a window of 420 px, the video at 20 to 320) the chip goes over the video as before: centred on its column.
+  await page.setViewportSize({ width: 420, height: 720 });
+  await page.evaluate(() => { (document.querySelector("#stage") as HTMLElement).style.left = "20px"; });
+  await page.evaluate((metrics) => (window as any).__scrollplus.show({ id: "pill2", metrics }), { ...low, likes: 11 });
+  await expect(page.locator("#advances")).toHaveText("2");
+  await page.waitForTimeout(300);
+  const over = (await host.boundingBox())!;
+  const moved = (await page.locator("#stage").boundingBox())!;
+  expect(over.x + over.width / 2).toBeCloseTo(moved.x + moved.width / 2, 0);
 });
 
 test("the skip chip stays inside a narrow window, and is centred on the window when no video is on screen", async ({ page }) => {

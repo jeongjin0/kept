@@ -349,6 +349,41 @@ describe("engine", () => {
     expect(box.chips.at(-1)).toBe("paused");
   });
 
+  it("lists each skip of a row, newest first, and starts over once the chip has gone", async () => {
+    const box = harness();
+    box.show({ ...low("a"), metrics: { ...low("a").metrics!, likes: 41 } });
+    await box.drain();
+    // One skip is the plain chip, with no row.
+    expect(box.models.at(-1)).toEqual({ mode: "skipped", metric: "likes", value: 41 });
+    box.flush(450);
+    box.show({ ...ad("b"), kind: "ad", metrics: null });
+    await box.drain();
+    box.flush(450);
+    box.show({ ...low("c"), metrics: { ...low("c").metrics!, likes: 312 } });
+    await box.drain();
+    expect(box.models.at(-1)).toEqual({
+      mode: "skipped", metric: "likes", value: 312,
+      run: [{ metric: "likes", value: 312 }, { metric: "ad" }, { metric: "likes", value: 41 }],
+    });
+    // The chip goes after 2.5 s. The next skip is a row of one again.
+    box.flush(2600);
+    expect(box.chips.at(-1)).toBe("none");
+    box.show({ ...low("d"), metrics: { ...low("d").metrics!, likes: 5 } });
+    await box.drain();
+    expect(box.models.at(-1)).toEqual({ mode: "skipped", metric: "likes", value: 5 });
+  });
+
+  it("shows at most three reasons of a row", async () => {
+    const box = harness({ skipAds: true });
+    for (let index = 1; index <= 5; index += 1) {
+      box.show({ ...low("v" + index), metrics: { ...low("v" + index).metrics!, likes: index } });
+      await box.drain();
+      box.flush(450);
+    }
+    const last = box.models.at(-1) as { run?: unknown[] };
+    expect(last.run).toHaveLength(3);
+  });
+
   it("undo keeps the current video for the session", async () => {
     const box = harness();
     box.show(low("a"));

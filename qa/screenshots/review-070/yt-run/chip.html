@@ -1,0 +1,34 @@
+<style>:host { all: initial; }
+*, *::before, *::after { box-sizing: border-box; }
+.chip { position: relative; width: 228px; font: 600 14.5px/1.3 ui-sans-serif, system-ui, -apple-system, 'Apple SD Gothic Neo', 'Segoe UI', sans-serif; color: #EEF5F4; background: #0D1414; border: 1.5px solid #59C5BF; border-radius: 18px; padding: 12px; display: grid; gap: 10px; box-shadow: 0 0 22px rgba(89, 197, 191, 0.4), 0 12px 30px rgba(0, 0, 0, 0.55); animation: in 120ms ease-out both; }
+.chip::after { content: ''; position: absolute; inset: -1.5px; border: 2px solid #59C5BF; border-radius: inherit; pointer-events: none; animation: ping 700ms ease-out both; }
+.chip.leaving { animation: out 200ms ease-out both; }
+.chip.leaving::after { display: none; }
+.head { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.dot { width: 26px; height: 26px; border-radius: 50%; background: #59C5BF; color: #031A19; display: grid; place-items: center; flex: none; }
+.dot svg { display: block; }
+.label { font-variant-numeric: tabular-nums; min-width: 0; }
+.chip:not(.compact) .head.run { display: none; }
+.rows { display: grid; gap: 6px; }
+.rows:empty { display: none; }
+.r { display: flex; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; }
+.r::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #59C5BF; flex: none; }
+.r:nth-child(n+2) { font-weight: 500; font-size: 13.5px; color: #99ACAB; }
+.head .count { display: none; }
+.chip.pause { gap: 12px; }
+.actions { display: grid; gap: 8px; }
+button { font: inherit; font-weight: 600; color: #EEF5F4; background: rgba(238, 245, 244, 0.12); border: 0; border-radius: 999px; min-height: 34px; padding: 8px 15px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: background 180ms ease-out; }
+button:hover { background: rgba(238, 245, 244, 0.18); }
+button:focus-visible { outline: 2px solid #59C5BF; outline-offset: 2px; }
+button.primary { background: #59C5BF; color: #031A19; }
+button.primary:hover { background: #6AD6CF; }
+.chip.compact { width: 52px; padding: 8px 0; gap: 6px; justify-items: center; border-radius: 26px; }
+.chip.compact .head { flex-direction: column; gap: 4px; }
+.chip.compact .label, .chip.compact .rows, .chip.compact .txt { display: none; }
+.chip.compact button { width: 34px; min-height: 34px; padding: 0; border-radius: 50%; }
+.count { font-size: 13px; font-variant-numeric: tabular-nums; }
+.chip.compact .head .count { display: block; }
+@keyframes in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes ping { from { inset: -1.5px; opacity: 0.85; } to { inset: -11px; opacity: 0; } }
+@keyframes out { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .chip, .chip.leaving, .chip::after { animation-duration: 1ms; } }</style><div><div class="chip" data-mode="skipped" role="status"><div class="head run"><span class="dot"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 5.6h2.6"></path><path d="M1.8 8h3.4"></path><path d="M3.6 10.4h1.6"></path><path d="M7.6 3.6 13.6 8l-6 4.4Z" fill="currentColor" stroke="none"></path></svg></span><span class="count">×3</span></div><div class="rows"><span class="r">넘김 · 좋아요 1.3만</span><span class="r">넘김 · 광고</span><span class="r">넘김 · 좋아요 1.9만</span></div><button type="button" aria-label="되돌리기"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.4 3.2 2.8 5.8l2.6 2.6"></path><path d="M3 5.8h6.2a3.5 3.5 0 0 1 0 7H6.4"></path></svg><span class="txt">되돌리기</span></button></div></div>

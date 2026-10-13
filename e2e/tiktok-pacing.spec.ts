@@ -135,7 +135,11 @@ test("TikTok: a skip that follows a skip changes the words of the chip instead o
   await tab.waitForFunction(() => document.querySelector("#scrollplus-chip-host")?.shadowRoot?.querySelector(".chip"));
   const chip = await tab.evaluateHandle(() => document.querySelector("#scrollplus-chip-host")!.shadowRoot!.querySelector(".chip")!);
   await expect(tab.locator("#scrollplus-chip-host")).toContainText(/30/, { timeout: 8000 });
-  expect(await chip.evaluate((node) => ({ shown: node.isConnected && !node.classList.contains("leaving"), label: node.querySelector(".label")!.textContent }))).toEqual({ shown: true, label: expect.stringMatching(/30/) });
+  // The same chip, still shown, now lists the row of skips, the newest first, with no head.
+  expect(await chip.evaluate((node) => ({ shown: node.isConnected && !node.classList.contains("leaving"), rows: Array.from(node.querySelectorAll(".r")).map((row) => row.textContent) }))).toEqual({
+    shown: true,
+    rows: [expect.stringMatching(/30/), expect.stringMatching(/20/), expect.stringMatching(/10/)],
+  });
 });
 
 test("TikTok: Undo still works while the next skip waits for the site", async ({ extension }) => {

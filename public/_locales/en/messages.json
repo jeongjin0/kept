@@ -229,5 +229,8 @@
   },
   "posLower": {
     "message": "Lower"
+  },
+  "posSide": {
+    "message": "Beside"
   }
 }

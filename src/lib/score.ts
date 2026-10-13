@@ -31,9 +31,10 @@ export type Rule = Record<Metric, Condition>;
 export type PresetName = "lenient" | "balanced" | "strict";
 export const PRESETS: PresetName[] = ["lenient", "balanced", "strict"];
 
-// Where the skip chip sits over the video, centred on it: high up, in the middle, or low but above the caption.
-export type ChipPosition = "top" | "middle" | "lower";
-export const CHIP_POSITIONS: ChipPosition[] = ["top", "middle", "lower"];
+// Where the skip chip sits: beside the video, in the clear space next to it (the default), or over the video centred on it: high up, in
+// the middle, or low but above the caption.
+export type ChipPosition = "side" | "top" | "middle" | "lower";
+export const CHIP_POSITIONS: ChipPosition[] = ["side", "top", "middle", "lower"];
 
 export const PRESET_LIKES: Record<PresetName, number> = {
   lenient: 100,
@@ -73,7 +74,8 @@ export const STORAGE_DAILY = "dailySkips";
 export const STORAGE_TOTALS = "totalSkips";
 export const STORAGE_SCHEMA = "schema";
 // 1 (no marker): 0.4.x and earlier, presets of 1,000 / 5,000 / 20,000 likes and Skip ads off. 2: 0.5.0, presets of 100 / 500 / 1,000 and Skip ads on.
-export const SCHEMA_VERSION = 2;
+// 3: 0.7.0, the skip chip beside the video in place of over it.
+export const SCHEMA_VERSION = 3;
 
 export function presetRule(name: PresetName, base?: Rule): Rule {
   return {
@@ -107,7 +109,7 @@ export const DEFAULT_SETTINGS: Settings = {
   platforms: { youtube: true, tiktok: true, instagram: true },
   filterGrids: false,
   showSkipChip: true,
-  chipPosition: "top",
+  chipPosition: "side",
   skipAds: true,
   keepFollowed: true,
   allowlist: [],
@@ -243,7 +245,7 @@ export function normalizeSettings(value: unknown): Settings {
     },
     filterGrids: raw.filterGrids === true,
     showSkipChip: raw.showSkipChip !== false,
-    chipPosition: CHIP_POSITIONS.find((position) => position === raw.chipPosition) ?? "top",
+    chipPosition: CHIP_POSITIONS.find((position) => position === raw.chipPosition) ?? "side",
     skipAds: raw.skipAds !== false,
     keepFollowed: raw.keepFollowed !== false,
     allowlist,
@@ -255,13 +257,19 @@ export function normalizeSettings(value: unknown): Settings {
 //   are 10x and 20x lower now. Without this a saved Lenient (1,000) would read as the new Strict and 5,000 and 20,000 as Custom.
 //   Any other rule is the person's own and stays as it is.
 // - Skip ads is on by default from 0.5.0. A saved "off" is also what a person who never touched the switch has, so it turns on once.
-export function migrateSettings(value: unknown): Settings {
-  const settings = normalizeSettings(value);
-  const saved = value && typeof value === "object" ? (value as Record<string, unknown>).rule : undefined;
-  const { likes, comments, views } = settings.rule;
-  // Only a rule that was saved as numbers is on the old scale. Settings from 0.1.x hold a word (sensitivity), which was read on the new one.
-  const legacy = saved && typeof saved === "object" && likes.on && !comments.on && !views.on ? PRESETS.find((name) => LEGACY_PRESET_LIKES[name] === likes.min) : undefined;
-  return { ...settings, rule: legacy ? presetRule(legacy, settings.rule) : settings.rule, skipAds: true };
+export function migrateSettings(value: unknown, from = 1): Settings {
+  let settings = normalizeSettings(value);
+  if (from < 2) {
+    const saved = value && typeof value === "object" ? (value as Record<string, unknown>).rule : undefined;
+    const { likes, comments, views } = settings.rule;
+    // Only a rule that was saved as numbers is on the old scale. Settings from 0.1.x hold a word (sensitivity), which was read on the new one.
+    const legacy = saved && typeof saved === "object" && likes.on && !comments.on && !views.on ? PRESETS.find((name) => LEGACY_PRESET_LIKES[name] === likes.min) : undefined;
+    settings = { ...settings, rule: legacy ? presetRule(legacy, settings.rule) : settings.rule, skipAds: true };
+  }
+  // 0.7.0 puts the skip chip beside the video. The top was the default of 0.5.0 and 0.6.0 and covers the video, so it moves once. A middle or
+  // lower place that a person chose stays.
+  if (from < 3 && settings.chipPosition === "top") settings = { ...settings, chipPosition: "side" };
+  return settings;
 }
 
 export function emptyMetrics(): Metrics {

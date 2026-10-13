@@ -229,5 +229,8 @@
   },
   "posLower": {
     "message": "아래"
+  },
+  "posSide": {
+    "message": "옆 여백"
   }
 }
