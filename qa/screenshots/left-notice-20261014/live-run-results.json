@@ -1,0 +1,99 @@
+{
+  "scope": "Real candidate unpacked extension in a fresh signed-out YouTube profile, temporary 100M-like threshold. A held QA pointer gesture freezes the real skip run for layout capture; not the shipped 500-like default or signed-in feeds.",
+  "results": [
+    {
+      "label": "real skip run, comments closed",
+      "host": {
+        "x": 321.875,
+        "y": 381.609375,
+        "width": 228,
+        "height": 136.78125,
+        "top": 381.609375,
+        "right": 549.875,
+        "bottom": 518.390625,
+        "left": 321.875
+      },
+      "video": {
+        "x": 565.875,
+        "y": 64,
+        "width": 452,
+        "height": 804,
+        "top": 64,
+        "right": 1017.875,
+        "bottom": 868,
+        "left": 565.875
+      },
+      "visible": "visible",
+      "compact": false,
+      "mode": "skipped",
+      "url": "https://www.youtube.com/shorts/iBVhOW6YR78"
+    },
+    {
+      "label": "real skip run, comments open",
+      "host": {
+        "x": 249.875,
+        "y": 409.90625,
+        "width": 44,
+        "height": 80.1875,
+        "top": 409.90625,
+        "right": 293.875,
+        "bottom": 490.09375,
+        "left": 249.875
+      },
+      "video": {
+        "x": 301.875,
+        "y": 64,
+        "width": 452,
+        "height": 804,
+        "top": 64,
+        "right": 753.875,
+        "bottom": 868,
+        "left": 301.875
+      },
+      "visible": "visible",
+      "compact": true,
+      "mode": "skipped",
+      "url": "https://www.youtube.com/shorts/iBVhOW6YR78"
+    },
+    {
+      "label": "real skip run, comments closed again",
+      "host": {
+        "x": 321.875,
+        "y": 381.609375,
+        "width": 228,
+        "height": 136.78125,
+        "top": 381.609375,
+        "right": 549.875,
+        "bottom": 518.390625,
+        "left": 321.875
+      },
+      "video": {
+        "x": 565.875,
+        "y": 37,
+        "width": 452,
+        "height": 804,
+        "top": 37,
+        "right": 1017.875,
+        "bottom": 841,
+        "left": 565.875
+      },
+      "visible": "visible",
+      "compact": false,
+      "mode": "skipped",
+      "url": "https://www.youtube.com/shorts/VVklbfLOPyM"
+    }
+  ],
+  "data": {
+    "dailySkips": {
+      "count": 4,
+      "day": "2026-10-14"
+    },
+    "totalSkips": {
+      "count": 4,
+      "onScreenMs": 5663,
+      "since": "2026-10-14"
+    }
+  },
+  "errors": [],
+  "passed": true
+}

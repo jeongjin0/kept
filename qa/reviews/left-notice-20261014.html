@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ScrollPlus · 왼쪽 넘김 표시</title>
+<style>
+:root{color-scheme:light;--ink:#162422;--muted:#687976;--line:#dce6e3;--teal:#317d78;--surface:#f4f8f6}*{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--surface);font:15px/1.65 system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif}main{max-width:1248px;margin:auto;padding:48px 28px 64px}header{margin-bottom:28px}.eyebrow{color:var(--teal);font-size:12px;font-weight:650;letter-spacing:.06em}h1{font-size:clamp(27px,4vw,38px);letter-spacing:-1px;line-height:1.25;margin:10px 0 14px}p{color:var(--muted);margin:0}a{color:var(--teal)}.viewer{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;margin:24px 0}.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}.tabs{display:flex;gap:6px;flex-wrap:wrap}button{font:inherit;font-weight:600;padding:8px 16px;min-height:42px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);cursor:pointer}button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}button:hover{border-color:var(--teal)}button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:3px}.state{color:var(--muted);font-size:13px}.shot{display:block;width:100%;height:auto}.caption{padding:16px 20px;border-top:1px solid var(--line);font-size:14px}.caption strong{color:var(--ink)}.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:24px 0 32px}.fact{border-top:1px solid var(--line);padding-top:14px}.fact strong{display:block;margin-bottom:5px}.fact p{font-size:14px}h2{font-size:20px;letter-spacing:-.4px;margin:32px 0 8px}.note{font-size:13px;margin-top:14px}.footer{font-size:13px;border-top:1px solid var(--line);padding-top:20px;margin-top:28px}@media(max-width:650px){main{padding:28px 16px 44px}.facts{grid-template-columns:1fr;gap:14px}.bar{padding:14px}.viewer{border-radius:14px}button{padding:8px 12px}.state{width:100%}}
+</style>
+<main>
+<header><span class="eyebrow">SCROLLPLUS · 개발판 · 2026.10.14</span><h1>댓글을 열어도,<br>표시는 왼쪽에.</h1><p>넉넉할 때는 최근 이유 3개. 좁아지면 숫자와 되돌리기만 남깁니다.</p></header>
+<div class="viewer">
+  <div class="bar"><div class="tabs" aria-label="연속 넘김 캡처"><button type="button" data-run="closed" aria-pressed="false">댓글 닫힘</button><button type="button" data-run="open" aria-pressed="true">댓글 열림</button></div><span class="state">실제 유튜브 · 실제 확장 캡처</span></div>
+  <img id="run-shot" class="shot" src="../screenshots/left-notice-20261014/08-live-run-comments-open.png" alt="유튜브 댓글을 연 상태에서 왼쪽 여백에 숫자 3과 되돌리기만 표시">
+  <p id="run-caption" class="caption"><strong>44px 안에 3과 되돌리기.</strong> 로고와 제목 없이, 영상과 사이드바 사이에 정렬했습니다.</p>
+</div>
+<div class="facts"><div class="fact"><strong>항상 왼쪽</strong><p>오른쪽 대체 배치와 영상 위 배치를 제거했습니다. 예전 위치 설정도 왼쪽으로 통일됩니다.</p></div><div class="fact"><strong>열고 닫으면 함께 이동</strong><p>패널이 움직이는 동안 잠시 숨기고, 이동한 영상의 왼쪽에 다시 표시합니다. 되돌리기 버튼의 포커스도 유지합니다.</p></div><div class="fact"><strong>자리 없으면 잠시 숨김</strong><p>왼쪽 공간이 없을 때는 화면을 가리지 않습니다. 공간이 생기면 다시 표시합니다.</p></div></div>
+<h2>연속 6개에서 멈추는 표시도 같은 규칙</h2><p>좁은 상태에서도 이어서 보기와 기준 낮추기를 사용할 수 있습니다.</p>
+<div class="viewer"><div class="bar"><div class="tabs" aria-label="일시정지 캡처"><button type="button" data-pause="closed" aria-pressed="false">닫힘</button><button type="button" data-pause="open" aria-pressed="true">열림</button><button type="button" data-pause="again" aria-pressed="false">다시 닫힘</button></div><span class="state">같은 영상 · 댓글 열고 닫기</span></div><img id="pause-shot" class="shot" src="../screenshots/left-notice-20261014/05-live-pause-comments-open.png" alt="댓글을 연 유튜브에서 왼쪽에 작은 이어서 보기와 기준 낮추기 버튼"><p class="caption">댓글을 닫으면 왼쪽 카드로 돌아옵니다. 작은 버튼에도 이름과 툴팁이 있습니다.</p></div>
+<h2>확인한 범위</h2><p>단위 검사 126개, 브라우저 전체 검사 78개 및 위치 추가 검사, 빌드와 패키지 검사를 통과했습니다. 위치를 위한 상시 반복 조회도 제거했습니다.</p>
+<p class="note">실제 캡처는 새 로그아웃 유튜브 프로필에 개발판을 설치하고, 테스트용 좋아요 기준 1억으로 넘긴 결과입니다. 연속 넘김 캡처에는 입력 제스처를 유지해 짧은 표시를 잡았습니다. 기본 500 기준이나 로그인된 릴스·틱톡의 전체 검증을 뜻하지 않습니다.</p>
+<footer class="footer"><a href="https://github.com/jeongjin0/scrollplus/blob/main/qa/left-notice-20261014.md">QA 기록</a> · <a href="https://github.com/jeongjin0/scrollplus">GitHub</a><p class="note">소스 개발판에 반영한 변경입니다. 기존 0.7.2 배포 ZIP과 Chrome Web Store 초안 패키지는 갱신 전이며 심사 미제출입니다.</p></footer>
+</main>
+<script>
+const base='../screenshots/left-notice-20261014/';
+document.querySelectorAll('[data-run]').forEach(button=>button.addEventListener('click',()=>{
+ const open=button.dataset.run==='open';document.querySelectorAll('[data-run]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+ document.getElementById('run-shot').src=base+(open?'08-live-run-comments-open.png':'07-live-run-closed.png');
+ document.getElementById('run-shot').alt=open?'유튜브 댓글을 연 상태에서 왼쪽 여백에 숫자 3과 되돌리기만 표시':'유튜브 댓글을 닫은 상태에서 영상 왼쪽에 최근 넘김 이유 세 개와 되돌리기 표시';
+ document.getElementById('run-caption').textContent=open?'44px 안에 3과 되돌리기. 로고와 제목 없이, 영상과 사이드바 사이에 정렬했습니다.':'최근 이유 3개와 되돌리기. 헤더와 연속 넘김 문구를 추가하지 않았습니다.';
+}));
+document.querySelectorAll('[data-pause]').forEach(button=>button.addEventListener('click',()=>{
+ document.querySelectorAll('[data-pause]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+ const files={closed:'04-live-pause-closed.png',open:'05-live-pause-comments-open.png',again:'06-live-pause-closed-again.png'};
+ document.getElementById('pause-shot').src=base+files[button.dataset.pause];
+ document.getElementById('pause-shot').alt=button.dataset.pause==='open'?'댓글을 연 유튜브에서 왼쪽에 작은 이어서 보기와 기준 낮추기 버튼':'댓글을 닫은 유튜브에서 영상 왼쪽에 일시정지 카드와 두 버튼';
+}));
+</script>
+</html>

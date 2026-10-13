@@ -43,6 +43,21 @@ export function mostVisibleVideo(): HTMLVideoElement | null {
   return best;
 }
 
+// A kept Instagram photo can replace the player while the preceding video's Undo is still offered.
+// Use a large visible image, never an avatar or toolbar icon, as the notice's current anchor.
+export function mostVisiblePhoto(): HTMLImageElement | null {
+  let best: HTMLImageElement | null = null;
+  let bestArea = 0;
+  for (const image of document.querySelectorAll("img")) {
+    const rect = image.getBoundingClientRect();
+    if (rect.width < 160 || rect.height < 160 || getComputedStyle(image).visibility !== "visible") continue;
+    const width = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
+    const height = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+    if (width * height > bestArea) { best = image; bestArea = width * height; }
+  }
+  return best;
+}
+
 export function tiktokActive(): { id: string; creatorId: string | null } | null {
   const fromUrl = location.pathname.match(/@([^/]+)\/video\/(\d+)/);
   if (fromUrl) return { creatorId: fromUrl[1], id: fromUrl[2] };

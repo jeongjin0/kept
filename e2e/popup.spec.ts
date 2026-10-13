@@ -134,7 +134,7 @@ test("settings accept typed numbers and mark the popup as custom", async () => {
     await likes.fill("700");
     await likes.press("Enter");
     await expect.poll(async () => (await stored(options)).rule.likes.min).toBe(700);
-    // 700 is no preset, so none of the three is checked. (The chip position below has a checked choice of its own.)
+    // 700 is no preset, so none of the three is checked.
     await expect(options.getByRole("radiogroup", { name: /Rules|기준/ }).getByRole("radio", { checked: true })).toHaveCount(0);
 
     await options.getByRole("switch", { name: /Comments|댓글/ }).click();
@@ -215,24 +215,20 @@ test("the time saved reads in Korean too", async () => {
   }
 });
 
-test("the skip chip sits beside the video by default, and Settings moves it", async () => {
-  const { context, id } = await launch("en");
+test("legacy notice positions normalize to the left gutter and Settings only toggles visibility", async () => {
+  const { context, id, worker } = await launch("en");
   try {
+    await worker.evaluate(async () => {
+      const { settings } = await chrome.storage.local.get("settings");
+      await chrome.storage.local.set({ settings: { ...settings, chipPosition: "lower", skipAds: false } });
+    });
     const options = await open(context, id, "options.html");
-    const group = options.getByRole("radiogroup", { name: "Skip chip position" });
-    await expect(group.getByRole("radio", { name: "Beside" })).toHaveAttribute("aria-checked", "true");
-    expect((await stored(options)).chipPosition).toBe("side");
-    await group.getByRole("radio", { name: "Lower" }).click();
-    await expect.poll(async () => (await stored(options)).chipPosition).toBe("lower");
-    await expect(group.getByRole("radio", { name: "Lower" })).toHaveAttribute("aria-checked", "true");
-    await group.getByRole("radio", { name: "Middle" }).click();
-    await expect.poll(async () => (await stored(options)).chipPosition).toBe("middle");
-    // With the chip off there is nothing to place.
+    await expect(options.getByRole("radiogroup", { name: "Skip chip position" })).toHaveCount(0);
     await options.getByRole("switch", { name: "Show the skip chip" }).click();
     await expect.poll(async () => (await stored(options)).showSkipChip).toBe(false);
-    await expect(group.getByRole("radio", { name: "Beside" })).toBeDisabled();
+    expect((await stored(options)).chipPosition).toBe("side");
+    expect((await stored(options)).skipAds).toBe(false);
     await options.getByRole("button", { name: /Reset to defaults/ }).click();
-    await expect.poll(async () => (await stored(options)).chipPosition).toBe("side");
     await expect.poll(async () => (await stored(options)).showSkipChip).toBe(true);
   } finally {
     await context.close();

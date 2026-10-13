@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_SETTINGS, SCHEMA_VERSION, STORAGE_DAILY, STORAGE_SCHEMA, STORAGE_SETTINGS, STORAGE_TOTALS, localDay, presetRule } from "./score";
-import { ensureInstalledState, readTotals, recordSkip } from "./storage";
+import { ensureInstalledState, loadSettings, readTotals, recordSkip } from "./storage";
 
 let data: Record<string, unknown> = {};
 
@@ -90,10 +90,14 @@ describe("updating from 0.6.x", () => {
     expect(moved.rule.likes.min).toBe(1000);
     expect(moved.skipAds).toBe(false);
     expect(data[STORAGE_SCHEMA]).toBe(SCHEMA_VERSION);
-    // Chosen again afterwards, it stays.
+    // Existing storage is preserved; the reader retires an overlay position without resetting the rule or ad preference.
     data[STORAGE_SETTINGS] = { ...moved, chipPosition: "top" };
     await ensureInstalledState();
     expect((data[STORAGE_SETTINGS] as typeof DEFAULT_SETTINGS).chipPosition).toBe("top");
+    const loaded = await loadSettings();
+    expect(loaded.chipPosition).toBe("side");
+    expect(loaded.rule.likes.min).toBe(1000);
+    expect(loaded.skipAds).toBe(false);
   });
 });
 
