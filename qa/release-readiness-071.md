@@ -7,7 +7,9 @@ Checked on 2026-10-13 KST. This patch removes estimate labels and explanatory co
 | Production build | Pass | `npm run build` |
 | Korean popup and Settings | Looked at | Captured from the built extension at 420 px and 1440 px. See [review captures](screenshots/review-071/). |
 | English and Korean locale JSON | Pass | Both locale files parse; the popup and Settings use the localized accessible name for the otherwise text-free time value. |
-| Unit, browser and minimum Chrome checks | Pending CI | PR #46 runs the established suites, including Chrome 120. |
+| Unit and package checks | Pass | [CI run 38358705884](https://github.com/jeongjin0/scrollplus/actions/runs/38358705884) and [CI run 38358710102](https://github.com/jeongjin0/scrollplus/actions/runs/38358710102); both `check` jobs passed. |
+| Browser tests | 67 passed in each CI run | Both full browser suites passed after updating the previous time-display assertions to check the text-free value and accessible name. |
+| Minimum Chrome 120 | Pass | Both CI runs passed the minimum-version suite. |
 | Chrome Web Store | Not submitted | This is a GitHub beta candidate. |
 
 ## Review
