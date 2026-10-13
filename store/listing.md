@@ -32,7 +32,7 @@ Every skip tells you why, for example "Skipped · 312 likes" or "Skipped · ad",
 
 ScrollPlus is not affiliated with YouTube, TikTok, Instagram, or GitHub. Page data is processed only on your device; it is not transmitted to the developer or third parties. Settings and aggregate counters stay in local Chrome storage; Undo choices stay in session memory. Open source, MIT: https://github.com/jeongjin0/scrollplus
 
-Single purpose: skip YouTube Shorts, TikTok videos, and Instagram Reels the user does not want to see: those with too few likes and ads (Skip ads is a switch that is on by default). It uses counts and ad markers already on the page. It also keeps videos from accounts the user already subscribes to or follows, while that switch is on.
+Single purpose: Automatically skip short videos below the user's chosen likes, comments or views thresholds, and site-marked ads, on YouTube Shorts, TikTok and Instagram Reels. Provide Undo and optional creator/follow exceptions using data already loaded on these sites.
 
 ## Korean
 
@@ -60,4 +60,4 @@ ScrollPlus는 좋아요가 설정한 기준보다 적은 숏폼 영상을 자동
 
 ScrollPlus는 YouTube, TikTok, Instagram, GitHub와 관계가 없습니다. 페이지 데이터는 기기 안에서만 처리하며 개발자나 제삼자에게 전송하지 않습니다. 설정과 합계는 Chrome 로컬 저장소에, 되돌리기 선택은 세션 메모리에 남습니다. 오픈소스(MIT): https://github.com/jeongjin0/scrollplus
 
-단일 목적: 보고 싶지 않은 유튜브 쇼츠, 틱톡, 인스타그램 릴스를 넘깁니다. 좋아요가 적은 영상과 광고(광고 건너뛰기는 기본으로 켜져 있는 스위치)가 대상입니다. 페이지에 이미 있는 수치와 광고 표시를 사용합니다. 구독·팔로우한 계정의 영상을 남기는 스위치도 있습니다.
+단일 목적: 유튜브 쇼츠, 틱톡, 인스타그램 릴스에서 사용자가 정한 좋아요·댓글·조회수 기준 아래의 영상과 사이트가 표시한 광고를 자동으로 넘깁니다. 사이트가 이미 불러온 정보를 사용하며, 되돌리기와 제작자·구독/팔로우 예외 옵션을 제공합니다.

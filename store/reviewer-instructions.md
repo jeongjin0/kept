@@ -1,6 +1,10 @@
 # Draft Chrome Web Store test instructions
 
-Prepared 2026-10-13 against the 0.7.2 feature set. Fill in the submitted version and ZIP hash after the candidate is frozen. This document is not evidence that the current live cases have all passed.
+Prepared 2026-10-13 for the uploaded 0.7.2 draft. ZIP SHA-256: `00451fd95dcf1460c297e20a158475255a8080dac9044d1337be72da8ca0f097`. This document is not evidence that the current live cases have all passed. If the candidate package changes before submission, replace the version/hash and verify the new package's live paths.
+
+The dashboard's Additional instructions field is limited to 500 characters. The draft uses the following 367-character summary, with this document providing the full steps. Reviewer username/password fields are blank because ScrollPlus has no account system; do not provide the owner's site credentials.
+
+> Chrome 120+. No ScrollPlus login. Defaults: 500 likes, ads/follow exceptions on. Open YouTube Shorts or TikTok; Reels needs your own Instagram login. Raise Likes above a visible count to trigger a skip. Undo, then reload: the restored video stays. Reset clears Undo choices. Full steps: https://github.com/jeongjin0/scrollplus/blob/main/store/reviewer-instructions.md
 
 ## Setup
 
