@@ -189,7 +189,7 @@
     "message": "Skipped · ad"
   },
   "savedValue": {
-    "message": "≈ $TIME$",
+    "message": "$TIME$",
     "placeholders": {
       "time": {
         "content": "$1",
@@ -197,17 +197,17 @@
       }
     }
   },
-  "savedLabel": {
-    "message": "saved so far"
-  },
-  "savedTitle": {
-    "message": "An estimate. Each skip counts as about 3 seconds you would have spent on the video before swiping it away yourself, minus the time it stayed on screen."
+  "savedAccessible": {
+    "message": "Estimated time saved: $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "3h 12m"
+      }
+    }
   },
   "statTotal": {
     "message": "skipped in total"
-  },
-  "statSaved": {
-    "message": "time saved (est.)"
   },
   "statSince": {
     "message": "Counted since $DATE$.",

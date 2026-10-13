@@ -50,6 +50,7 @@ h1, h2, p { margin: 0; }
 .stat + .stat { border-left: 1px solid var(--line); }
 .stat .big { font-size: 28px; white-space: nowrap; }
 .stat.saved .big { color: var(--accent); }
+.saved-value { display: flex; align-items: center; gap: 7px; min-height: 35px; color: var(--accent); }
 .stat .hero-label { font-size: 13px; line-height: 1.25; }
 .stats-note { color: var(--muted); font-size: 12px; line-height: 1.5; }
 
