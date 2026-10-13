@@ -1,7 +1,8 @@
-import { createEngine, type EngineItem } from "./engine";
+import { createEngine, type ChipModel, type EngineItem } from "./engine";
 import { mountChip } from "./chip";
 import { DEFAULT_SETTINGS, presetRule, type Metrics, type Settings } from "../lib/score";
 import { observeJsonResponses } from "../platforms/observe";
+import { mostVisiblePhoto, mostVisibleVideo } from "./page";
 
 let settings: Settings = {
   ...DEFAULT_SETTINGS,
@@ -17,7 +18,7 @@ const chip = mountChip(
     keepGoing: () => engine.keepGoing(),
     lower: () => engine.lower(),
   },
-  { position: () => settings.chipPosition, anchor: () => document.querySelector("video") },
+  { anchor: () => mostVisibleVideo() ?? mostVisiblePhoto() },
 );
 const engine = createEngine({
   getSettings: () => settings,
@@ -70,6 +71,7 @@ declare global {
       show: typeof show;
       setBlockedMenu: (open: boolean) => void;
       settings: Settings;
+      renderChip: (model: ChipModel | null) => void;
     };
   }
 }
@@ -81,6 +83,7 @@ window.__scrollplus = {
     if (menu instanceof HTMLElement) menu.hidden = !open;
   },
   settings,
+  renderChip: (model) => chip.update(model),
 };
 
 window.__scrollplusObserverQa = observeJsonResponses;

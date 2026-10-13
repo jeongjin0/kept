@@ -31,10 +31,9 @@ export type Rule = Record<Metric, Condition>;
 export type PresetName = "lenient" | "balanced" | "strict";
 export const PRESETS: PresetName[] = ["lenient", "balanced", "strict"];
 
-// Where the skip chip sits: beside the video, in the clear space next to it (the default), or over the video centred on it: high up, in
-// the middle, or low but above the caption.
+// Legacy saved positions are accepted as input, then normalized to the left gutter.
 export type ChipPosition = "side" | "top" | "middle" | "lower";
-export const CHIP_POSITIONS: ChipPosition[] = ["side", "top", "middle", "lower"];
+// Keep the legacy field shape readable. The renderer now always uses the left gutter.
 
 export const PRESET_LIKES: Record<PresetName, number> = {
   lenient: 100,
@@ -245,7 +244,7 @@ export function normalizeSettings(value: unknown): Settings {
     },
     filterGrids: raw.filterGrids === true,
     showSkipChip: raw.showSkipChip !== false,
-    chipPosition: CHIP_POSITIONS.find((position) => position === raw.chipPosition) ?? "side",
+    chipPosition: "side",
     skipAds: raw.skipAds !== false,
     keepFollowed: raw.keepFollowed !== false,
     allowlist,
@@ -266,9 +265,7 @@ export function migrateSettings(value: unknown, from = 1): Settings {
     const legacy = saved && typeof saved === "object" && likes.on && !comments.on && !views.on ? PRESETS.find((name) => LEGACY_PRESET_LIKES[name] === likes.min) : undefined;
     settings = { ...settings, rule: legacy ? presetRule(legacy, settings.rule) : settings.rule, skipAds: true };
   }
-  // 0.7.0 puts the skip chip beside the video. The top was the default of 0.5.0 and 0.6.0 and covers the video, so it moves once. A middle or
-  // lower place that a person chose stays.
-  if (from < 3 && settings.chipPosition === "top") settings = { ...settings, chipPosition: "side" };
+  // normalizeSettings also retires all legacy overlay positions without changing other choices.
   return settings;
 }
 

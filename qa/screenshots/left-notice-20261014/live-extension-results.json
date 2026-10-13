@@ -1,0 +1,99 @@
+{
+  "scope": "Real candidate unpacked extension in a fresh signed-out YouTube profile, temporary 100M-like threshold. The six-skip safety pause is tested; not the shipped 500-like default or signed-in feeds.",
+  "results": [
+    {
+      "label": "real pause, comments closed",
+      "host": {
+        "x": 321.875,
+        "y": 382.734375,
+        "width": 228,
+        "height": 134.53125,
+        "top": 382.734375,
+        "right": 549.875,
+        "bottom": 517.265625,
+        "left": 321.875
+      },
+      "video": {
+        "x": 565.875,
+        "y": 64,
+        "width": 452,
+        "height": 804,
+        "top": 64,
+        "right": 1017.875,
+        "bottom": 868,
+        "left": 565.875
+      },
+      "visible": "visible",
+      "compact": false,
+      "mode": "paused",
+      "url": "https://www.youtube.com/shorts/09aJpx_X3JA"
+    },
+    {
+      "label": "real pause, comments open",
+      "host": {
+        "x": 249.875,
+        "y": 404,
+        "width": 44,
+        "height": 92,
+        "top": 404,
+        "right": 293.875,
+        "bottom": 496,
+        "left": 249.875
+      },
+      "video": {
+        "x": 301.875,
+        "y": 64,
+        "width": 452,
+        "height": 804,
+        "top": 64,
+        "right": 753.875,
+        "bottom": 868,
+        "left": 301.875
+      },
+      "visible": "visible",
+      "compact": true,
+      "mode": "paused",
+      "url": "https://www.youtube.com/shorts/09aJpx_X3JA"
+    },
+    {
+      "label": "real pause, comments closed again",
+      "host": {
+        "x": 321.875,
+        "y": 382.734375,
+        "width": 228,
+        "height": 134.53125,
+        "top": 382.734375,
+        "right": 549.875,
+        "bottom": 517.265625,
+        "left": 321.875
+      },
+      "video": {
+        "x": 565.875,
+        "y": 64,
+        "width": 452,
+        "height": 804,
+        "top": 64,
+        "right": 1017.875,
+        "bottom": 868,
+        "left": 565.875
+      },
+      "visible": "visible",
+      "compact": false,
+      "mode": "paused",
+      "url": "https://www.youtube.com/shorts/09aJpx_X3JA"
+    }
+  ],
+  "data": {
+    "dailySkips": {
+      "count": 6,
+      "day": "2026-10-14"
+    },
+    "totalSkips": {
+      "count": 6,
+      "onScreenMs": 5743,
+      "since": "2026-10-14"
+    }
+  },
+  "errors": [],
+  "passed": true
+}

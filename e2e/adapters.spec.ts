@@ -30,7 +30,7 @@ function fixture(platform: typeof platforms[number]) {
     like_count: index ? 8000 : 10, play_count: 100000, comment_count: 100,
   }));
   return `<!doctype html><meta charset="utf-8"><title>ScrollPlus adapter fixture</title>
-  <style>body{margin:0}video{width:320px;height:600px;display:block}button{height:40px}</style>
+  <style>body{margin:0}video{width:320px;height:600px;display:block;margin-left:280px}button{height:40px}</style>
   <div id="xgwrapper-0-${platform.ids[0]}"><video muted></video><a href="/@${platform.creator}">Creator</a></div>
   <div id="navigation-button-down"><button data-e2e="feed-navigation-next" aria-label="Next video">Next</button></div>
   <div id="navigation-button-up"><button data-e2e="feed-navigation-prev" aria-label="Previous video">Previous</button></div>

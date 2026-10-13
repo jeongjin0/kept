@@ -32,7 +32,7 @@ const [AD1, NORMAL1, , NORMAL2] = FEED.map((item) => item.id);
 // Routed pages that exercise the shipped scripts. They reproduce what was observed on the real sites
 // (qa/ads.md) and do not establish compatibility with every current site layout.
 function page(site: Site, items: Item[], flag: "data" | "label"): string {
-  const common = '<style>body{margin:0}video{width:320px;height:600px;display:block}button{height:40px}#label{position:absolute;left:10px;top:560px;font:12px sans-serif}</style>';
+  const common = '<style>body{margin:0}video{width:320px;height:600px;display:block;margin-left:280px}button{height:40px}#label{position:absolute;left:10px;top:560px;font:12px sans-serif}</style>';
   const script = (body: string) => '<script>const items=' + JSON.stringify(items) + ';let index=0;window.fixtureMoves=0;' + body + 'window.fixtureNext=()=>{window.fixtureMoves++;show(index+1);};show(0);</script>';
   if (site === "youtube") {
     return '<!doctype html><meta charset="utf-8">' + common

@@ -3,7 +3,7 @@ import { incrementSkips, loadSettings, saveSettings } from "../lib/storage";
 import { loadUndoKeeps, rememberUndo, validVideoId, type UndoView } from "../lib/session-keep";
 import { createEngine, type EngineItem, type SkipReason } from "./engine";
 import { mountChip } from "./chip";
-import { mostVisibleVideo } from "./page";
+import { mostVisiblePhoto, mostVisibleVideo } from "./page";
 import type { ExtractedItem } from "../platforms/extract";
 import { visiblePoll } from "../lib/visible-poll";
 
@@ -52,7 +52,7 @@ export function startFilter(adapter: Adapter): void {
       keepGoing: () => engine.keepGoing(),
       lower: () => engine.lower(),
     },
-    { position: () => settings.chipPosition, anchor: () => mostVisibleVideo() },
+    { anchor: () => mostVisibleVideo() ?? (adapter.platform === "instagram" && adapter.readActive()?.kind === "carousel" ? mostVisiblePhoto() : null) },
   );
   const engine = createEngine({
     getSettings: () => settings,

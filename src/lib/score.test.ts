@@ -153,13 +153,13 @@ describe("presets and settings", () => {
     expect(normalizeSettings({ keepFollowed: "no" }).keepFollowed).toBe(true);
     expect(normalizeSettings({ keepFollowed: 0 }).keepFollowed).toBe(true);
   });
-  it("places the skip chip at the top unless the settings say otherwise", () => {
+  it("always uses the left gutter, including legacy saved positions", () => {
     expect(DEFAULT_SETTINGS.chipPosition).toBe("side");
     expect(normalizeSettings(undefined).chipPosition).toBe("side");
     expect(normalizeSettings({ chipPosition: "side" }).chipPosition).toBe("side");
-    expect(normalizeSettings({ chipPosition: "top" }).chipPosition).toBe("top");
-    expect(normalizeSettings({ chipPosition: "middle" }).chipPosition).toBe("middle");
-    expect(normalizeSettings({ chipPosition: "lower" }).chipPosition).toBe("lower");
+    expect(normalizeSettings({ chipPosition: "top" }).chipPosition).toBe("side");
+    expect(normalizeSettings({ chipPosition: "middle" }).chipPosition).toBe("side");
+    expect(normalizeSettings({ chipPosition: "lower" }).chipPosition).toBe("side");
     expect(normalizeSettings({ chipPosition: "bottom" }).chipPosition).toBe("side");
     expect(normalizeSettings({ chipPosition: 3 }).chipPosition).toBe("side");
   });
@@ -252,11 +252,11 @@ describe("moving settings from 0.5.x and 0.6.x to the chip beside the video", ()
     expect(moved.rule.likes.min).toBe(1000);
     expect(moved.skipAds).toBe(false);
   });
-  it("keeps a middle or lower place that a person chose", () => {
-    expect(migrateSettings(saved({ chipPosition: "middle" }), 2).chipPosition).toBe("middle");
-    expect(migrateSettings(saved({ chipPosition: "lower" }), 2).chipPosition).toBe("lower");
+  it("retires the middle and lower overlay positions too", () => {
+    expect(migrateSettings(saved({ chipPosition: "middle" }), 2).chipPosition).toBe("side");
+    expect(migrateSettings(saved({ chipPosition: "lower" }), 2).chipPosition).toBe("side");
   });
-  it("does not move anything from the current schema", () => {
-    expect(migrateSettings(saved(), 3).chipPosition).toBe("top");
+  it("uses the left gutter even for legacy overlay positions saved with the current schema", () => {
+    expect(migrateSettings(saved(), 3).chipPosition).toBe("side");
   });
 });

@@ -1,26 +1,18 @@
 import { svgIcon } from "../lib/icons";
 import { formatCount } from "../lib/numbers";
 import { t } from "../lib/i18n";
-import type { ChipPosition } from "../lib/score";
 import type { ChipModel, ChipReason } from "./engine";
 
-// A video is never closer to the window's edge than this many px when the chip is centred on it.
+// Keep the chip inside the viewport as well as outside the video.
 const EDGE_GAP_PX = 8;
-// The chip is a card this wide. Beside a video it keeps this much clear of the video's edge.
-const CARD_WIDTH_PX = 228;
 const SIDE_GAP_PX = 16;
-// To the right of a video the sites put a column of buttons (like, comment, share). The card starts after it.
-const RIGHT_BUTTONS_PX = 78;
+const COMPACT_GAP_PX = 8;
 
 const CSS = [
   ":host { all: initial; }",
   "*, *::before, *::after { box-sizing: border-box; }",
-  // A dark body keeps the words readable on any video. The accent border and glow keep the chip itself visible on a dark one.
-  ".chip { position: relative; width: 228px; font: 600 14.5px/1.3 ui-sans-serif, system-ui, -apple-system, 'Apple SD Gothic Neo', 'Segoe UI', sans-serif; color: #EEF5F4; background: #0D1414; border: 1.5px solid #59C5BF; border-radius: 18px; padding: 12px; display: grid; gap: 10px; box-shadow: 0 0 22px rgba(89, 197, 191, 0.4), 0 12px 30px rgba(0, 0, 0, 0.55); animation: in 120ms ease-out both; }",
-  // One ring that widens and fades when the chip appears, to catch the eye without moving the chip.
-  ".chip::after { content: ''; position: absolute; inset: -1.5px; border: 2px solid #59C5BF; border-radius: inherit; pointer-events: none; animation: ping 700ms ease-out both; }",
+  ".chip { position: relative; width: 228px; font: 600 14.5px/1.3 ui-sans-serif, system-ui, -apple-system, 'Apple SD Gothic Neo', 'Segoe UI', sans-serif; color: #EEF5F4; background: #0D1414; border: 1px solid rgba(89, 197, 191, 0.24); border-radius: 18px; padding: 12px; display: grid; gap: 10px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); animation: in 120ms ease-out both; }",
   ".chip.leaving { animation: out 200ms ease-out both; }",
-  ".chip.leaving::after { display: none; }",
   ".head { display: flex; align-items: center; gap: 10px; min-width: 0; }",
   ".dot { width: 26px; height: 26px; border-radius: 50%; background: #59C5BF; color: #031A19; display: grid; place-items: center; flex: none; }",
   ".dot svg { display: block; }",
@@ -39,23 +31,27 @@ const CSS = [
   "button:focus-visible { outline: 2px solid #59C5BF; outline-offset: 2px; }",
   "button.primary { background: #59C5BF; color: #031A19; }",
   "button.primary:hover { background: #6AD6CF; }",
-  // Where there is no room beside the video the card shrinks to a pill: the mark, how many in a row, and Undo.
-  ".chip.compact { width: 52px; padding: 8px 0; gap: 6px; justify-items: center; border-radius: 26px; }",
-  ".chip.compact .head { flex-direction: column; gap: 4px; }",
-  ".chip.compact .label, .chip.compact .rows, .chip.compact .txt { display: none; }",
-  ".chip.compact button { width: 34px; min-height: 34px; padding: 0; border-radius: 50%; }",
-  ".count { font-size: 13px; font-variant-numeric: tabular-nums; }",
+  // A comments panel can leave only 62 px between the guide and the video. No logo or reasons in this narrow state.
+  ".chip.compact { width: 44px; padding: 6px 0 2px; gap: 4px; justify-items: center; border-radius: 22px; }",
+  ".chip.compact .head { justify-content: center; padding: 4px 0; }",
+  ".chip.compact .dot, .chip.compact .label, .chip.compact .rows, .chip.compact .txt, .chip.compact.pause .head { display: none; }",
+  ".chip.compact button { width: 40px; min-height: 40px; padding: 0; border-radius: 20px; background: transparent; color: #59C5BF; }",
+  ".chip.compact button:hover { background: rgba(238, 245, 244, 0.1); }",
+  ".chip.compact button svg { width: 18px; height: 18px; }",
+  ".chip.compact:not(.pause) button { border-top: 1px solid rgba(238, 245, 244, 0.12); border-top-left-radius: 0; border-top-right-radius: 0; }",
+  ".chip.compact .actions { gap: 2px; }",
+  ".count { font-size: 14px; font-variant-numeric: tabular-nums; }",
   ".chip.compact .head .count { display: block; }",
-  "@keyframes in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }",
-  "@keyframes ping { from { inset: -1.5px; opacity: 0.85; } to { inset: -11px; opacity: 0; } }",
+  "@keyframes in { from { opacity: 0; } to { opacity: 1; } }",
   "@keyframes out { from { opacity: 1; } to { opacity: 0; } }",
-  "@media (prefers-reduced-motion: reduce) { .chip, .chip.leaving, .chip::after { animation-duration: 1ms; } }",
+  "@media (prefers-reduced-motion: reduce) { .chip, .chip.leaving { animation-duration: 1ms; } }",
 ].join("\n");
 
 function button(label: string, onClick: () => void, icon?: Parameters<typeof svgIcon>[0], primary = false): HTMLButtonElement {
   const node = document.createElement("button");
   node.type = "button";
   node.setAttribute("aria-label", label);
+  node.title = label;
   if (primary) node.className = "primary";
   if (icon) node.append(svgIcon(icon, 14));
   const text = document.createElement("span");
@@ -86,14 +82,12 @@ function span(className: string, text: string): HTMLSpanElement {
 }
 
 export interface ChipOptions {
-  // Where the chip sits. Defaults to "side": beside the video, so that none of the video is covered.
-  position?: () => ChipPosition;
-  // The video the chip is placed by, when one is on screen. Without it the chip is centred on the window.
+  // Without an on-screen anchor, a side chip stays hidden until a video is available.
   anchor?: () => HTMLElement | null;
 }
 
 // Something a person reads or presses on a site. The chip is never put on top of one of these.
-const BUSY = "a, button, input, textarea, select, video, iframe, img, canvas, [role='button'], [role='link'], [role='menuitem'], [role='textbox']";
+const BUSY = "a, button, input, textarea, select, video, iframe, img, canvas, p, h1, h2, h3, h4, h5, h6, li, nav, aside, [role='button'], [role='link'], [role='menuitem'], [role='textbox'], [role='dialog'], [role='menu'], ytd-guide-renderer, ytd-engagement-panel-section-list-renderer";
 
 export function mountChip(actions: { undo: () => void; keepGoing: () => void; lower: () => void }, options: ChipOptions = {}) {
   let host: HTMLDivElement | null = null;
@@ -101,8 +95,21 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
   let leaveTimer: number | null = null;
   let placeTimer: number | null = null;
   let previousModel = "null";
-  // The centre of the video's column the last time a video was found. A feed that swaps its video elements has none for a moment.
-  let lastCentre: number | null = null;
+  let watching = false;
+  let frame: number | null = null;
+  let motionUntil = 0;
+  let watchedAnchor: HTMLElement | null = null;
+  const ancestors = new Set<Element>();
+  const resized = new ResizeObserver(() => queuePlace());
+  const structure = new MutationObserver((records) => {
+    if (records.some((record) => {
+      if (record.target === host) return false;
+      if (record.type === "childList") return ![...record.addedNodes, ...record.removedNodes].every((node) => node === host);
+      const target = record.target;
+      return target instanceof Element && (ancestors.has(target) || !!target.closest(BUSY) ||
+        [...target.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim()));
+    })) queuePlace();
+  });
 
   function ensure(): void {
     if (host && root) return;
@@ -110,13 +117,69 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     host.id = "scrollplus-chip-host";
     host.style.position = "fixed";
     host.style.zIndex = "2147483646";
+    host.style.visibility = "hidden";
     const shadow = host.attachShadow({ mode: "open" });
     const style = document.createElement("style");
     style.textContent = CSS;
     root = document.createElement("div");
     shadow.append(style, root);
     (document.documentElement ?? document.body).append(host);
-    window.addEventListener("resize", () => { lastCentre = null; place(); }, { passive: true });
+    window.addEventListener("resize", () => queuePlace(), { passive: true });
+    window.addEventListener("scroll", () => queuePlace(), { capture: true, passive: true });
+    document.addEventListener("transitionrun", (event) => {
+      if (!watching || !(event.target instanceof Element) || !ancestors.has(event.target)) return;
+      // Follow the moving column while a panel animates. There is no repeating placement work on an idle page.
+      motionUntil = performance.now() + 600;
+      queuePlace();
+    }, true);
+    document.addEventListener("transitionend", () => queuePlace(), true);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stopWatching();
+      else if (previousModel !== "null") { startWatching(); place(); }
+    });
+  }
+
+  function queuePlace(): void {
+    if (!watching || document.hidden || frame != null) return;
+    frame = requestAnimationFrame(() => {
+      frame = null;
+      if (!watching || document.hidden) return;
+      place();
+      if (performance.now() < motionUntil) queuePlace();
+    });
+  }
+
+  function watchAnchor(anchor: HTMLElement | null): void {
+    const chain: Element[] = [];
+    for (let node: Element | null = anchor; node; node = node.parentElement) chain.push(node);
+    // Sites may keep the video node but move its player into another container.
+    if (anchor === watchedAnchor && chain.length === ancestors.size && [...ancestors].every((node, index) => node === chain[index])) return;
+    resized.disconnect();
+    ancestors.clear();
+    watchedAnchor = anchor;
+    for (const node of chain) {
+      ancestors.add(node);
+      resized.observe(node);
+    }
+  }
+
+  function startWatching(): void {
+    if (watching || document.hidden) return;
+    watching = true;
+    structure.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ["style", "class", "hidden", "aria-expanded"] });
+  }
+
+  function stopWatching(): void {
+    watching = false;
+    structure.disconnect();
+    resized.disconnect();
+    ancestors.clear();
+    watchedAnchor = null;
+    motionUntil = 0;
+    if (frame != null) cancelAnimationFrame(frame);
+    frame = null;
+    if (placeTimer != null) window.clearTimeout(placeTimer);
+    placeTimer = null;
   }
 
   function chipNode(): HTMLElement | null {
@@ -134,88 +197,62 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
         for (const fy of [0.05, 0.5, 0.95]) {
           const stack = document.elementsFromPoint(left + width * fx, top + height * fy);
           const top1 = stack.find((node) => node !== host);
-          if (top1 && top1.closest(BUSY)) return false;
+          // Transparent layout wrappers can sit above visible navigation. Check the stack, not just its first element.
+          if (stack.some((node) => node !== host && node.closest(BUSY))) return false;
+          if (top1 && [...top1.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim())) return false;
         }
       }
     } catch {
-      return true;
+      return false;
     }
     return true;
   }
 
-  // Beside the video, where nothing of it is covered: its left side first, then its right. A card needs the room of a card. Where
-  // there is less, a pill is used for a skip, and a pause chip with its two buttons goes over the video as it did before.
-  function placeSide(box: DOMRect, paused: boolean): boolean {
+  // Use only the left gutter. If even the compact chip would cover the page, do not show it there.
+  function placeSide(box: DOMRect): boolean {
     const chip = chipNode();
     if (!host || !chip) return false;
     const height = window.innerHeight;
     // The middle of the window. A feed such as TikTok's scrolls to the next video while the chip is up, so the video's own box is moving
     // and its middle is not where it will rest. The video is as tall as the window or nearly, so the window's middle is its middle.
     const middle = height / 2;
-    const tries: Array<{ compact: boolean; right: boolean }> = [
-      { compact: false, right: false },
-      { compact: false, right: true },
-      ...(paused ? [] : [{ compact: true, right: false }, { compact: true, right: true }]),
-    ];
-    for (const attempt of tries) {
-      chip.classList.toggle("compact", attempt.compact);
-      host.style.left = "0px";
-      host.style.top = "0px";
+    for (const compact of [false, true]) {
+      chip.classList.toggle("compact", compact);
       host.style.transform = "none";
       host.style.bottom = "auto";
-      const rect = host.getBoundingClientRect();
-      const left = attempt.right ? box.right + RIGHT_BUTTONS_PX : box.left - SIDE_GAP_PX - rect.width;
-      const top = Math.min(Math.max(middle - rect.height / 2, 72), Math.max(72, height - rect.height - 24));
-      if (!isFree(left, top, rect.width, rect.height)) continue;
-      host.style.left = Math.round(left) + "px";
-      host.style.top = Math.round(top) + "px";
+      const { width, height: chipHeight } = chip.getBoundingClientRect();
+      const left = box.left - (compact ? COMPACT_GAP_PX : SIDE_GAP_PX) - width;
+      const top = Math.min(Math.max(middle - chipHeight / 2, 72), Math.max(72, height - chipHeight - 24));
+      if (!isFree(left, top, width, chipHeight)) continue;
+      host.style.left = left + "px";
+      host.style.top = top + "px";
       return true;
     }
-    chip.classList.remove("compact");
     return false;
   }
 
-  // Over the video, centred on its column: high up, in the middle, or low but above the caption. The height is measured from the
-  // window, not from the video: while TikTok scrolls to the next video its box is still moving, but its column is not.
-  function placeOver(position: ChipPosition, box: DOMRect | null): void {
-    if (!host) return;
-    chipNode()?.classList.remove("compact");
-    const width = document.documentElement.clientWidth || window.innerWidth;
-    const height = window.innerHeight;
-    let center: number;
-    if (box && box.width > 0 && box.right > 0 && box.left < width) {
-      center = box.left + box.width / 2;
-      lastCentre = center;
-    } else {
-      center = lastCentre ?? width / 2;
-    }
-    // Measure from the window's edge, where the chip has all the room it can use, and not from wherever it was left before.
-    host.style.left = "0px";
-    const half = host.getBoundingClientRect().width / 2;
-    center = Math.min(Math.max(center, half + EDGE_GAP_PX), Math.max(half + EDGE_GAP_PX, width - half - EDGE_GAP_PX));
-    host.style.left = Math.round(center) + "px";
-    host.style.transform = position === "middle" ? "translate(-50%, -50%)" : "translateX(-50%)";
-    host.style.top = position === "lower" ? "auto" : position === "middle" ? "50%" : Math.round(Math.min(140, Math.max(24, height * 0.18))) + "px";
-    host.style.bottom = position === "lower" ? Math.round(Math.min(220, Math.max(24, height * 0.28))) + "px" : "auto";
-  }
-
   function place(): void {
-    if (!host) return;
-    const position = options.position?.() ?? "side";
+    if (!host || !chipNode() || document.hidden) return;
     let box: DOMRect | null = null;
     try {
-      box = options.anchor?.()?.getBoundingClientRect() ?? null;
+      const anchor = options.anchor?.() ?? null;
+      if (watching) watchAnchor(anchor);
+      box = anchor?.getBoundingClientRect() ?? null;
     } catch {
       box = null;
     }
     const width = document.documentElement.clientWidth || window.innerWidth;
-    const onScreen = !!box && box.width > 0 && box.right > 0 && box.left < width;
-    if (position === "side" && box && onScreen && placeSide(box, chipNode()?.dataset.mode === "paused")) return;
-    placeOver(position === "side" ? "top" : position, box);
+    const onScreen = !!box && box.width > 0 && box.height > 0 && box.right > 0 && box.left < width && box.bottom > 0 && box.top < window.innerHeight;
+    // Hide before measuring or moving, so a comments panel cannot reveal a stale position over the video.
+    host.style.visibility = "hidden";
+    if (!box || !onScreen || !placeSide(box)) return;
+    host.style.visibility = "visible";
   }
 
   // Place the chip now, and once more a moment later: the video of a feed that is still swapping players may not be there yet.
   function settle(): void {
+    if (document.hidden) return;
+    startWatching();
     place();
     if (placeTimer != null) window.clearTimeout(placeTimer);
     placeTimer = window.setTimeout(() => {
@@ -238,10 +275,12 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     const dot = document.createElement("span");
     dot.className = "dot";
     dot.append(svgIcon("streak", 16));
-    // One skip: the mark and the reason. A row of skips: only the reasons, newest first. The mark and the count are kept for the pill.
+    // The narrow chip is just a count and Undo. Keep the reasons available in its tooltip and accessible name.
     head.classList.toggle("run", !!run);
-    head.replaceChildren(dot, run ? span("count", "×" + run.length) : span("label", reasonLabel(model)));
+    head.replaceChildren(dot, span("count", String(run?.length ?? 1)), ...(run ? [] : [span("label", reasonLabel(model))]));
     rows.replaceChildren(...(run ? run.map((reason) => span("r", reasonLabel(reason))) : []));
+    chip.title = (run ?? [model]).map(reasonLabel).join("\n");
+    chip.setAttribute("aria-label", chip.title);
   }
 
   return {
@@ -266,6 +305,7 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
         return;
       }
       if (!model) {
+        stopWatching();
         const existing = chipNode();
         if (!existing) return;
         existing.classList.add("leaving");
@@ -292,8 +332,10 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
         head.append(span("label", t("paused")));
         const row = document.createElement("div");
         row.className = "actions";
-        row.append(button(t("keepGoing"), actions.keepGoing, undefined, true));
-        if (model.canLower) row.append(button(t("lowerBar"), actions.lower));
+        chip.title = t("paused");
+        chip.setAttribute("aria-label", t("paused"));
+        row.append(button(t("keepGoing"), actions.keepGoing, "streak", true));
+        if (model.canLower) row.append(button(t("lowerBar"), actions.lower, "minus"));
         chip.append(head, row);
       }
       root.replaceChildren(chip);

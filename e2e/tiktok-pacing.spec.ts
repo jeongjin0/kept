@@ -25,7 +25,7 @@ interface Feed {
 // A routed TikTok For You page: the site's own Next control, one player whose volume is set again for every video, a scroll event
 // when a video has arrived, and a stats response that carries the like counts. It does not establish compatibility with the live site.
 function page(feed: Feed): string {
-  return '<!doctype html><meta charset="utf-8"><style>body{margin:0}video{width:320px;height:600px;display:block}</style>'
+  return '<!doctype html><meta charset="utf-8"><style>body{margin:0}video{width:320px;height:600px;display:block;margin-left:280px}</style>'
     + '<div id="xgwrapper-0-1000"><video></video><a href="/@creator">creator</a></div>'
     + '<button data-e2e="feed-navigation-next">Next</button>'
     + '<button data-e2e="feed-navigation-prev">Previous</button>'
