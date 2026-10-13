@@ -59,11 +59,11 @@ test("the skip chip sits beside the video by default, lists a row of skips, and 
     return (await page.locator("#scrollplus-chip-host").boundingBox())!;
   }
 
-  // The default is beside the video: its right edge 16 px from the video's left edge, and the middle of the visible video (40 to 580 px,
-  // so 310) less 20 px. None of the video is covered.
+  // The default is beside the video: its right edge 16 px from the video's left edge, and its middle at the middle of the window (360 px).
+  // None of the video is covered.
   const side = await chipBox();
   expect(side.x + side.width).toBeCloseTo(video.x - 16, 0);
-  expect(side.y + side.height / 2).toBeCloseTo(290, 0);
+  expect(side.y + side.height / 2).toBeCloseTo(360, 0);
   expect(side.width).toBeCloseTo(228, 0);
   expect(side.x + side.width).toBeLessThanOrEqual(video.x);
 

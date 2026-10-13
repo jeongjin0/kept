@@ -4,7 +4,7 @@ The chip used to sit on the video, at the top. That covered what a person was lo
 
 ## What it does
 
-- A card 228 px wide. Its right edge is 16 px from the left edge of the video on screen. It is centred on the visible part of the video, less 20 px, so it sits a little above the middle.
+- A card 228 px wide. Its right edge is 16 px from the left edge of the video on screen. Its middle is the middle of the window. That is used and not the video's own middle, because TikTok's video is still scrolling when the chip appears and its box is moving.
 - If the left side has no room, or has something a person reads or presses under the card (a link, a button, an image, an input, a video), it goes to the right of the video, after the column of buttons the sites put there (78 px).
 - If neither side has room for a card, a skip shows as a pill 52 px wide: the mark, how many in a row, and Undo as a round button. A pause chip needs its two buttons and has no pill. It goes over the video, centred, as the old top did.
 - The old places, top, middle and lower, are still in Settings. They put the chip over the video, as before.

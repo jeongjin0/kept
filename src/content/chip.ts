@@ -148,9 +148,9 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     const chip = chipNode();
     if (!host || !chip) return false;
     const height = window.innerHeight;
-    const visibleTop = Math.max(box.top, 0);
-    const visibleBottom = Math.min(box.bottom, height);
-    const middle = (visibleTop + visibleBottom) / 2 - 20;
+    // The middle of the window. A feed such as TikTok's scrolls to the next video while the chip is up, so the video's own box is moving
+    // and its middle is not where it will rest. The video is as tall as the window or nearly, so the window's middle is its middle.
+    const middle = height / 2;
     const tries: Array<{ compact: boolean; right: boolean }> = [
       { compact: false, right: false },
       { compact: false, right: true },
