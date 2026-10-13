@@ -22,5 +22,13 @@
     "retries": 0,
     "scope": "before final late-count and in-flight sixth-move resets; final change requires CI"
   },
-  "unitTests": 126
+  "unitTests": 126,
+  "runtimeCI": {
+    "run": 38377709553,
+    "headSha": "743e41e8b3873fdbb38cf7f095b9626ca88b7af9",
+    "unitTests": 126,
+    "browserTests": 70,
+    "minimumChrome": "120.0.6099.109",
+    "result": "passed"
+  }
 }

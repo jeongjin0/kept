@@ -36,8 +36,10 @@ The ordinary Playwright launcher forces every page into foreground focus. Visibi
 ## Verification scope
 
 - TypeScript, 126 unit tests, production build and package checks passed locally.
-- The local full browser suite passed 70/70 before the additional late-count and in-flight sixth-move resets; both resets passed their new unit regressions. Final CI must exercise the completed change, including minimum Chrome 120, before merging.
+- The local browser suite passed 70/70. [CI run 38377709553](https://github.com/jeongjin0/scrollplus/actions/runs/38377709553) also passed all 70 browser tests, 126 unit tests and the minimum Chrome 120 suite on the completed runtime, including the final late-count and in-flight sixth-move corrections. Final QA-launcher/docs checks are visible on [PR #47](https://github.com/jeongjin0/scrollplus/pull/47).
 - The UI is captured from the production build in [review screenshots](screenshots/review-072/). The store images are regenerated to include the text-free time display from 0.7.1.
 - [Release readiness](release-readiness.md) records the final CI and live scope.
 
 No signed-in Instagram/Following claim, day-long stability claim, live CPU percentage or bounded-history memory claim is established by these checks.
+
+An earlier duplicate CI run passed 69 tests but failed to start its separate QA Chrome before one test; the companion run passed all 70. The launcher now uses the same shared-memory fallback as Playwright and retains bounded startup stderr. The timeout alone did not establish a product failure or a shared-memory root cause.

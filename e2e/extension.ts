@@ -15,13 +15,21 @@ export async function launch(language?: "en" | "ko", profile?: string, nativeVis
     const child = spawn(process.env.SCROLLPLUS_CHROME_EXECUTABLE ?? chromium.executablePath(), [
       "--user-data-dir=" + dir, "--remote-debugging-port=0", "--no-first-run", "--no-default-browser-check",
       "--no-sandbox", // Disposable QA profile, matching Playwright's Linux launch default.
+      "--disable-dev-shm-usage", // CI's small shared-memory mount must not limit separate browsers.
       "--disable-background-networking", "--disable-component-update", "--password-store=basic", "--use-mock-keychain",
       "--disable-component-extensions-with-background-pages", "--disable-default-apps",
       "--disable-extensions-except=" + extension, "--load-extension=" + extension, "about:blank",
-    ], { stdio: "ignore" });
+    ], { stdio: ["ignore", "ignore", "pipe"] });
+    let startupError = "";
+    let startupLog = "";
+    child.once("error", error => { startupError = String(error); });
+    child.stderr.on("data", chunk => { startupLog = (startupLog + String(chunk)).slice(-4000); });
     try {
       const activePort = path.join(dir, "DevToolsActivePort");
-      await expect.poll(() => fs.existsSync(activePort), { timeout: 15000 }).toBe(true);
+      await expect.poll(() => {
+        if (startupError || child.exitCode != null) throw new Error(`QA Chrome exited before startup: ${startupError || child.exitCode}\n${startupLog}`);
+        return fs.existsSync(activePort);
+      }, { timeout: 15000, message: "native QA Chrome exposes its debugging port" }).toBe(true);
       const [port] = fs.readFileSync(activePort, "utf8").split("\n");
       const browser = await chromium.connectOverCDP("http://127.0.0.1:" + port, { noDefaults: true });
       context = browser.contexts()[0];
@@ -32,7 +40,10 @@ export async function launch(language?: "en" | "ko", profile?: string, nativeVis
           await browser.close().catch(() => {});
         } finally { if (child.exitCode == null) child.kill(); }
       };
-    } catch (error) { child.kill(); throw error; }
+    } catch (error) {
+      child.kill();
+      throw new Error(`${error}\nNative QA Chrome startup log:\n${startupLog}`);
+    }
   } else {
     context = await chromium.launchPersistentContext(dir, {
       executablePath: process.env.SCROLLPLUS_CHROME_EXECUTABLE,

@@ -6,14 +6,14 @@ Checked 2026-10-13 KST on Mini, macOS ARM64. This patch suspends background-tab 
 | --- | --- | --- |
 | TypeScript and production build | Pass | npm run compile; npm run build |
 | Unit tests | 126 passed | Ten new engine regressions for kept videos, interrupted navigation and visibility; existing rule/storage/number tests remain green |
-| Local browser suite | 70 passed | Full suite before the final late-count and in-flight sixth-move resets; the added late-count and in-flight cap unit tests pass. Final CI is the completed-change gate |
+| Browser suite | 70 passed | The local full suite and [CI run 38377709553](https://github.com/jeongjin0/scrollplus/actions/runs/38377709553); CI includes the final late-count and in-flight sixth-move cap corrections |
 | Before/after regressions | Reproduced and fixed | Published 0.7.1 fails script-read, hidden-tab navigation and pointer-cancel checks. See [foreground hardening](foreground-hardening-072.md) |
 | Package | Pass | npm run zip; node scripts/check-package.mjs; manifest 0.7.2, storage-only permission, exact three supported hosts |
 | Popup and settings | Looked at | Popup 426 px tall; Korean settings at 420/1440 px; [captures](screenshots/review-072/) |
 | Store images | Regenerated | English and Korean popup/settings include the text-free time value |
 | Live smoke | Scoped observation | Production-build YouTube/TikTok in disposable signed-out Chromium 153; see below |
 | Soak runner preflight | Pass | Current defaults accepted; 500-like bar and side chip. Finite 1-second requested duration, 3.5-second startup/exit; no long-run claim |
-| CI and minimum Chrome 120 | Required before merge | check, full e2e and minimum-chrome jobs; public PR checks are the final completed-change gate |
+| CI and minimum Chrome 120 | Pass | [CI run 38377709553](https://github.com/jeongjin0/scrollplus/actions/runs/38377709553): check, full e2e and minimum-chrome passed on the completed production runtime. [PR #47](https://github.com/jeongjin0/scrollplus/pull/47) checks cover the final QA-launcher/docs revision |
 | Chrome Web Store | Not submitted | GitHub beta only |
 
 ## Live observations
