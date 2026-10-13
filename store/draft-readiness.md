@@ -15,6 +15,10 @@ Prepared 2026-10-13 through the owner's browser. This is a saved draft, not a re
 
 After contact verification, reopening the item showed **Draft** and an enabled **Submit for review** button, with no missing-fields button. Package view says the item has not been published. The submit button was not clicked.
 
+## Description refresh · 2026-10-14
+
+The English and Korean descriptions were shortened into feature lists. They now distinguish desktop Chrome websites from mobile video apps, a ScrollPlus account from each site's login, and optional skip notices from unconditional notices. On-device processing is stated near the start, while experimental Reels support and the saved-time estimate remain explicit. English is 1,782 characters; Korean is 1,023. Both descriptions were saved and checked in the same draft; the package, title, summary, images, permissions and distribution remain unchanged. This copy update adds no runtime QA evidence or review submission.
+
 ## Remaining before review submission
 
 1. Finish the exact candidate's focused [live-site matrix](../qa/release-readiness.md), especially current signed-in Reels and positive subscription/follow paths. Keep unsupported or unobserved claims qualified. Creating the Store draft adds no live compatibility evidence.
