@@ -71,7 +71,23 @@ export async function launch(language?: "en" | "ko", profile?: string, nativeVis
   }
   try {
     const isExtension = (worker: { url(): string }) => worker.url().startsWith("chrome-extension://") && worker.url().endsWith("/background.js");
-    const worker = context.serviceWorkers().find(isExtension) ?? await context.waitForEvent("serviceworker", { predicate: isExtension, timeout: 10000 });
+    let worker = context.serviceWorkers().find(isExtension);
+    if (!worker && nativeVisibility) {
+      // A worker from the first install can already be idle before CDP attaches.
+      // The content script's session request wakes it again, with no live network.
+      const url = "https://www.youtube.com/scrollplus-qa-worker";
+      const fulfill = (route: import("@playwright/test").Route) => route.fulfill({ contentType: "text/html", body: "<!doctype html><title>QA worker wake</title>" });
+      await context.route(url, fulfill);
+      const wakePage = await context.newPage();
+      const waiting = context.waitForEvent("serviceworker", { predicate: isExtension, timeout: 10000 });
+      try {
+        [worker] = await Promise.all([waiting, wakePage.goto(url)]);
+      } finally {
+        await wakePage.close();
+        await context.unroute(url, fulfill);
+      }
+    }
+    worker ??= await context.waitForEvent("serviceworker", { predicate: isExtension, timeout: 10000 });
     await expect.poll(() => worker.evaluate(async () => {
       const local = globalThis.chrome?.storage?.local;
       return typeof local?.get === "function" ? (await local.get("settings")).settings?.enabled : false;
