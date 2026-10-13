@@ -5,9 +5,12 @@ Nothing here has been submitted. This is what to have ready when the owner decid
 ## Before you start
 
 - A Chrome Web Store developer account (one-time registration fee).
+- Verified publisher/contact details and the required 2-Step Verification. Check these in the selected publisher account; a general Google login is not evidence of completed publisher registration.
 - The public store search for [ScrollPlus](https://chromewebstore.google.com/search/scrollplus) showed no results on 2026-10-07. Recheck before submission; this is not a trademark clearance.
 - Review the scoped [signed-in Instagram and TikTok results](../qa/signed-in-smoke.md) and finish the remaining gates in [release-readiness.md](../qa/release-readiness.md).
-- Install the zip on a clean Chrome profile and use it for a day on your own feed.
+- Install the exact candidate ZIP on a clean Chrome profile. Verify low-like skip, passing-video keep, Undo/reload, followed/subscribed keep, ads and background-tab return on current feeds. Instagram remains experimental until its current signed-in paths are observed.
+- A day of ordinary use is recommended before broad promotion. Longer runs and a small manual-feedback beta follow the initial release; an older build's soak does not certify the candidate.
+- Follow [ROADMAP.md](../ROADMAP.md) for the scoped launch sequence. Domain purchase, website publication and Store submission remain owner decisions.
 
 ## Package
 
@@ -30,12 +33,20 @@ Nothing here has been submitted. This is what to have ready when the owner decid
 
 ## Privacy practices tab
 
-- Single purpose: skip YouTube Shorts, TikTok videos, and Instagram Reels the user does not want to see: those with too few likes and ads (Skip ads is a switch that is on by default). It uses counts and ad markers already on the page.
+- Single purpose: skip short videos below the user's chosen count thresholds and site-disclosed ads, with Undo and an option to retain followed creators. It uses page data already loaded on the three supported sites.
 - `storage` justification: saves the user's settings (rule, site switches, creators to keep), today's skip count and an all-time total (how many skips, and for how long those videos were on screen, which gives the estimate of time saved) on their device. It also keeps the video IDs the user chooses to Undo only in memory for the current browser session, so those choices survive reloads and new tabs. Temporary Undo choices clear on browser restart, extension reload/update/disable, or Reset to defaults; they are not written to disk.
-- Host permission justification: on these three sites only, the extension reads the like, comment, and view counts and the ad markers the page has already loaded, and presses the page's own next-video control to skip a video or, while Skip ads is on, an ad. It does not call any site API of its own.
+- Host permission justification: on these three sites only, the extension reads video/creator identifiers, counts, ad markers and subscription/follow signals the page has already loaded, and presses the site's own next/previous controls for skip and Undo. It does not call any site API of its own.
 - Remote code: none. All code ships in the package.
-- Data collected: none. The extension does not collect, transmit, or sell user data, so leave every data-collection box unchecked.
+- Data handling: do not automatically leave all boxes unchecked just because nothing is transmitted. Google requires disclosure of locally processed/stored data too ([User Data FAQ, questions 3 and 14](https://developer.chrome.com/docs/webstore/program-policies/user-data-faq)). Map the current dashboard definitions to page content (identifiers, counts, ad/follow signals), Undo choices, the creator allowlist, and aggregate skip/time counters. Review Website content and User activity as candidate categories; confirm the actual field definitions before certifying the selections. Document that all processing/storage stays on device and no data is transmitted to the developer or a third party.
 - Certify that data is not sold, not used for unrelated purposes, and not used for creditworthiness or lending.
+- The privacy policy must explicitly describe the page-memory cache, local/session storage, retention/removal and Limited Use. Use a publicly reachable policy URL; a custom domain is not a prerequisite for preparing the submission.
+
+## Distribution recommendation
+
+- Start with one unlisted item so testers can install from a direct Store link. Unlisted still undergoes the same review and policy requirements as public/private ([distribution guidance](https://developer.chrome.com/docs/webstore/cws-dashboard-distribution)).
+- Defer automatic publication after approval so the owner can review the approved listing first. Approved staged submissions have a 30-day publication window ([publication guidance](https://developer.chrome.com/docs/webstore/publish)).
+- Use the same item for the later public rollout. Create a separate beta item only if parallel channels become necessary, and then follow Google's beta naming rules.
+- Prepare exact-version test instructions for the three sites. If a sign-in is needed, explain it without publishing the owner's credentials or using them as reviewer credentials.
 
 ## After approval
 

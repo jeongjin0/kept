@@ -44,6 +44,8 @@ Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English an
 
 ScrollPlus is a public beta, installed from a GitHub release for now (see below).
 
+The next launch steps and remaining live checks are in [ROADMAP.md](ROADMAP.md). Store submission and the product domain are not yet selected for publication.
+
 - Tested on controlled pages for all three sites, including Chrome 120, the oldest supported version.
 - Tried on real feeds: YouTube Shorts (a 24-hour automated run on 0.3.5, with two page-reload recoveries), TikTok For You, and Instagram Reels in a signed-in browser. Instagram Reels is the newest and least exercised site.
 - Known issue: on YouTube Shorts the feed can occasionally stop responding to scroll and Next while the video keeps playing; reloading the page fixes it. In long automated runs this was YouTube's own request for more Shorts failing with a server error, and it also happens without ScrollPlus ([details](qa/soak.md#youtube-shorts-feed-stalls-youtubes-feed-request-fails)).
@@ -89,7 +91,7 @@ The product rules are in [SPEC.md](SPEC.md). QA notes are in [qa/](qa). Contribu
 
 ## Privacy
 
-ScrollPlus reads the counts the page has already loaded and decides on your device. Settings, today's skip count and the all-time total (how many skips, and how long those videos were on screen) stay in Chrome storage; Undo choices stay only in memory until browser restart or Reset. Nothing is collected or sent anywhere. See [PRIVACY.md](PRIVACY.md).
+ScrollPlus reads the counts and available ad/follow signals the page has already loaded and decides on your device. Page data is cached in memory while the document remains open. Settings, today's skip count and the all-time total stay in local Chrome storage; Undo choices stay in session memory. None of this is sent to the developer or a third party. See [PRIVACY.md](PRIVACY.md) for storage, retention and removal.
 
 ScrollPlus is not affiliated with YouTube, TikTok, Instagram, or GitHub. The GitHub mark in the popup and on the settings page only links to this repository.
 
