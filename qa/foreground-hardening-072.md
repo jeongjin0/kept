@@ -42,4 +42,4 @@ The ordinary Playwright launcher forces every page into foreground focus. Visibi
 
 No signed-in Instagram/Following claim, day-long stability claim, live CPU percentage or bounded-history memory claim is established by these checks.
 
-An earlier duplicate CI run passed 69 tests but failed to start its separate QA Chrome before one test; the companion run passed all 70. The launcher now uses the same shared-memory fallback as Playwright and retains bounded startup stderr. The timeout alone did not establish a product failure or a shared-memory root cause.
+An earlier duplicate CI run passed 69 tests but failed to start its separate QA Chrome before one test; the companion run passed all 70. The launcher now uses the same shared-memory fallback as Playwright and retains bounded startup stderr. Only the YouTube visibility scenario uses it; the existing pacing and pointer scenarios keep the ordinary Playwright launcher. Waiting for the extension worker is bounded independently of the fixture timeout. The timeout alone did not establish a product failure or a shared-memory root cause.

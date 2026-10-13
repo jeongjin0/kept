@@ -1,9 +1,10 @@
 import { expect, test as base } from "@playwright/test";
 import { launch } from "./extension";
 
-const test = base.extend<{ extension: Awaited<ReturnType<typeof launch>> }>({
-  extension: [async ({}, use) => {
-    const extension = await launch(undefined, undefined, true);
+const test = base.extend<{ extension: Awaited<ReturnType<typeof launch>>; nativeVisibility: boolean }>({
+  nativeVisibility: [false, { option: true }],
+  extension: [async ({ nativeVisibility }, use) => {
+    const extension = await launch(undefined, undefined, nativeVisibility);
     try { await use(extension); }
     finally { await extension.close(); }
   }, { timeout: 30000 }],
@@ -54,22 +55,25 @@ const id = (tab: Tab) => tab.evaluate(() => (window as unknown as { fixtureId: s
 const presses = (tab: Tab) => tab.evaluate(() => (window as unknown as { presses: number[] }).presses);
 const moves = (tab: Tab) => tab.evaluate(() => (window as unknown as { fixtureMoves: number }).fixtureMoves);
 
-test("YouTube: hidden tabs do not skip, and resume on return", async ({ extension }) => {
-  const tab = await open(extension, { likes: [40000, 10, 40000] });
-  await tab.waitForTimeout(2200);
-  const feedTabId = await extension.worker.evaluate(async () => {
-    const tab = (await chrome.tabs.query({})).find(tab => tab.url?.includes("youtube.com/shorts/"))!;
-    await chrome.tabs.create({ windowId: tab.windowId, url: "about:blank", active: true });
-    return tab.id!;
+test.describe("native tab visibility", () => {
+  test.use({ nativeVisibility: true });
+  test("YouTube: hidden tabs do not skip, and resume on return", async ({ extension }) => {
+    const tab = await open(extension, { likes: [40000, 10, 40000] });
+    await tab.waitForTimeout(2200);
+    const feedTabId = await extension.worker.evaluate(async () => {
+      const tab = (await chrome.tabs.query({})).find(tab => tab.url?.includes("youtube.com/shorts/"))!;
+      await chrome.tabs.create({ windowId: tab.windowId, url: "about:blank", active: true });
+      return tab.id!;
+    });
+    await expect.poll(() => tab.evaluate(() => document.hidden)).toBe(true);
+    await tab.evaluate(() => document.querySelector<HTMLElement>("#navigation-button-down button")!.click());
+    await tab.waitForTimeout(2000);
+    expect(await id(tab)).toBe("v1");
+    expect(await presses(tab)).toHaveLength(1);
+    await extension.worker.evaluate(id => chrome.tabs.update(id, { active: true }), feedTabId);
+    await expect.poll(() => id(tab), { timeout: 8000 }).toBe("v2");
+    expect(await presses(tab)).toHaveLength(2);
   });
-  await expect.poll(() => tab.evaluate(() => document.hidden)).toBe(true);
-  await tab.evaluate(() => document.querySelector<HTMLElement>("#navigation-button-down button")!.click());
-  await tab.waitForTimeout(2000);
-  expect(await id(tab)).toBe("v1");
-  expect(await presses(tab)).toHaveLength(1);
-  await extension.worker.evaluate(id => chrome.tabs.update(id, { active: true }), feedTabId);
-  await expect.poll(() => id(tab), { timeout: 8000 }).toBe("v2");
-  expect(await presses(tab)).toHaveLength(2);
 });
 
 test("YouTube: a cancelled pointer gesture does not leave filtering blocked", async ({ extension }) => {

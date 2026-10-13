@@ -71,7 +71,7 @@ export async function launch(language?: "en" | "ko", profile?: string, nativeVis
   }
   try {
     const isExtension = (worker: { url(): string }) => worker.url().startsWith("chrome-extension://") && worker.url().endsWith("/background.js");
-    const worker = context.serviceWorkers().find(isExtension) ?? await context.waitForEvent("serviceworker", { predicate: isExtension });
+    const worker = context.serviceWorkers().find(isExtension) ?? await context.waitForEvent("serviceworker", { predicate: isExtension, timeout: 10000 });
     await expect.poll(() => worker.evaluate(async () => {
       const local = globalThis.chrome?.storage?.local;
       return typeof local?.get === "function" ? (await local.get("settings")).settings?.enabled : false;
