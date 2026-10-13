@@ -97,7 +97,8 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
   let previousModel = "null";
   let watching = false;
   let frame: number | null = null;
-  let motionUntil = 0;
+  const transitions = new Map<Element, Set<string>>();
+  let transitionFocus: HTMLElement | null = null;
   let watchedAnchor: HTMLElement | null = null;
   const ancestors = new Set<Element>();
   const resized = new ResizeObserver(() => queuePlace());
@@ -128,11 +129,26 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     window.addEventListener("scroll", () => queuePlace(), { capture: true, passive: true });
     document.addEventListener("transitionrun", (event) => {
       if (!watching || !(event.target instanceof Element) || !ancestors.has(event.target)) return;
-      // Follow the moving column while a panel animates. There is no repeating placement work on an idle page.
-      motionUntil = performance.now() + 600;
-      queuePlace();
+      if (!transitions.size && document.activeElement === host) {
+        const focused = host?.shadowRoot?.activeElement;
+        transitionFocus = focused instanceof HTMLElement ? focused : null;
+      }
+      // A delayed frame can move the player farther than the gutter gap. Hide through the transition instead of chasing it.
+      const properties = transitions.get(event.target) ?? new Set<string>();
+      properties.add(event.propertyName);
+      transitions.set(event.target, properties);
+      if (host) host.style.visibility = "hidden";
     }, true);
-    document.addEventListener("transitionend", () => queuePlace(), true);
+    const endTransition = (event: TransitionEvent) => {
+      if (!(event.target instanceof Element)) return;
+      const properties = transitions.get(event.target);
+      if (!properties) return;
+      properties.delete(event.propertyName);
+      if (!properties.size) transitions.delete(event.target);
+      queuePlace();
+    };
+    document.addEventListener("transitionend", endTransition, true);
+    document.addEventListener("transitioncancel", endTransition, true);
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) stopWatching();
       else if (previousModel !== "null") { startWatching(); place(); }
@@ -145,7 +161,6 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
       frame = null;
       if (!watching || document.hidden) return;
       place();
-      if (performance.now() < motionUntil) queuePlace();
     });
   }
 
@@ -157,6 +172,7 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     resized.disconnect();
     ancestors.clear();
     watchedAnchor = anchor;
+    for (const node of transitions.keys()) if (!chain.includes(node)) transitions.delete(node);
     for (const node of chain) {
       ancestors.add(node);
       resized.observe(node);
@@ -175,7 +191,8 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     resized.disconnect();
     ancestors.clear();
     watchedAnchor = null;
-    motionUntil = 0;
+    transitions.clear();
+    transitionFocus = null;
     if (frame != null) cancelAnimationFrame(frame);
     frame = null;
     if (placeTimer != null) window.clearTimeout(placeTimer);
@@ -245,8 +262,13 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     const onScreen = !!box && box.width > 0 && box.height > 0 && box.right > 0 && box.left < width && box.bottom > 0 && box.top < window.innerHeight;
     // Hide before measuring or moving, so a comments panel cannot reveal a stale position over the video.
     host.style.visibility = "hidden";
+    if (transitions.size) return;
     if (!box || !onScreen || !placeSide(box)) return;
     host.style.visibility = "visible";
+    if (transitionFocus?.isConnected && (document.activeElement === document.body || document.activeElement === host)) {
+      transitionFocus.focus({ preventScroll: true });
+    }
+    transitionFocus = null;
   }
 
   // Place the chip now, and once more a moment later: the video of a feed that is still swapping players may not be there yet.

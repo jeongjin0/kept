@@ -135,7 +135,7 @@ test("a reparented player keeps following its new container's layout", async ({ 
   expect((await host.boundingBox())!.x + 228).toBeCloseTo(549.875, 0);
 });
 
-test("animated column changes keep the notice left throughout the motion", async ({ page }) => {
+test("animated column changes hide the notice until its left gutter settles", async ({ page }) => {
   await open(page);
   await page.locator("video").evaluate((node: HTMLVideoElement) => { node.style.transition = "left 400ms linear"; });
   await move(page, 301.875);
@@ -148,9 +148,23 @@ test("animated column changes keep the notice left throughout the motion", async
     }
     return values;
   });
-  // Allow one frame of website motion before the matching placement callback runs.
+  expect(observations.some(value => !value.visible), "the notice stays out of a moving player").toBe(true);
   expect(observations.filter(value => value.visible).every(value => value.right <= value.videoLeft + 1)).toBe(true);
+  await expect(page.locator("#scrollplus-chip-host")).toBeVisible();
   await expect.poll(async () => (await page.locator("#scrollplus-chip-host").boundingBox())?.width).toBe(44);
+});
+
+test("cancelling a column transition restores the notice instead of leaving it hidden", async ({ page }) => {
+  await open(page);
+  await page.getByRole("button", { name: "Undo" }).focus();
+  await page.locator("video").evaluate((node: HTMLVideoElement) => { node.style.transition = "left 1s linear"; });
+  await move(page, 301.875);
+  const host = page.locator("#scrollplus-chip-host");
+  await expect(host).toBeHidden();
+  await page.locator("video").evaluate((node: HTMLVideoElement) => { node.style.transition = "none"; });
+  await expect(host).toBeVisible();
+  await expect.poll(async () => (await host.boundingBox())?.width).toBe(44);
+  await expect(page.getByRole("button", { name: "Undo" })).toBeFocused();
 });
 
 test("placement has no idle polling and stops after the notice is dismissed", async ({ page }) => {
