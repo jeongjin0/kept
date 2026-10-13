@@ -174,7 +174,7 @@ The chip is the only thing ScrollPlus adds to a site. It must be seen on any vid
 - The chip is placed again when its words change, 250 ms after it appears (a feed that swaps its video players may have none for a moment) and when the window is resized.
 - Bottom, 32 px from the window's edge as in 0.4.4, is gone: it sat on the caption, and on a dark video the dark chip could not be told from the video.
 - Look: see Visual system.
-- The chip is shown for 2.5 seconds after the last skip. A skip that follows a skip, while the chip is up, adds a line to the same chip instead of showing a new one. Its head then says how many in a row ("3 skipped in a row" / "연속 3개 넘김"), and under it each reason is listed, newest first, at most four, the older ones fainter. One skip shows the plain chip: "Skipped · 454 likes" and Undo. Undo still moves back one item, the newest. The pause chip ("The next ones are under your bar.") has the same look and the same place.
+- The chip is shown for 2.5 seconds after the last skip. A skip that follows a skip, while the chip is up, adds a line to the same chip instead of showing a new one. The chip then has no head and no mark: it lists the reasons, newest first, at most three, the older ones fainter, and Undo. The pill keeps the mark and the count (×3). One skip shows the plain chip: the mark and "Skipped · 454 likes", and Undo. Undo still moves back one item, the newest. The pause chip ("The next ones are under your bar.") has the same look and the same place.
 
 ## Time saved
 

@@ -25,12 +25,13 @@ const CSS = [
   ".dot { width: 26px; height: 26px; border-radius: 50%; background: #59C5BF; color: #031A19; display: grid; place-items: center; flex: none; }",
   ".dot svg { display: block; }",
   ".label { font-variant-numeric: tabular-nums; min-width: 0; }",
-  ".label.run { color: #59C5BF; font-size: 13.5px; }",
+  ".chip:not(.compact) .head.run { display: none; }",
   ".rows { display: grid; gap: 6px; }",
   ".rows:empty { display: none; }",
   ".r { display: flex; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; }",
   ".r::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #59C5BF; flex: none; }",
   ".r:nth-child(n+2) { font-weight: 500; font-size: 13.5px; color: #99ACAB; }",
+  ".head .count { display: none; }",
   ".chip.pause { gap: 12px; }",
   ".actions { display: grid; gap: 8px; }",
   "button { font: inherit; font-weight: 600; color: #EEF5F4; background: rgba(238, 245, 244, 0.12); border: 0; border-radius: 999px; min-height: 34px; padding: 8px 15px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: background 180ms ease-out; }",
@@ -43,8 +44,8 @@ const CSS = [
   ".chip.compact .head { flex-direction: column; gap: 4px; }",
   ".chip.compact .label, .chip.compact .rows, .chip.compact .txt { display: none; }",
   ".chip.compact button { width: 34px; min-height: 34px; padding: 0; border-radius: 50%; }",
-  ".count { display: none; font-size: 13px; font-variant-numeric: tabular-nums; }",
-  ".chip.compact .count { display: block; }",
+  ".count { font-size: 13px; font-variant-numeric: tabular-nums; }",
+  ".chip.compact .head .count { display: block; }",
   "@keyframes in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }",
   "@keyframes ping { from { inset: -1.5px; opacity: 0.85; } to { inset: -11px; opacity: 0; } }",
   "@keyframes out { from { opacity: 1; } to { opacity: 0; } }",
@@ -237,8 +238,9 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     const dot = document.createElement("span");
     dot.className = "dot";
     dot.append(svgIcon("streak", 16));
-    const total = run ? run.length : 1;
-    head.replaceChildren(dot, run ? span("label run", t("chipRun", total)) : span("label", reasonLabel(model)), span("count", total > 1 ? "×" + total : ""));
+    // One skip: the mark and the reason. A row of skips: only the reasons, newest first. The mark and the count are kept for the pill.
+    head.classList.toggle("run", !!run);
+    head.replaceChildren(dot, run ? span("count", "×" + run.length) : span("label", reasonLabel(model)));
     rows.replaceChildren(...(run ? run.map((reason) => span("r", reasonLabel(reason))) : []));
   }
 

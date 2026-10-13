@@ -68,13 +68,13 @@ test("the skip chip sits beside the video by default, lists a row of skips, and 
   expect(side.x + side.width).toBeLessThanOrEqual(video.x);
 
   // The other three put it over the video, centred on its column. Top: 18% of the window down (130 of 720 px). This is the second skip in a
-  // row: it adds a line to the same chip. The head says how many, and each reason is listed, newest first.
+  // row: it adds a line to the same chip, and the chip lists the reasons newest first, with no head and no mark.
   const top = await chipBox("top");
   expect(top.x + top.width / 2).toBeCloseTo(videoCentre, 0);
   expect(top.y).toBeCloseTo(130, 0);
-  await expect(page.locator("#scrollplus-chip-host")).toContainText("2 skipped in a row");
   const rows = await page.locator("#scrollplus-chip-host").evaluate((host) => Array.from(host.shadowRoot!.querySelectorAll(".r")).map((node) => node.textContent));
   expect(rows).toEqual(["Skipped · 11 likes", "Skipped · 10 likes"]);
+  expect(await page.locator("#scrollplus-chip-host").evaluate((host) => getComputedStyle(host.shadowRoot!.querySelector(".head")!).display)).toBe("none");
 
   const middle = await chipBox("middle");
   expect(middle.x + middle.width / 2).toBeCloseTo(videoCentre, 0);

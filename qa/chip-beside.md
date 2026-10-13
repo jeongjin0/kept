@@ -11,7 +11,7 @@ The chip used to sit on the video, at the top. That covered what a person was lo
 
 ## A row of skips
 
-When a video is skipped while the chip of the one before is still up, the same chip takes a line: the head says how many in a row ("3 skipped in a row" / "연속 3개 넘김"), and each reason is listed under it, newest first, at most four, the older ones fainter. After the chip has gone (2.5 s after the last skip) the next skip starts a row of one. One skip looks as it did, with the plain reason and Undo.
+When a video is skipped while the chip of the one before is still up, the same chip takes a line. It then has no head and no mark, only the reasons, newest first, at most three, the older ones fainter, and Undo. The pill keeps the mark and the count (×3). After the chip has gone (2.5 s after the last skip) the next skip starts a row of one. One skip looks as it did, with the plain reason and Undo.
 
 Undo still moves back one video, the newest. Undoing the whole row was not built.
 

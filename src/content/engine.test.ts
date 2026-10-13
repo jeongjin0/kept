@@ -373,7 +373,7 @@ describe("engine", () => {
     expect(box.models.at(-1)).toEqual({ mode: "skipped", metric: "likes", value: 5 });
   });
 
-  it("shows at most four reasons of a row", async () => {
+  it("shows at most three reasons of a row", async () => {
     const box = harness({ skipAds: true });
     for (let index = 1; index <= 5; index += 1) {
       box.show({ ...low("v" + index), metrics: { ...low("v" + index).metrics!, likes: index } });
@@ -381,7 +381,7 @@ describe("engine", () => {
       box.flush(450);
     }
     const last = box.models.at(-1) as { run?: unknown[] };
-    expect(last.run).toHaveLength(4);
+    expect(last.run).toHaveLength(3);
   });
 
   it("undo keeps the current video for the session", async () => {

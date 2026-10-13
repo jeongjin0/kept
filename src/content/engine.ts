@@ -19,7 +19,7 @@ export type ChipModel =
   | { mode: "paused"; canLower: boolean };
 
 // A row of skips shows at most this many reasons.
-const RUN_SHOWN = 4;
+const RUN_SHOWN = 3;
 
 // Why ScrollPlus is moving on: a count under its minimum, or an ad with Skip ads on.
 export type SkipReason = "below" | "ad";
