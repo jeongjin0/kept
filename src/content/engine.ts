@@ -71,6 +71,7 @@ export function createEngine(deps: EngineDeps) {
   let advancing = false;
   let suspended = false;
   let activityRevision = 0;
+  let runRevision = 0;
   let lastSkippedId: string | null = null;
   // The reasons of the skips that follow each other while one chip is up, newest first.
   let runReasons: ChipReason[] = [];
@@ -117,6 +118,7 @@ export function createEngine(deps: EngineDeps) {
   }
 
   function resetRun() {
+    runRevision++;
     paused = false;
     consecutive = 0;
     clearChip();
@@ -194,6 +196,7 @@ export function createEngine(deps: EngineDeps) {
     }
     advancing = true;
     const revision = activityRevision;
+    const run = runRevision;
     let moved = false;
     try {
       moved = await deps.advance(decision.reason);
@@ -224,15 +227,19 @@ export function createEngine(deps: EngineDeps) {
     lastSkippedId = item.id;
     lastAdvanceAt = deps.now();
     deps.onSkipped(Math.max(0, lastAdvanceAt - shownAt));
+    // Visibility suspends a run rather than ending it: an already-issued sixth
+    // move must still reach the safety cap, even if its notification is hidden.
+    if (run === runRevision) {
+      consecutive += 1;
+      if (consecutive >= SKIP_CAP) paused = true;
+    }
     // A move already sent to the site can finish after disable, navigation or a
     // tab switch. Count the real move, but never bring back the old run or chip.
     if (revision !== activityRevision) {
       if (current) evaluate(current);
       return;
     }
-    consecutive += 1;
-    if (consecutive >= SKIP_CAP) {
-      paused = true;
+    if (paused) {
       showPaused();
       return;
     }

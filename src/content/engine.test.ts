@@ -118,6 +118,20 @@ function ad(id: string, metrics: EngineItem["metrics"] = null): EngineItem {
 const good = { views: 900000, likes: 40000, comments: 200, shares: 10, saves: null };
 
 describe("interrupted skip runs", () => {
+  it("keeps the six-skip pause when the sixth move completes after hiding", async () => {
+    let calls = 0;
+    const box = harness({}, true, () => {
+      if (++calls === 6) box.engine.setVisible(false);
+    });
+    for (let i = 0; i < 6; i++) {
+      box.show(low(String(i))); await box.drain(); box.flush(450);
+    }
+    expect(box.skips).toBe(6);
+    expect(box.models.at(-1)).toBeNull();
+    box.engine.setVisible(true); box.show(low("next")); await box.drain();
+    expect(box.skips).toBe(6);
+    expect(box.models.at(-1)).toEqual({ mode: "paused", canLower: true });
+  });
   it("ends the run when late counts leave a video on screen", async () => {
     const box = harness();
     for (let i = 0; i < 5; i++) {
