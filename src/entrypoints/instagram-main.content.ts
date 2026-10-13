@@ -1,7 +1,8 @@
 import { defineContentScript } from "wxt/utils/define-content-script";
 import { instagramReelId, visibleVideo } from "../content/page";
 import { extractInstagram } from "../platforms/extract";
-import { createEmbeddedReader, createItemBridge } from "../platforms/item-bridge";
+import { createEmbeddedReader, createItemBridge, observeEmbeddedScripts } from "../platforms/item-bridge";
+import { visiblePoll } from "../lib/visible-poll";
 import { instagramHasVisibleAd } from "../platforms/instagram-player";
 import { observeJsonResponses } from "../platforms/observe";
 
@@ -17,17 +18,14 @@ export default defineContentScript({
     const ingest = (data: unknown) => bridge.ingest(extractInstagram(data));
     const readJson = createEmbeddedReader(ingest);
     observeJsonResponses((url) => url.includes("instagram.com") && (url.includes("graphql") || url.includes("/api/")), ingest);
-    const readEmbedded = () => {
-      for (const script of document.querySelectorAll("script")) {
-        const text = script.textContent || "";
-        if (text.length < 20 || text.length > 1500000) continue;
-        if (!text.includes("like_count") && !text.includes("play_count")) continue;
-        readJson(script, text);
-      }
-    };
-    document.addEventListener("DOMContentLoaded", readEmbedded);
+    observeEmbeddedScripts(script => {
+      const text = script.textContent || "";
+      if (text.length < 20 || text.length > 1500000) return;
+      if (!text.includes("like_count") && !text.includes("play_count")) return;
+      readJson(script, text);
+    });
     window.addEventListener("message", (event) => {
-      if (event.source !== window) return;
+      if (event.source !== window || document.hidden) return;
       const data = event.data as { source?: string; type?: string; key?: string; ad?: boolean } | null;
       if (!data || data.source !== "scrollplus" || data.type !== "advance" || (data.key !== "ArrowUp" && data.key !== "ArrowDown")) return;
       try {
@@ -36,10 +34,7 @@ export default defineContentScript({
         /* leave the page alone */
       }
     });
-    window.setInterval(() => {
-      readEmbedded();
-      bridge.publish();
-    }, 800);
+    visiblePoll(() => bridge.publish(), 800);
   },
 });
 

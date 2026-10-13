@@ -4,10 +4,13 @@ import { collectStallDiagnostics, FeedProgress, readDuringNavigation } from '../
 test('soak survives a real page reload but does not swallow other errors or a closed page', async ({ page }) => {
   await page.goto('/player.html');
   let navigations = 0;
-  const value = await readDuringNavigation(page, () => page.evaluate(() => new Promise(resolve => {
+  // The helper can return while the replacement document is still loading.
+  // Observe that load before closing it, so Chromium does not race reload and close.
+  const reloaded = page.waitForEvent('domcontentloaded');
+  const [value] = await Promise.all([readDuringNavigation(page, () => page.evaluate(() => new Promise(resolve => {
     setTimeout(() => location.reload(), 50);
     setTimeout(() => resolve('stale document'), 500);
-  })), () => navigations++);
+  })), () => navigations++), reloaded]);
   expect(value).toBeNull();
   expect(navigations).toBe(1);
   expect(await readDuringNavigation(page, () => page.title(), () => navigations++)).toBeTruthy();

@@ -22,6 +22,7 @@ export function createItemBridge(platform: Platform, readActive: () => Active | 
   let lastPlayer: Player | null = null;
 
   function publish(): void {
+    if (document.hidden) return;
     try {
       const active = readActive();
       if (!active) { lastPlayer = null; return; }
@@ -63,4 +64,27 @@ export function createEmbeddedReader(ingest: (data: unknown) => void) {
     try { ingest(JSON.parse(text)); }
     catch { /* not a JSON payload; retry only when its text changes */ }
   };
+}
+
+// Observe both parser-inserted scripts and later payload replacements. Each
+// mutation batch reads only its affected scripts, never the whole page again.
+export function observeEmbeddedScripts(read: (script: HTMLScriptElement) => void): () => void {
+  const observer = new MutationObserver(records => {
+    const dirty = new Set<HTMLScriptElement>();
+    const collect = (node: Node) => {
+      if (node instanceof HTMLScriptElement) dirty.add(node);
+      else if (node instanceof Element) {
+        for (const script of node.querySelectorAll("script")) dirty.add(script);
+      }
+    };
+    for (const record of records) {
+      const target = record.target instanceof HTMLScriptElement ? record.target : record.target.parentElement;
+      if (target instanceof HTMLScriptElement) dirty.add(target);
+      for (const node of record.addedNodes) collect(node);
+    }
+    for (const script of dirty) if (script.isConnected) read(script);
+  });
+  observer.observe(document, { childList: true, characterData: true, subtree: true });
+  for (const script of document.querySelectorAll("script")) read(script);
+  return () => observer.disconnect();
 }

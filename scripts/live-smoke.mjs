@@ -14,7 +14,7 @@ const context = await chromium.launchPersistentContext(fs.mkdtempSync(path.join(
 const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
 await expect.poll(() => worker.evaluate(async () => (await chrome.storage.local.get('settings')).settings?.enabled)).toBe(true);
 const settings = await worker.evaluate(async () => (await chrome.storage.local.get('settings')).settings);
-expect(settings.rule).toEqual({ likes: { on: true, min: 5000 }, comments: { on: false, min: 100 }, views: { on: false, min: 100000 } });
+expect(settings.rule).toEqual({ likes: { on: true, min: 500 }, comments: { on: false, min: 100 }, views: { on: false, min: 100000 } });
 const report = { at: new Date().toISOString(), version: JSON.parse(fs.readFileSync(path.join(extension, 'manifest.json'))).version, settings, runs: [] };
 try {
   for (const [platform, url] of [['youtube', 'https://www.youtube.com/shorts'], ['tiktok', 'https://www.tiktok.com/foryou']]) {
@@ -61,7 +61,7 @@ try {
           const events = window.__scrollplusQA.splice(0);
           const host = document.querySelector('#scrollplus-chip-host');
           const chip = host?.shadowRoot?.querySelector('.chip');
-          return { id, events, activeMetrics: window.__scrollplusQACache[id], previousMetrics: window.__scrollplusQACache[previous], chip: chip && !chip.classList.contains('leaving') ? chip.textContent.replace(/\s+/g, ' ').trim() : '', paused: chip?.classList.contains('stack') || false };
+          return { id, events, activeMetrics: window.__scrollplusQACache[id], previousMetrics: window.__scrollplusQACache[previous], chip: chip && !chip.classList.contains('leaving') ? chip.textContent.replace(/\s+/g, ' ').trim() : '', paused: chip?.dataset.mode === 'paused' || chip?.classList.contains('stack') || false };
         }, current);
         for (const [id, metrics] of [[snap.id, snap.activeMetrics], [current, snap.previousMetrics]]) {
           if (!id || !metrics) continue;
@@ -103,7 +103,7 @@ try {
       await page.close();
       if (video) run.video = path.relative(output, await video.path());
     } catch (error) { run.error = String(error); await page.close(); }
-    run.summary = { samples: run.samples.length, knownLikes: run.samples.filter(row => typeof row.metrics?.likes === 'number').length, lowLikeSamples: run.samples.filter(row => row.metrics?.likes != null && row.metrics.likes < 5000).length, automaticMoves: run.moves.filter(row => row.automatic).length, capturedChips: run.screenshots.length, errors: run.errors.length };
+    run.summary = { samples: run.samples.length, knownLikes: run.samples.filter(row => typeof row.metrics?.likes === 'number').length, lowLikeSamples: run.samples.filter(row => row.metrics?.likes != null && row.metrics.likes < settings.rule.likes.min).length, automaticMoves: run.moves.filter(row => row.automatic).length, capturedChips: run.screenshots.length, errors: run.errors.length };
     console.log(JSON.stringify({ platform, ...run.summary, error: run.error }));
     fs.writeFileSync(path.join(output, 'report.json'), JSON.stringify(report, null, 2));
   }

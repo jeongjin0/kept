@@ -57,8 +57,19 @@ try {
   const checkDefaults = async () => {
     if (!settingsPage) return null;
     const data = await settingsPage.evaluate(() => chrome.storage.local.get(null));
-    // Builds before 0.4.0 do not store skipAds; it is off by default.
-    expect({ skipAds: false, ...data.settings }).toEqual({ enabled: !extensionOff, rule: { likes: { on: true, min: 5000 }, comments: { on: false, min: 100 }, views: { on: false, min: 100000 } }, platforms: { youtube: true, tiktok: true, instagram: true }, filterGrids: false, showSkipChip: true, skipAds: false, allowlist: [] });
+    // Keep the historical 0.3.x/0.4.x measurement path, while checking the
+    // shipped defaults for new builds instead of requiring the old 5,000 bar.
+    const [major, minor, patch] = report.version.split('.').map(Number);
+    const modern = major > 0 || minor >= 5;
+    expect({ skipAds: false, ...data.settings }).toEqual({
+      enabled: !extensionOff,
+      rule: { likes: { on: true, min: modern ? 500 : 5000 }, comments: { on: false, min: 100 }, views: { on: false, min: 100000 } },
+      platforms: { youtube: true, tiktok: true, instagram: true }, filterGrids: false, showSkipChip: true,
+      skipAds: modern, allowlist: [],
+      ...(modern ? { chipPosition: major > 0 || minor >= 7 ? 'side' : 'top' } : {}),
+      ...(major > 0 || minor > 5 || minor === 5 && patch >= 1 ? { keepFollowed: true } : {}),
+    });
+    report.likeMinimum = data.settings.rule.likes.min;
     return data.dailySkips;
   };
   report.initialDailyCount = await checkDefaults();
@@ -85,13 +96,13 @@ try {
   while (!stop && Date.now() - started < duration) {
     const snap = await readDuringNavigation(page, () => page.evaluate(() => {
       const chip = document.querySelector('#scrollplus-chip-host')?.shadowRoot?.querySelector('.chip');
-      return { id: location.pathname.match(/^\/shorts\/([^/?#]+)/)?.[1], events: window.__scrollplusSoakEvents?.splice(0) || [], chip: chip && !chip.classList.contains('leaving') ? chip.textContent : '', paused: chip?.classList.contains('stack') || false };
+      return { id: location.pathname.match(/^\/shorts\/([^/?#]+)/)?.[1], events: window.__scrollplusSoakEvents?.splice(0) || [], chip: chip && !chip.classList.contains('leaving') ? chip.textContent : '', paused: chip?.dataset.mode === 'paused' || chip?.classList.contains('stack') || false };
     }), () => { report.navigationRetries++; progress.reset(Date.now()); write(); });
     if (!snap) continue;
     for (const event of snap.events) {
       if (!seen.has(event.id)) { seen.add(event.id); report.samples++; }
       if (typeof event.likes === 'number' && !known.has(event.id)) { known.add(event.id); report.knownLikes++; }
-      if (typeof event.likes === 'number' && event.likes < 5000 && !low.has(event.id)) { low.add(event.id); report.belowMinimum++; }
+      if (typeof event.likes === 'number' && event.likes < report.likeMinimum && !low.has(event.id)) { low.add(event.id); report.belowMinimum++; }
     }
     if (noExtension && snap.id && !seen.has(snap.id)) { seen.add(snap.id); report.samples++; }
     const movement = progress.observe(snap.id, Date.now());

@@ -117,6 +117,109 @@ function ad(id: string, metrics: EngineItem["metrics"] = null): EngineItem {
 
 const good = { views: 900000, likes: 40000, comments: 200, shares: 10, saves: null };
 
+describe("interrupted skip runs", () => {
+  it("keeps the six-skip pause when the sixth move completes after hiding", async () => {
+    let calls = 0;
+    const box = harness({}, true, () => {
+      if (++calls === 6) box.engine.setVisible(false);
+    });
+    for (let i = 0; i < 6; i++) {
+      box.show(low(String(i))); await box.drain(); box.flush(450);
+    }
+    expect(box.skips).toBe(6);
+    expect(box.models.at(-1)).toBeNull();
+    box.engine.setVisible(true); box.show(low("next")); await box.drain();
+    expect(box.skips).toBe(6);
+    expect(box.models.at(-1)).toEqual({ mode: "paused", canLower: true });
+  });
+  it("ends the run when late counts leave a video on screen", async () => {
+    const box = harness();
+    for (let i = 0; i < 5; i++) {
+      box.show(low(String(i))); await box.drain(); box.flush(450);
+    }
+    box.show({ ...low("late"), metrics: null });
+    box.flush(4000);
+    box.show(low("late")); await box.drain();
+    expect(box.skips).toBe(5);
+    box.show(low("next")); await box.drain();
+    expect(box.models.at(-1)).toEqual({ mode: "skipped", metric: "likes", value: 10 });
+  });
+  it("ends the run when revisiting a video that was already kept", async () => {
+    const box = harness();
+    box.show({ ...low("good"), metrics: good });
+    for (let i = 0; i < 5; i++) {
+      box.show(low(String(i))); await box.drain(); box.flush(450);
+    }
+    box.show({ ...low("good"), metrics: good });
+    box.show(low("next")); await box.drain();
+    expect(box.models.at(-1)).toEqual({ mode: "skipped", metric: "likes", value: 10 });
+  });
+  it("does not group reasons across a video that passes the rule", async () => {
+    const box = harness();
+    box.show(low("a")); await box.drain();
+    box.show({ ...low("good"), metrics: good });
+    box.flush(450); box.show(low("b")); await box.drain();
+    expect(box.models.at(-1)).toEqual({ mode: "skipped", metric: "likes", value: 10 });
+  });
+  it("does not move while hidden and retains a safety pause on return", async () => {
+    const box = harness();
+    box.engine.setVisible(false); box.show(low("hidden")); await box.drain();
+    expect(box.skips).toBe(0);
+    box.engine.setVisible(true); box.engine.poke(); await box.drain();
+    expect(box.skips).toBe(1);
+    for (let i = 0; i < 5; i++) {
+      box.flush(450); box.show(low(String(i))); await box.drain();
+    }
+    expect(box.models.at(-1)).toEqual({ mode: "paused", canLower: true });
+    box.engine.setVisible(false); box.engine.setVisible(true);
+    box.show(low("next")); await box.drain();
+    expect(box.skips).toBe(6);
+    expect(box.models.at(-1)).toEqual({ mode: "paused", canLower: true });
+  });
+
+  it("does not revive a chip when an in-flight move finishes while hidden", async () => {
+    const box = harness({}, true, () => box.engine.setVisible(false));
+    box.show(low("a")); await box.drain();
+    expect(box.skips).toBe(1);
+    expect(box.models.at(-1)).toBeNull();
+  });
+
+  it("starts a fresh run after a session-kept video", async () => {
+    const box = harness({}, true, undefined, { sessionKeep: new Set(["kept"]) });
+    for (let i = 0; i < 5; i++) {
+      box.show(low(String(i))); await box.drain(); box.flush(450);
+    }
+    box.show(low("kept"));
+    box.show(low("next")); await box.drain();
+    expect(box.skips).toBe(6);
+    expect(box.models.at(-1)).toEqual({ mode: "skipped", metric: "likes", value: 10 });
+  });
+
+  it("starts a fresh run after keeping the current creator", async () => {
+    const box = harness();
+    for (let i = 0; i < 5; i++) {
+      box.show(low(String(i))); await box.drain(); box.flush(450);
+    }
+    box.setBlocked(true); box.show(low("kept")); box.engine.keepCurrent();
+    box.setBlocked(false); box.show(low("next")); await box.drain();
+    expect(box.models.at(-1)).toEqual({ mode: "skipped", metric: "likes", value: 10 });
+  });
+
+  for (const interruption of ["disable", "leave"] as const) {
+    it(`does not revive a notification when a move finishes after ${interruption}`, async () => {
+      const box = harness({}, true, () => {
+        if (interruption === "disable") {
+          box.settings.enabled = false;
+          box.engine.settingsChanged();
+        } else box.engine.onInactive();
+      });
+      box.show(low("a")); await box.drain();
+      expect(box.skips).toBe(1); // The site did carry out the move.
+      expect(box.models.at(-1)).toBeNull();
+    });
+  }
+});
+
 describe("engine and ads", () => {
   it("keeps an ad that has few likes while Skip ads is off", async () => {
     const box = harness({ skipAds: false });

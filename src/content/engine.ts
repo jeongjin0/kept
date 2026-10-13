@@ -69,6 +69,9 @@ export function createEngine(deps: EngineDeps) {
   let consecutive = 0;
   let paused = false;
   let advancing = false;
+  let suspended = false;
+  let activityRevision = 0;
+  let runRevision = 0;
   let lastSkippedId: string | null = null;
   // The reasons of the skips that follow each other while one chip is up, newest first.
   let runReasons: ChipReason[] = [];
@@ -107,13 +110,25 @@ export function createEngine(deps: EngineDeps) {
     skipQueuedFor = null;
   }
 
-  function resumeCurrent() {
-    clearWait();
-    clearGap();
-    paused = false;
-    consecutive = 0;
+  function clearChip() {
+    if (chipTimer != null) deps.cancel(chipTimer);
+    chipTimer = null;
     runReasons = [];
     deps.render(null);
+  }
+
+  function resetRun() {
+    runRevision++;
+    paused = false;
+    consecutive = 0;
+    clearChip();
+  }
+
+  function resumeCurrent() {
+    activityRevision++;
+    clearWait();
+    clearGap();
+    resetRun();
     if (!current) return;
     finished.delete(current.id);
     seenAt = deps.now();
@@ -144,7 +159,7 @@ export function createEngine(deps: EngineDeps) {
 
   async function performSkip(item: EngineItem) {
     if (item.id !== current?.id || sessionKeep.has(item.id) || finished.has(item.id)) return;
-    if (advancing || paused) return;
+    if (advancing || paused || suspended) return;
     if (deps.isBlocked()) return;
     const decision = judge(current);
     if (decision.action !== "skip") return;
@@ -166,7 +181,7 @@ export function createEngine(deps: EngineDeps) {
     if (deps.ready && !deps.ready()) {
       if (now - seenAt >= RETRY_FOR_MS) {
         finished.add(item.id);
-        deps.render(null);
+        resetRun();
         return;
       }
       if (skipQueuedFor === item.id) return;
@@ -180,6 +195,8 @@ export function createEngine(deps: EngineDeps) {
       return;
     }
     advancing = true;
+    const revision = activityRevision;
+    const run = runRevision;
     let moved = false;
     try {
       moved = await deps.advance(decision.reason);
@@ -189,10 +206,14 @@ export function createEngine(deps: EngineDeps) {
       advancing = false;
     }
     if (!moved) {
+      if (revision !== activityRevision) {
+        if (current) evaluate(current);
+        return;
+      }
       if (current?.id !== item.id) return;
       if (deps.now() - seenAt >= RETRY_FOR_MS) {
         finished.add(item.id);
-        deps.render(null);
+        resetRun();
         return;
       }
       if (gapTimer != null) deps.cancel(gapTimer);
@@ -205,10 +226,20 @@ export function createEngine(deps: EngineDeps) {
     finished.add(item.id);
     lastSkippedId = item.id;
     lastAdvanceAt = deps.now();
-    consecutive += 1;
     deps.onSkipped(Math.max(0, lastAdvanceAt - shownAt));
-    if (consecutive >= SKIP_CAP) {
-      paused = true;
+    // Visibility suspends a run rather than ending it: an already-issued sixth
+    // move must still reach the safety cap, even if its notification is hidden.
+    if (run === runRevision) {
+      consecutive += 1;
+      if (consecutive >= SKIP_CAP) paused = true;
+    }
+    // A move already sent to the site can finish after disable, navigation or a
+    // tab switch. Count the real move, but never bring back the old run or chip.
+    if (revision !== activityRevision) {
+      if (current) evaluate(current);
+      return;
+    }
+    if (paused) {
       showPaused();
       return;
     }
@@ -219,7 +250,7 @@ export function createEngine(deps: EngineDeps) {
 
   function evaluate(item: EngineItem) {
     if (item.id !== current?.id || sessionKeep.has(item.id) || finished.has(item.id)) return;
-    if (advancing) return;
+    if (advancing || suspended) return;
     const decision = judge(item);
     if (decision.action === "keep") {
       const waiting = decision.reason === "no-metrics" || decision.reason === "unscored";
@@ -227,11 +258,13 @@ export function createEngine(deps: EngineDeps) {
       finished.add(item.id);
       consecutive = 0;
       paused = false;
+      runReasons = [];
       if (chipTimer == null) deps.render(null);
       return;
     }
     if (!metricsReady && deps.now() >= graceEnd()) {
       finished.add(item.id);
+      resetRun();
       return;
     }
     metricsReady = true;
@@ -264,11 +297,18 @@ export function createEngine(deps: EngineDeps) {
       }
       if (sessionKeep.has(item.id)) {
         clearWait();
-        deps.render(null);
+        clearGap();
+        // Do this once on arrival, rather than invalidating a pending move on every poll.
+        if (changed) activityRevision++;
+        resetRun();
         return;
       }
       if (changed) clearWait();
-      if (finished.has(item.id)) return;
+      if (finished.has(item.id)) {
+        // A revisited video stays, so it also ends a run of automatic skips.
+        if (changed) resetRun();
+        return;
+      }
       // An ad needs no counts, so it is judged as soon as it is known to be one.
       if (item.surface === "player" && item.metrics == null && item.kind !== "ad") {
         armWait(item);
@@ -314,22 +354,35 @@ export function createEngine(deps: EngineDeps) {
       resumeCurrent();
     },
     onInactive() {
+      activityRevision++;
       current = null;
       clearWait();
       clearGap();
-      paused = false;
-      consecutive = 0;
-      runReasons = [];
-      deps.render(null);
+      resetRun();
+    },
+    setVisible(visible: boolean) {
+      if (suspended === !visible) return;
+      suspended = !visible;
+      activityRevision++;
+      clearWait();
+      clearGap();
+      clearChip();
+      // Preserve the six-skip safety pause across tab switches. The next visible
+      // observation gets a fresh grace period for counts that arrived while away.
+      if (visible) {
+        seenAt = deps.now();
+        metricsReady = false;
+        if (paused) showPaused();
+      }
     },
     keepCurrent() {
       if (!current) return;
+      activityRevision++;
       sessionKeep.add(current.id);
       finished.add(current.id);
       clearWait();
       clearGap();
-      paused = false;
-      deps.render(null);
+      resetRun();
     },
   };
 }

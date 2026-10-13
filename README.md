@@ -34,6 +34,8 @@ In Settings you can also turn on a minimum for comments or views, switch a site 
 
 A skip is the site's own Next control, pressed for you, so you see the usual slide to the next video. On YouTube Shorts a skipped video is on screen for about half a second, and it is muted meanwhile. That half second is YouTube's own pace between moves ([timing](qa/skip-timing.md)). On TikTok a skipped video is on screen for about 0.4 s, with its sound on: TikTok takes a mute made by a script as your own choice, so ScrollPlus leaves it alone ([timing](qa/skip-timing-tiktok.md)). On Instagram Reels it is about 0.3 s, measured signed in with the built scripts run in the page ([timing](qa/skip-timing-instagram.md)).
 
+Hidden tabs do not auto-skip. Returning to a feed checks it immediately; the six-skip safety pause remains until you choose to continue.
+
 If a count is missing, the video stays. Photo posts stay too. It never skips on a guess, never hides a feed, and stops after six skips in a row so you can decide to keep going or lower the bar.
 
 Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English and Korean.
@@ -51,7 +53,7 @@ ScrollPlus is a public beta, installed from a GitHub release for now (see below)
 - Keep accounts I follow covers YouTube, TikTok and Instagram. 0.5.3 also recognises the longer subscribe and follow labels, and stops rereading YouTube responses that did not change. It was checked on controlled pages: a subscribed Short, a followed Reel, and a followed TikTok stay under the like bar. A signed-in browser, where those signals can be seen on a real account, has not been watched for this version. See [follow](qa/follow.md).
 - Not yet established: ordinary day-long use, and the Instagram advertisement guard on a live advertisement.
 
-Each claim is scoped in [release readiness](qa/release-readiness.md). More: [signed-in QA](qa/signed-in-smoke.md), [long feed QA](qa/soak.md), [UI audit](qa/ui-audit.md), [session Undo QA](qa/session-undo.md).
+The 0.7.2 state and performance checks are in [foreground hardening](qa/foreground-hardening-072.md). Earlier live claims retain their version scope in [release readiness](qa/release-readiness.md). More: [signed-in QA](qa/signed-in-smoke.md), [long feed QA](qa/soak.md), [UI audit](qa/ui-audit.md), [session Undo QA](qa/session-undo.md).
 
 ## Install
 

@@ -5,6 +5,7 @@ import { createEngine, type EngineItem, type SkipReason } from "./engine";
 import { mountChip } from "./chip";
 import { mostVisibleVideo } from "./page";
 import type { ExtractedItem } from "../platforms/extract";
+import { visiblePoll } from "../lib/visible-poll";
 
 export interface Adapter {
   platform: Platform;
@@ -68,7 +69,7 @@ export function startFilter(adapter: Adapter): void {
       settings = { ...settings, rule: next };
       void saveSettings(settings);
     },
-    isBlocked: () => pointerDown || typing() || menuOpen(),
+    isBlocked: () => document.hidden || pointerDown || typing() || menuOpen(),
     render: (model) => chip.update(model),
     schedule: (fn, ms) => window.setTimeout(fn, ms),
     cancel: (id) => window.clearTimeout(id),
@@ -105,7 +106,7 @@ export function startFilter(adapter: Adapter): void {
   let inactiveSince = 0;
 
   function showActive(): void {
-    if (!ready) return;
+    if (!ready || document.hidden) return;
     const active = adapter.readActive();
     if (!active) {
       const now = Date.now();
@@ -133,6 +134,7 @@ export function startFilter(adapter: Adapter): void {
   let gridsMayBeHidden = true;
 
   function scanGrids(): void {
+    if (document.hidden) return;
     if (!settings.filterGrids && !gridsMayBeHidden) return;
     let cards: Array<{ id: string; element: HTMLElement }> = [];
     try {
@@ -201,13 +203,24 @@ export function startFilter(adapter: Adapter): void {
     if (!inside) engine.poke();
   }, true);
   window.addEventListener("focusout", () => engine.poke(), true);
+  window.addEventListener("pointercancel", () => { pointerDown = false; engine.poke(); }, true);
+  window.addEventListener("blur", () => { pointerDown = false; }, true);
+
+  let scrollTimer: number | null = null;
+  document.addEventListener("visibilitychange", () => {
+    pointerDown = false;
+    inactiveSince = 0;
+    if (scrollTimer != null) window.clearTimeout(scrollTimer);
+    scrollTimer = null;
+    engine.setVisible(!document.hidden);
+  });
+  engine.setVisible(!document.hidden);
 
   // Idle pages produce no scroll events, so this costs nothing until the feed moves.
   if (adapter.watchScroll) {
-    let scrollTimer: number | null = null;
     let lastScrollLook = 0;
     window.addEventListener("scroll", () => {
-      if (scrollTimer != null) return;
+      if (scrollTimer != null || document.hidden) return;
       scrollTimer = window.setTimeout(() => {
         scrollTimer = null;
         lastScrollLook = Date.now();
@@ -265,7 +278,7 @@ export function startFilter(adapter: Adapter): void {
     });
   }
   initialize();
-  window.setInterval(() => {
+  visiblePoll(() => {
     showActive();
     scanGrids();
   }, 400);

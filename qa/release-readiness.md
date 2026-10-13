@@ -1,27 +1,29 @@
-# Release readiness · 0.7.0
+# Release readiness · 0.7.2
 
-Checked on 2026-10-13 KST, macOS ARM64. This candidate moves the skip chip off the video and changes what it shows for a row of skips. It does not change how a video is judged or skipped. The settings schema marker is 3, and an install that had the chip at the top is moved to the side once. Permissions are unchanged. Chrome Web Store submission has not occurred.
+Checked 2026-10-13 KST on Mini, macOS ARM64. This patch suspends background-tab filtering and recurring DOM polls, observes Instagram payload changes, and repairs skip-run state after kept videos and interrupted moves. Rules, defaults, UI appearance, permissions and storage keys are unchanged. The generated store screenshots also include the text-free saved-time display introduced in 0.7.1.
 
 | Check | Result | Evidence / scope |
 | --- | --- | --- |
-| TypeScript | Pass | tsc --noEmit |
-| Unit tests | 116 passed | npm test. The row of skips lists up to three reasons, newest first; it starts over after the chip has gone, and one skip has no row. Also covers migrating the top position to the side, preserving middle/lower choices, schema 3, and install settings. |
-| Built-script browser tests | 66 passed in CI | npx playwright test on both PR runs. Covers the side chip by default, the centred position, first and subsequent skips, the narrow-window pill, pause state, and no-room fallback. Local full-suite runs had intermittent failures in different browser tests; each passed on retry, and both clean CI runs passed all 66. |
-| The chip on real sites | Looked at | Signed-out YouTube Shorts (a card with three skips, left of the video, centred), TikTok (a card with four skips, left of the video, clear of the site's menu) and YouTube in a 760 px window (a pill with the count and Undo). See [chip beside the video](chip-beside.md) |
-| Popup and settings | Looked at | Popup 426 px high, no scroll. Settings has four position choices and fits at 420 px |
-| Store images | Looked at | The chip image shows the card beside the video. Rendered again |
-| Package | Pass | npm run zip and node scripts/check-package.mjs. scrollplus-0.7.0-chrome.zip, 148,165 bytes |
-| Minimum Chrome 120 | Pass | [CI run 38350164245](https://github.com/jeongjin0/scrollplus/actions/runs/38350164245) and [CI run 38350167995](https://github.com/jeongjin0/scrollplus/actions/runs/38350167995); both Chrome 120 checks passed |
-| Chrome Web Store | Not submitted | Owner decision |
+| TypeScript and production build | Pass | npm run compile; npm run build |
+| Unit tests | 126 passed | Ten new engine regressions for kept videos, interrupted navigation and visibility; existing rule/storage/number tests remain green |
+| Browser suite | 70 passed | The local full suite and [CI run 38377709553](https://github.com/jeongjin0/scrollplus/actions/runs/38377709553); CI includes the final late-count and in-flight sixth-move cap corrections |
+| Before/after regressions | Reproduced and fixed | Published 0.7.1 fails script-read, hidden-tab navigation and pointer-cancel checks. See [foreground hardening](foreground-hardening-072.md) |
+| Package | Pass | npm run zip; node scripts/check-package.mjs; manifest 0.7.2, storage-only permission, exact three supported hosts |
+| Popup and settings | Looked at | Popup 426 px tall; Korean settings at 420/1440 px; [captures](screenshots/review-072/) |
+| Store images | Regenerated | English and Korean popup/settings include the text-free time value |
+| Live smoke | Scoped observation | Production-build YouTube/TikTok in disposable signed-out Chromium 153; see below |
+| Soak runner preflight | Pass | Current defaults accepted; 500-like bar and side chip. Finite 1-second requested duration, 3.5-second startup/exit; no long-run claim |
+| CI and minimum Chrome 120 | Pass | [CI run 38377709553](https://github.com/jeongjin0/scrollplus/actions/runs/38377709553): check, full e2e and minimum-chrome passed on the completed production runtime. [PR #47](https://github.com/jeongjin0/scrollplus/pull/47) checks cover the final QA-launcher/docs revision |
+| Chrome Web Store | Not submitted | GitHub beta only |
 
-## Artifact
+## Live observations
 
-scrollplus-0.7.0-chrome.zip, 148,165 bytes.
+The 0.7.2 candidate runtime was observed for 25 seconds on each site, before the final in-flight sixth-move cap adjustment. YouTube loaded five known-count videos, skipped one advertisement, and reported no page errors. The earlier candidate's 35-second YouTube run also skipped a 111-like video and one ad; that observation preceded the final late-count reset and is not presented as proof of the final ZIP. TikTok loaded four known-count videos in the final run, none under 500 likes, so automatic low-like filtering was not exercised by that live sample. It emitted one `a.init is not a function` page error from its own `ttwstatic.com` script; the same error was reproduced in a separate 25-second no-extension control using a fresh profile. It is recorded as a site error that also occurs without ScrollPlus, rather than an extension-free assumption or an error-free live pass. Instagram redirected to `/accounts/login/`, so signed-in Reels was not checked.
 
-The 0.6.0 report is in [release readiness 0.6.0](release-readiness-060.md).
+Native-visibility controlled pages establish hidden-tab stop/resume on all three platforms. They do not establish current signed-in production compatibility. Human day-long use, current signed-in Following/Instagram Undo and a live Instagram ad remain open. Historical signed-in, latency and 24-hour evidence retain their original package scope.
 
-## Remaining gates
+## Review and history
 
-1. A signed-in feed. The card was seen beside the video on two signed-out feeds and one narrow window; a signed-in page may put something in the margin (a comments panel opens on the right of YouTube Shorts).
-2. Instagram Reels was not seen with the card. Signed out it redirects to the login page. The placement uses only the video's box and what is under the card's nine points.
-3. Undo on a row of skips still moves back one video, the newest. Undoing a whole row was not built. The compact pill count is capped at three.
+The Air-openable review is [http://100.65.71.13:8778/review-072/](http://100.65.71.13:8778/review-072/). The Mini private review service serves only review assets and the beta ZIP. Stop after review ends with `launchctl bootout gui/501/com.edgethink.scrollplus.review-031`. No Air-side probe is claimed.
+
+Earlier reports: [0.7.1](release-readiness-071.md), [0.7.0](release-readiness-070.md), [0.6.0](release-readiness-060.md), [historical signed-in](signed-in-smoke.md), [historical long-feed QA](soak.md).
