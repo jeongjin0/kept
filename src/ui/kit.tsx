@@ -194,16 +194,15 @@ export function Hero(props: { count: number; totals: TotalSkips }) {
         <span className="big">{props.count.toLocaleString()}</span>
         <span className="hero-label">{t("skippedToday")}</span>
       </div>
-      <div className="hero-saved" title={t("savedTitle")}>
+      <div className="hero-saved" role="img" aria-label={t("savedAccessible", formatDuration(savedMs(props.totals), "narrow"))}>
         <Icon name="clock" size={13} />
         <b>{t("savedValue", formatDuration(savedMs(props.totals), "narrow"))}</b>
-        <span>{t("savedLabel")}</span>
       </div>
     </div>
   );
 }
 
-// Settings page: today, all time, and the estimated time saved, with how the estimate is made.
+// Settings page: today, all time, and the estimated time saved.
 export function Stats(props: { count: number; totals: TotalSkips }) {
   return (
     <div className="stats-block">
@@ -216,12 +215,11 @@ export function Stats(props: { count: number; totals: TotalSkips }) {
           <span className="big">{props.totals.count.toLocaleString()}</span>
           <span className="hero-label">{t("statTotal")}</span>
         </div>
-        <div className="stat saved">
-          <span className="big">{formatDuration(savedMs(props.totals), "narrow")}</span>
-          <span className="hero-label">{t("statSaved")}</span>
+        <div className="stat saved" role="img" aria-label={t("savedAccessible", formatDuration(savedMs(props.totals), "narrow"))}>
+          <span className="saved-value"><Icon name="clock" size={15} /><span className="big">{formatDuration(savedMs(props.totals), "narrow")}</span></span>
         </div>
       </div>
-      <p className="stats-note">{t("savedTitle")} {t("statSince", formatDay(props.totals.since))}</p>
+      <p className="stats-note">{t("statSince", formatDay(props.totals.since))}</p>
     </div>
   );
 }

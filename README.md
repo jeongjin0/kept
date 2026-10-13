@@ -28,7 +28,7 @@ In Settings you can also turn on a minimum for comments or views, switch a site 
 
 **Keep accounts I follow** is on in Settings. A video from a channel you subscribe to, or an account you follow, stays even under the like bar. ScrollPlus reads that from the page. It does not keep a list. If the page does not say, the video is judged by its likes. An ad is still skipped when Skip ads is on.
 
-**Time saved.** Under today's count the popup shows how much time the skips have saved so far, for example "≈ 1h 3m saved so far", and Settings adds the total number of skips. It is an estimate: each skip counts as about 3 seconds you would have spent on the video before swiping it away yourself, minus the time it stayed on screen. Settings explains the estimate. The figures are counted on your device, from the day you installed or updated to 0.5.0.
+**Time saved.** The popup shows a clock and a time value under today's count. Settings also shows the total number of skips and the same time value, with the date counting began. The figure is calculated on your device: each skip counts as about 3 seconds you would have spent on the video before swiping it away yourself, minus the time it stayed on screen. The formula is documented here rather than explained in the interface. The figures are counted from the day you installed or updated to 0.5.0.
 
 **The skip chip** tells you why a video was skipped and has Undo. It sits beside the video, in the empty space next to it, so none of the video is covered. When several videos are skipped one after another it is one chip that lists the last three reasons, newest first. Where the window leaves no room beside the video it shrinks to a small pill. Settings can also put it over the video: top, middle or lower.
 

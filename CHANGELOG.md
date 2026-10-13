@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1 – 2026-10-13
+
+- Removed the time-saved explanation and labels from the popup and Settings. Both show only a clock icon and the time value; Settings keeps the date the count began.
+
 ## 0.7.0 – 2026-10-13
 
 - The skip chip no longer covers the video. It sits beside it: a card 228 px wide, its right edge 16 px from the video's left edge, centred on the window's height. If the left side is taken by something on the site or has no room it goes to the right of the video, after the site's buttons. Where there is room for neither a card, a skip shows as a small pill with the mark, how many in a row and Undo, and a pause chip, which needs its two buttons, goes over the video as before.
