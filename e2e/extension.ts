@@ -79,9 +79,14 @@ export async function launch(language?: "en" | "ko", profile?: string, nativeVis
       const fulfill = (route: import("@playwright/test").Route) => route.fulfill({ contentType: "text/html", body: "<!doctype html><title>QA worker wake</title>" });
       await context.route(url, fulfill);
       const wakePage = await context.newPage();
-      const waiting = context.waitForEvent("serviceworker", { predicate: isExtension, timeout: 10000 });
       try {
-        [worker] = await Promise.all([waiting, wakePage.goto(url)]);
+        await wakePage.goto(url);
+        // The worker may have appeared during route/newPage setup, before an event waiter could be attached.
+        // Inspect current workers as well as newly started ones, within the same bounded startup budget.
+        await expect.poll(() => {
+          worker = context.serviceWorkers().find(isExtension);
+          return !!worker;
+        }, { timeout: 10000, message: "native QA extension worker is available after its wake page" }).toBe(true);
       } finally {
         await wakePage.close();
         await context.unroute(url, fulfill);
