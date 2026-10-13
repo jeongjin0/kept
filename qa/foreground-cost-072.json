@@ -20,7 +20,7 @@
     "tests": 70,
     "failed": 0,
     "retries": 0,
-    "scope": "before final late-count reset; final change requires CI"
+    "scope": "before final late-count and in-flight sixth-move resets; final change requires CI"
   },
-  "unitTests": 125
+  "unitTests": 126
 }

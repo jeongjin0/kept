@@ -5,8 +5,8 @@ Checked 2026-10-13 KST on Mini, macOS ARM64. This patch suspends background-tab 
 | Check | Result | Evidence / scope |
 | --- | --- | --- |
 | TypeScript and production build | Pass | npm run compile; npm run build |
-| Unit tests | 125 passed | Nine new engine regressions for kept videos, interrupted navigation and visibility; existing rule/storage/number tests remain green |
-| Local browser suite | 70 passed | Full suite before the final late-count reset; the added late-count unit test passes. Final CI is the completed-change gate |
+| Unit tests | 126 passed | Ten new engine regressions for kept videos, interrupted navigation and visibility; existing rule/storage/number tests remain green |
+| Local browser suite | 70 passed | Full suite before the final late-count and in-flight sixth-move resets; the added late-count and in-flight cap unit tests pass. Final CI is the completed-change gate |
 | Before/after regressions | Reproduced and fixed | Published 0.7.1 fails script-read, hidden-tab navigation and pointer-cancel checks. See [foreground hardening](foreground-hardening-072.md) |
 | Package | Pass | npm run zip; node scripts/check-package.mjs; manifest 0.7.2, storage-only permission, exact three supported hosts |
 | Popup and settings | Looked at | Popup 426 px tall; Korean settings at 420/1440 px; [captures](screenshots/review-072/) |
@@ -18,7 +18,7 @@ Checked 2026-10-13 KST on Mini, macOS ARM64. This patch suspends background-tab 
 
 ## Live observations
 
-The final runtime build was observed for 25 seconds on each site. YouTube loaded five known-count videos, skipped one advertisement, and reported no page errors. The earlier candidate's 35-second YouTube run also skipped a 111-like video and one ad; that observation preceded the final late-count reset and is not presented as proof of the final ZIP. TikTok loaded four known-count videos in the final run, none under 500 likes, so automatic low-like filtering was not exercised by that live sample. It emitted one `a.init is not a function` page error from its own `ttwstatic.com` script; the same error was reproduced in a separate 25-second no-extension control using a fresh profile. It is recorded as a site error that also occurs without ScrollPlus, rather than an extension-free assumption or an error-free live pass. Instagram redirected to `/accounts/login/`, so signed-in Reels was not checked.
+The 0.7.2 candidate runtime was observed for 25 seconds on each site, before the final in-flight sixth-move cap adjustment. YouTube loaded five known-count videos, skipped one advertisement, and reported no page errors. The earlier candidate's 35-second YouTube run also skipped a 111-like video and one ad; that observation preceded the final late-count reset and is not presented as proof of the final ZIP. TikTok loaded four known-count videos in the final run, none under 500 likes, so automatic low-like filtering was not exercised by that live sample. It emitted one `a.init is not a function` page error from its own `ttwstatic.com` script; the same error was reproduced in a separate 25-second no-extension control using a fresh profile. It is recorded as a site error that also occurs without ScrollPlus, rather than an extension-free assumption or an error-free live pass. Instagram redirected to `/accounts/login/`, so signed-in Reels was not checked.
 
 Native-visibility controlled pages establish hidden-tab stop/resume on all three platforms. They do not establish current signed-in production compatibility. Human day-long use, current signed-in Following/Instagram Undo and a live Instagram ad remain open. Historical signed-in, latency and 24-hour evidence retain their original package scope.
 
