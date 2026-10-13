@@ -145,12 +145,12 @@ function page(body, extra = "") {
 const brand = '<div class="brand">' + MARK.replaceAll("SIZE", "36") + "<span>" + NAME + "</span></div>";
 const copy = ([h1, p]) => '<div class="copy">' + brand + "<h1>" + h1 + "</h1><p>" + p + "</p></div>";
 
-const CARD_CSS = ".card{position:absolute;left:760px;top:64px;width:380px;height:672px;border-radius:30px;background:linear-gradient(160deg,#1F2E2D,#111A19 60%,#0D1414);border:1px solid rgba(238,245,244,.08);box-shadow:0 30px 60px rgba(0,0,0,.55);overflow:hidden}" +
+const CARD_CSS = ".card{position:absolute;left:900px;top:64px;width:300px;height:672px;border-radius:30px;background:linear-gradient(160deg,#1F2E2D,#111A19 60%,#0D1414);border:1px solid rgba(238,245,244,.08);box-shadow:0 30px 60px rgba(0,0,0,.55);overflow:hidden}" +
   ".orb{position:absolute;left:-60px;top:70px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(89,197,191,.28),transparent 68%)}" +
-  ".blob{position:absolute;left:70px;top:150px;width:240px;height:240px;border-radius:44% 56% 52% 48% / 52% 44% 56% 48%;background:linear-gradient(145deg,rgba(238,245,244,.14),rgba(238,245,244,.03))}" +
+  ".blob{position:absolute;left:30px;top:150px;width:240px;height:240px;border-radius:44% 56% 52% 48% / 52% 44% 56% 48%;background:linear-gradient(145deg,rgba(238,245,244,.14),rgba(238,245,244,.03))}" +
   ".acts{position:absolute;right:22px;bottom:178px;display:flex;flex-direction:column;gap:16px}.acts i{display:block;width:40px;height:40px;border-radius:50%;background:rgba(238,245,244,.12)}" +
   ".who{position:absolute;left:28px;bottom:180px;display:flex;align-items:center;gap:10px}.who b{display:block;width:34px;height:34px;border-radius:50%;background:rgba(89,197,191,.55)}.who span{display:block;width:110px;height:10px;border-radius:5px;background:rgba(238,245,244,.2)}" +
-  ".chipwrap{position:absolute;left:0;right:0;display:flex;justify-content:center}.chipwrap img{display:block}";
+  ".chipwrap{position:absolute}.chipwrap img{display:block}";
 
 async function render(lang, cfg) {
   const dirOut = path.join(work, lang);
@@ -161,14 +161,16 @@ async function render(lang, cfg) {
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
   const stage = await context.newPage();
-  // The chip is shown about 330 px wide in a 380 px card, where the skip chip sits by default: near the top of the video.
-  const chipScale = 330 / chipBox.inner;
+  // The chip is shown about 250 px wide, beside the video card and not on it: its right edge 18 px from the video's left edge, centred on it.
+  const chipScale = 250 / chipBox.inner;
   const chipW = Math.round(chipBox.w * chipScale);
-  const chipTop = Math.round(64 - chipBox.pad * chipScale);
+  const chipH = Math.round(chipBox.h * chipScale);
+  const chipTop = Math.round(64 + 672 / 2 - chipH / 2 - 20);
+  const chipLeft = Math.round(900 - 18 - chipW + chipBox.pad * chipScale);
   const jobs = [
     { file: "popup.png", html: page(copy(cfg.popup) + '<div class="shot" style="left:700px;top:96px"><img src="' + uri(path.join(dirOut, "popup.png")) + '" width="480"></div>') },
     { file: "options.png", html: page(copy(cfg.options) + '<div class="shot" style="left:640px;top:0;width:560px;height:800px;overflow:hidden;border-radius:0 0 22px 22px"><img src="' + uri(path.join(dirOut, "options-full.png")) + '" width="560" style="border-radius:0;margin-top:56px"></div>') },
-    { file: "chip.png", html: page(copy(cfg.chip) + '<div class="card"><div class="orb"></div><div class="blob"></div><div class="acts"><i></i><i></i><i></i></div><div class="who"><b></b><span></span></div><div class="chipwrap" style="top:' + chipTop + 'px"><img src="' + uri(path.join(dirOut, "chip.png")) + '" width="' + chipW + '"></div></div>', CARD_CSS) },
+    { file: "chip.png", html: page(copy(cfg.chip) + '<div class="card"><div class="orb"></div><div class="blob"></div><div class="acts"><i></i><i></i><i></i></div><div class="who"><b></b><span></span></div></div><div class="chipwrap" style="left:' + chipLeft + 'px;top:' + chipTop + 'px"><img src="' + uri(path.join(dirOut, "chip.png")) + '" width="' + chipW + '"></div>', CARD_CSS) },
   ];
   for (const job of jobs) {
     await stage.setContent(job.html);

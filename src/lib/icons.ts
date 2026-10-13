@@ -1,7 +1,7 @@
 export type IconName =
   | "power" | "heart" | "comment" | "eye" | "youtube" | "tiktok" | "reels" | "sliders" | "github" | "grid"
   | "pill" | "trash" | "plus" | "minus" | "reset" | "user" | "check" | "undo" | "streak" | "megaphone"
-  | "clock" | "chipTop" | "chipMiddle" | "chipLower" | "userCheck";
+  | "clock" | "chipSide" | "chipTop" | "chipMiddle" | "chipLower" | "userCheck";
 
 export type Shape =
   | { t: "path"; d: string; fill?: boolean }
@@ -40,6 +40,8 @@ export const ICONS: Record<IconName, Shape[]> = {
   megaphone: [p("M2.6 6.2h2.2l5.6-2.8v9.2L4.8 9.8H2.6a.8.8 0 0 1-.8-.8V7a.8.8 0 0 1 .8-.8Z"), p("M5 9.9l.8 2.9h1.8l-.6-2.4"), p("M12.6 6.4a2.6 2.6 0 0 1 0 3.2")],
   clock: [c(8, 8, 5.8), p("M8 4.8V8l2.2 1.4")],
   // A video with the chip drawn as a short bar: high up, in the middle, low.
+  // The card beside the video, not on it.
+  chipSide: [r(7.4, 1.6, 6.4, 12.8, 2), r(1.4, 5.2, 4.2, 5.6, 1.4)],
   chipTop: [r(3.6, 1.6, 8.8, 12.8, 2.2), p("M6.2 4.9h3.6")],
   chipMiddle: [r(3.6, 1.6, 8.8, 12.8, 2.2), p("M6.2 8h3.6")],
   chipLower: [r(3.6, 1.6, 8.8, 12.8, 2.2), p("M6.2 11.1h3.6")],

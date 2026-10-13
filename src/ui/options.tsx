@@ -5,13 +5,13 @@ import { GitHubLink, Icon, Mark, NumberStepper, PowerButton, PresetControl, Row,
 import { SITES, useFilterState } from "./state";
 
 const METRIC_ICON: Record<Metric, IconName> = { likes: "heart", comments: "comment", views: "eye" };
-const POSITION_ICON: Record<ChipPosition, IconName> = { top: "chipTop", middle: "chipMiddle", lower: "chipLower" };
+const POSITION_ICON: Record<ChipPosition, IconName> = { side: "chipSide", top: "chipTop", middle: "chipMiddle", lower: "chipLower" };
 
 export function OptionsApp() {
   const { settings, ready, skips, totals, update, reset, resetting, resetFailed } = useFilterState();
   const preset = activePreset(settings.rule);
   const labels: Record<PresetName, string> = { lenient: t("presetLenient"), balanced: t("presetBalanced"), strict: t("presetStrict") };
-  const positionLabels: Record<ChipPosition, string> = { top: t("posTop"), middle: t("posMiddle"), lower: t("posLower") };
+  const positionLabels: Record<ChipPosition, string> = { side: t("posSide"), top: t("posTop"), middle: t("posMiddle"), lower: t("posLower") };
 
   function setCondition(metric: Metric, change: { on?: boolean; min?: number }) {
     update((current) => ({ ...current, rule: { ...current.rule, [metric]: { ...current.rule[metric], ...change } } }));

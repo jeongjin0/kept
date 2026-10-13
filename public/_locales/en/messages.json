@@ -229,5 +229,17 @@
   },
   "posLower": {
     "message": "Lower"
+  },
+  "chipRun": {
+    "message": "$COUNT$ skipped in a row",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "posSide": {
+    "message": "Beside"
   }
 }

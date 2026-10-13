@@ -10,10 +10,16 @@ export interface EngineItem {
   followed?: boolean | null;
 }
 
+// Why one video was skipped: a count that was under its minimum, or an ad.
+export type ChipReason = { metric: Metric; value: number } | { metric: "ad" };
+
+// run is every skip of the current row of skips, newest first, and is there only when the row has more than one.
 export type ChipModel =
-  | { mode: "skipped"; metric: Metric; value: number }
-  | { mode: "skipped"; metric: "ad" }
+  | ({ mode: "skipped"; run?: ChipReason[] } & ChipReason)
   | { mode: "paused"; canLower: boolean };
+
+// A row of skips shows at most this many reasons.
+const RUN_SHOWN = 4;
 
 // Why ScrollPlus is moving on: a count under its minimum, or an ad with Skip ads on.
 export type SkipReason = "below" | "ad";
@@ -64,6 +70,8 @@ export function createEngine(deps: EngineDeps) {
   let paused = false;
   let advancing = false;
   let lastSkippedId: string | null = null;
+  // The reasons of the skips that follow each other while one chip is up, newest first.
+  let runReasons: ChipReason[] = [];
   let metricsReady = false;
   let skipQueuedFor: string | null = null;
   const sessionKeep = deps.sessionKeep ?? new Set<string>();
@@ -104,6 +112,7 @@ export function createEngine(deps: EngineDeps) {
     clearGap();
     paused = false;
     consecutive = 0;
+    runReasons = [];
     deps.render(null);
     if (!current) return;
     finished.delete(current.id);
@@ -118,9 +127,13 @@ export function createEngine(deps: EngineDeps) {
       deps.render(null);
       return;
     }
-    deps.render(decision.reason === "ad" ? { mode: "skipped", metric: "ad" } : { mode: "skipped", metric: decision.metric, value: decision.value });
+    const reason: ChipReason = decision.reason === "ad" ? { metric: "ad" } : { metric: decision.metric, value: decision.value };
+    runReasons.unshift(reason);
+    if (runReasons.length > RUN_SHOWN) runReasons.length = RUN_SHOWN;
+    deps.render({ mode: "skipped", ...reason, ...(runReasons.length > 1 ? { run: [...runReasons] } : {}) });
     chipTimer = deps.schedule(() => {
       chipTimer = null;
+      runReasons = [];
       if (!paused) deps.render(null);
     }, CHIP_HOLD_MS);
   }
@@ -279,6 +292,7 @@ export function createEngine(deps: EngineDeps) {
       clearGap();
       if (chipTimer != null) deps.cancel(chipTimer);
       chipTimer = null;
+      runReasons = [];
       consecutive = Math.max(0, consecutive - 1);
       paused = false;
       deps.render(null);
@@ -305,6 +319,7 @@ export function createEngine(deps: EngineDeps) {
       clearGap();
       paused = false;
       consecutive = 0;
+      runReasons = [];
       deps.render(null);
     },
     keepCurrent() {

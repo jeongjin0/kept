@@ -154,12 +154,14 @@ describe("presets and settings", () => {
     expect(normalizeSettings({ keepFollowed: 0 }).keepFollowed).toBe(true);
   });
   it("places the skip chip at the top unless the settings say otherwise", () => {
-    expect(DEFAULT_SETTINGS.chipPosition).toBe("top");
-    expect(normalizeSettings(undefined).chipPosition).toBe("top");
+    expect(DEFAULT_SETTINGS.chipPosition).toBe("side");
+    expect(normalizeSettings(undefined).chipPosition).toBe("side");
+    expect(normalizeSettings({ chipPosition: "side" }).chipPosition).toBe("side");
+    expect(normalizeSettings({ chipPosition: "top" }).chipPosition).toBe("top");
     expect(normalizeSettings({ chipPosition: "middle" }).chipPosition).toBe("middle");
     expect(normalizeSettings({ chipPosition: "lower" }).chipPosition).toBe("lower");
-    expect(normalizeSettings({ chipPosition: "bottom" }).chipPosition).toBe("top");
-    expect(normalizeSettings({ chipPosition: 3 }).chipPosition).toBe("top");
+    expect(normalizeSettings({ chipPosition: "bottom" }).chipPosition).toBe("side");
+    expect(normalizeSettings({ chipPosition: 3 }).chipPosition).toBe("side");
   });
   it("starts from the balanced preset and reads old settings", () => {
     expect(normalizeSettings(undefined).rule).toEqual(presetRule("balanced"));
@@ -221,12 +223,40 @@ describe("moving settings from 0.4.x to the 0.5.0 scale", () => {
     expect(moved.showSkipChip).toBe(false);
     expect(moved.platforms).toEqual({ youtube: true, tiktok: false, instagram: true });
     expect(moved.allowlist).toEqual([{ platform: "youtube", id: "kept-creator" }]);
-    expect(moved.chipPosition).toBe("top");
+    expect(moved.chipPosition).toBe("side");
     expect(moved.keepFollowed).toBe(true);
   });
   it("reads settings from the first versions and anything unreadable as the defaults", () => {
     expect(migrateSettings({ sensitivity: "strict" }).rule).toEqual(presetRule("strict"));
     expect(migrateSettings(undefined)).toEqual(DEFAULT_SETTINGS);
     expect(migrateSettings("broken")).toEqual(DEFAULT_SETTINGS);
+  });
+});
+
+describe("moving settings from 0.5.x and 0.6.x to the chip beside the video", () => {
+  const saved = (extra: Record<string, unknown> = {}) => ({
+    enabled: true,
+    rule: presetRule("strict"),
+    platforms: { youtube: true, tiktok: true, instagram: true },
+    filterGrids: false,
+    showSkipChip: true,
+    chipPosition: "top",
+    skipAds: false,
+    keepFollowed: true,
+    allowlist: [],
+    ...extra,
+  });
+  it("moves the top, which covered the video, to the side, and nothing else", () => {
+    const moved = migrateSettings(saved(), 2);
+    expect(moved.chipPosition).toBe("side");
+    expect(moved.rule.likes.min).toBe(1000);
+    expect(moved.skipAds).toBe(false);
+  });
+  it("keeps a middle or lower place that a person chose", () => {
+    expect(migrateSettings(saved({ chipPosition: "middle" }), 2).chipPosition).toBe("middle");
+    expect(migrateSettings(saved({ chipPosition: "lower" }), 2).chipPosition).toBe("lower");
+  });
+  it("does not move anything from the current schema", () => {
+    expect(migrateSettings(saved(), 3).chipPosition).toBe("top");
   });
 });

@@ -51,7 +51,7 @@ export async function ensureInstalledState(): Promise<void> {
   const schema = data[STORAGE_SCHEMA];
   const current = typeof schema === "number" && schema >= SCHEMA_VERSION;
   if (!data[STORAGE_SETTINGS]) next[STORAGE_SETTINGS] = DEFAULT_SETTINGS;
-  else if (!current) next[STORAGE_SETTINGS] = migrateSettings(data[STORAGE_SETTINGS]);
+  else if (!current) next[STORAGE_SETTINGS] = migrateSettings(data[STORAGE_SETTINGS], typeof schema === "number" ? schema : 1);
   if (!current) next[STORAGE_SCHEMA] = SCHEMA_VERSION;
   if (!data[STORAGE_DAILY]) next[STORAGE_DAILY] = { day: localDay(), count: 0 };
   if (!data[STORAGE_TOTALS]) next[STORAGE_TOTALS] = parseTotals(undefined);

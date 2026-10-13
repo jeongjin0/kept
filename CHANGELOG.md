@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.0 – 2026-10-13
+
+- The skip chip no longer covers the video. It sits beside it: a card 228 px wide, its right edge 16 px from the video's left edge, centred on the video. If the left side is taken by something on the site or has no room it goes to the right of the video, after the site's buttons. Where there is room for neither a card, a skip shows as a small pill with the mark, how many in a row and Undo, and a pause chip, which needs its two buttons, goes over the video as before.
+- A row of skips is one chip. When several videos are skipped one after another, each adds a line to the same chip: the head says how many ("3 skipped in a row"), and each reason is listed under it, newest first, at most four. One skip looks as it did. Undo still moves back one video.
+- Settings, Skip chip position, has a new first choice, Beside, which is the default. Top, Middle and Lower are still there and put the chip over the video. An install that had the chip at the top, which was the default of 0.5.0 and 0.6.0, is moved to Beside once. A middle or lower place that you chose stays.
+- Skipping, settings, storage keys and permissions are otherwise unchanged. The settings schema marker is 3.
+
+
 ## 0.6.0 – 2026-10-13
 
 - New look. The accent is a calm teal instead of the orange-red, and the dark surfaces, text and borders share its hue. The old accent was about twice as saturated as the surfaces around it and shouted. The new one is picked at one lightness and one chroma, so no other hue would have looked stronger (the comparison is in [qa/color-study.md](qa/color-study.md)).

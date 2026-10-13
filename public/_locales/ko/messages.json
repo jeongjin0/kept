@@ -229,5 +229,17 @@
   },
   "posLower": {
     "message": "아래"
+  },
+  "chipRun": {
+    "message": "연속 $COUNT$개 넘김",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "posSide": {
+    "message": "옆 여백"
   }
 }

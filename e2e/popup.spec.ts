@@ -212,13 +212,13 @@ test("the time saved reads in Korean too", async () => {
   }
 });
 
-test("the skip chip sits at the top by default, and Settings moves it", async () => {
+test("the skip chip sits beside the video by default, and Settings moves it", async () => {
   const { context, id } = await launch("en");
   try {
     const options = await open(context, id, "options.html");
     const group = options.getByRole("radiogroup", { name: "Skip chip position" });
-    await expect(group.getByRole("radio", { name: "Top" })).toHaveAttribute("aria-checked", "true");
-    expect((await stored(options)).chipPosition).toBe("top");
+    await expect(group.getByRole("radio", { name: "Beside" })).toHaveAttribute("aria-checked", "true");
+    expect((await stored(options)).chipPosition).toBe("side");
     await group.getByRole("radio", { name: "Lower" }).click();
     await expect.poll(async () => (await stored(options)).chipPosition).toBe("lower");
     await expect(group.getByRole("radio", { name: "Lower" })).toHaveAttribute("aria-checked", "true");
@@ -227,9 +227,9 @@ test("the skip chip sits at the top by default, and Settings moves it", async ()
     // With the chip off there is nothing to place.
     await options.getByRole("switch", { name: "Show the skip chip" }).click();
     await expect.poll(async () => (await stored(options)).showSkipChip).toBe(false);
-    await expect(group.getByRole("radio", { name: "Top" })).toBeDisabled();
+    await expect(group.getByRole("radio", { name: "Beside" })).toBeDisabled();
     await options.getByRole("button", { name: /Reset to defaults/ }).click();
-    await expect.poll(async () => (await stored(options)).chipPosition).toBe("top");
+    await expect.poll(async () => (await stored(options)).chipPosition).toBe("side");
     await expect.poll(async () => (await stored(options)).showSkipChip).toBe(true);
   } finally {
     await context.close();
@@ -244,7 +244,7 @@ test("an update moves 0.4.4 settings to the new scale once, and a restart leaves
     // What a 0.4.4 profile holds: Lenient was 1,000 likes, Skip ads was off, and there is no schema marker.
     await first.worker.evaluate(async () => {
       const { settings } = await chrome.storage.local.get("settings");
-      await chrome.storage.local.set({ settings: { ...settings, skipAds: false, rule: { likes: { on: true, min: 1000 }, comments: { on: false, min: 100 }, views: { on: false, min: 100000 } }, allowlist: [{ platform: "youtube", id: "kept-creator" }] } });
+      await chrome.storage.local.set({ settings: { ...settings, skipAds: false, chipPosition: "top", rule: { likes: { on: true, min: 1000 }, comments: { on: false, min: 100 }, views: { on: false, min: 100000 } }, allowlist: [{ platform: "youtube", id: "kept-creator" }] } });
       await chrome.storage.local.remove(["schema", "totalSkips"]);
     });
     await first.context.close();
@@ -254,7 +254,9 @@ test("an update moves 0.4.4 settings to the new scale once, and a restart leaves
     const moved = await second.worker.evaluate(async () => chrome.storage.local.get(null));
     expect(moved.settings.skipAds).toBe(true);
     expect(moved.settings.allowlist).toEqual([{ platform: "youtube", id: "kept-creator" }]);
-    expect(moved.schema).toBe(2);
+    // The chip was at the top, which covered the video, and is beside it now.
+    expect(moved.settings.chipPosition).toBe("side");
+    expect(moved.schema).toBe(3);
     expect(moved.totalSkips).toMatchObject({ count: 0, onScreenMs: 0 });
     const popup = await open(second.context, second.id, "popup.html");
     await expect(popup.getByRole("radio", { name: /Lenient/ })).toHaveAttribute("aria-checked", "true");

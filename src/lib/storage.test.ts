@@ -80,6 +80,23 @@ describe("installing and updating", () => {
   });
 });
 
+describe("updating from 0.6.x", () => {
+  it("moves the chip from the top to the side once, and leaves the rest as it is", async () => {
+    data[STORAGE_SCHEMA] = 2;
+    data[STORAGE_SETTINGS] = { ...DEFAULT_SETTINGS, rule: presetRule("strict"), skipAds: false, chipPosition: "top" };
+    await ensureInstalledState();
+    const moved = data[STORAGE_SETTINGS] as typeof DEFAULT_SETTINGS;
+    expect(moved.chipPosition).toBe("side");
+    expect(moved.rule.likes.min).toBe(1000);
+    expect(moved.skipAds).toBe(false);
+    expect(data[STORAGE_SCHEMA]).toBe(SCHEMA_VERSION);
+    // Chosen again afterwards, it stays.
+    data[STORAGE_SETTINGS] = { ...moved, chipPosition: "top" };
+    await ensureInstalledState();
+    expect((data[STORAGE_SETTINGS] as typeof DEFAULT_SETTINGS).chipPosition).toBe("top");
+  });
+});
+
 describe("counting skips", () => {
   it("adds one skip to today and to the total, with the time the video was on screen", async () => {
     await ensureInstalledState();
