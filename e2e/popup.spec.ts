@@ -173,7 +173,7 @@ test("settings accept typed numbers and mark the popup as custom", async () => {
 // saves 1,482 x 3 s less that, 3,823,560 ms.
 const SEEDED = { since: "2026-10-05", count: 1482, onScreenMs: 622440 };
 
-test("the popup and Settings show the time the skips saved, and say it is an estimate", async () => {
+test("the popup and Settings show the time value without explanatory labels", async () => {
   const { context, id, worker } = await launch("en");
   try {
     await worker.evaluate(async (totals) => {
@@ -183,13 +183,15 @@ test("the popup and Settings show the time the skips saved, and say it is an est
     }, SEEDED);
     const popup = await open(context, id, "popup.html");
     await expect(popup.locator(".hero")).toContainText("18");
-    await expect(popup.locator(".hero-saved")).toContainText("≈ 1h 3m");
-    await expect(popup.locator(".hero-saved")).toHaveAttribute("title", /estimate/i);
+    await expect(popup.locator(".hero-saved")).toHaveText("1h 3m");
+    await expect(popup.locator(".hero-saved")).toHaveAttribute("aria-label", "Estimated time saved: 1h 3m");
+    await expect(popup.locator(".hero-saved")).not.toHaveAttribute("title");
     const options = await open(context, id, "options.html");
     const stats = options.locator(".stats");
     await expect(stats).toContainText("1,482");
-    await expect(stats).toContainText("1h 3m");
-    await expect(options.locator(".stats-note")).toContainText(/estimate/i);
+    await expect(stats.locator(".stat.saved")).toHaveText("1h 3m");
+    await expect(stats.locator(".stat.saved")).toHaveAttribute("aria-label", "Estimated time saved: 1h 3m");
+    await expect(options.locator(".stats-note")).not.toContainText(/estimate/i);
     await expect(options.locator(".stats-note")).toContainText("Oct 5");
     // A skip counted while the page is open moves the figures at once.
     await options.evaluate(() => chrome.runtime.sendMessage({ type: "scrollplus:skipped", onScreenMs: 500 }));
@@ -205,8 +207,9 @@ test("the time saved reads in Korean too", async () => {
   try {
     await worker.evaluate(async (totals) => { await chrome.storage.local.set({ totalSkips: totals }); }, SEEDED);
     const popup = await open(context, id, "popup.html");
-    await expect(popup.locator(".hero-saved")).toContainText("약 1시간 3분");
-    await expect(popup.locator(".hero-saved")).toHaveAttribute("title", /추정/);
+    await expect(popup.locator(".hero-saved")).toHaveText("1시간 3분");
+    await expect(popup.locator(".hero-saved")).toHaveAttribute("aria-label", "예상 절약 시간 1시간 3분");
+    await expect(popup.locator(".hero-saved")).not.toHaveAttribute("title");
   } finally {
     await context.close();
   }
