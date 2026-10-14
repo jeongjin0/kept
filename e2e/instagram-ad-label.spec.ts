@@ -15,7 +15,7 @@ function disclosedReel(labelStyle = ""): string {
   return `<!doctype html><meta charset="utf-8">
     <style>body{margin:0}#player{position:relative;margin-left:476px;width:488px;height:620px}
       video{width:488px;height:620px}#caption{position:absolute;left:-305px;bottom:16px;width:273px}
-      #label{display:block;font:12px sans-serif;${labelStyle}}</style>
+      #label{display:block;font:12px sans-serif;${labelStyle}}#label[hidden]{display:none}</style>
     <section id="player"><video muted></video><div id="caption"><span dir="auto" id="label">Ad</span></div></section>
     <button aria-label="Next reel">Next</button><button aria-label="Previous reel">Previous</button>
     <script type="application/json">{"items":[{"code":"blockAd","like_count":99021,"user":{"username":"advertiser"}},{"code":"ordinary","like_count":900000,"user":{"username":"creator"}}]}</script>
