@@ -1,6 +1,6 @@
 # Chrome Web Store update test instructions · 0.7.4
 
-Prepared 2026-10-14 for the 0.7.4 next-update candidate (not submitted). ZIP SHA-256: `d6b747448b41aba7611af945d1e1c73ad51eccdd90ea5999efbc094e4a06e872`. This document is not evidence that the current live cases have all passed. If the candidate package changes before submission, replace the version/hash and verify the new package's live paths.
+Prepared 2026-10-14 for the 0.7.4 next-update candidate (not submitted). ZIP SHA-256: `48c71bcf667d9de1920cafdceb6401c7914e840e5f005d0cbf1f765b2f413269`. This document is not evidence that the current live cases have all passed. If the candidate package changes before submission, replace the version/hash and verify the new package's live paths.
 
 The dashboard's Additional instructions field is limited to 500 characters. The draft uses the following 371-character summary, with this document providing the full steps. Reviewer username/password fields are blank because ScrollPlus has no account system; do not provide the owner's site credentials.
 

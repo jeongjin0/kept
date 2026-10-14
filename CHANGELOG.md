@@ -2,6 +2,8 @@
 
 ## 0.7.4 – update candidate (not published)
 
+- Instagram recognises a small Ad disclosure even when its span stretches across the caption column. Ads off keeps the disclosed ad below the count minimum; ads on skips it with the ad reason. Hidden and off-screen disclosure text is ignored.
+
 - On Instagram Reels, skip notices wait for scrolling to settle before appearing. This avoids brief hide/reappear cycles while moving captions change the available left gutter. Undo and pause controls keep keyboard focus.
 - Followed Reels are recognised when the site's follow button is deeper in the current player card. Hidden, off-screen and neighbouring-player controls are excluded; missing relation signals still use the count rules.
 - Prepared a new ZIP and version-specific reviewer instructions without replacing the submitted 0.7.3 package. Defaults, permissions and the storage schema are unchanged. The local 0.7.3 → 0.7.4 upgrade preserves settings, saved creators and counters; Store delivery still requires a new review.

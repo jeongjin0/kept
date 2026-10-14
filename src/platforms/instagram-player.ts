@@ -45,7 +45,13 @@ export function instagramHasVisibleAd(): boolean {
   for (const label of document.querySelectorAll("span[dir='auto']")) {
     const text = label.textContent?.trim() ?? "";
     if (text.length > 16 || !AD_LABEL.test(text)) continue;
-    const rect = label.getBoundingClientRect();
+    if (getComputedStyle(label).visibility !== "visible") continue;
+    // Desktop Reels stretches the disclosure span across its caption column.
+    // Its 273 px box still contains only 15 px of Ad text. Measure the text,
+    // keeping the small-label and bounded-player guards below intact.
+    const range = document.createRange();
+    range.selectNodeContents(label);
+    const rect = range.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0 || rect.width > 180 || rect.height > 40) continue;
     if (rect.top < 0 || rect.bottom > window.innerHeight) continue;
     if (rect.right < player.left - 320 || rect.left > player.right + 120) continue;

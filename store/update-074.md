@@ -8,14 +8,16 @@ Prepared 2026-10-14 KST. This is an upload-ready candidate, not a submitted or p
 | --- | --- |
 | Version | 0.7.4 |
 | ZIP | `scrollplus-0.7.4-chrome.zip` |
-| Size | 150,545 bytes |
-| SHA-256 | `d6b747448b41aba7611af945d1e1c73ad51eccdd90ea5999efbc094e4a06e872` |
-| Runtime | All 20 non-manifest ZIP entries match the final PR #54 runtime byte for byte |
+| Size | 150,625 bytes |
+| SHA-256 | `48c71bcf667d9de1920cafdceb6401c7914e840e5f005d0cbf1f765b2f413269` |
+| Runtime | Two Instagram bundles add the native ad-disclosure correction; the other 18 non-manifest entries match the original 0.7.4 candidate |
 | Defaults / permissions / schema | Unchanged: 500 likes; ads and followed exceptions on; `storage` and the three supported HTTPS hosts; schema 3 |
 | Full reviewer steps | [reviewer-instructions-074.md](reviewer-instructions-074.md) |
 | Validation | [0.7.4 QA](../qa/release-readiness-074.md) |
 
 The submitted 0.7.3 ZIP remains 150,158 bytes, SHA-256 `054ca73645ae9811efc8a4ec7cbc63cc966613cb7a7187ceb791e121c6a48ecc`. The public 0.7.2 ZIP is also preserved. No release tag or GitHub release is created by preparation.
+
+The latest local build is `.output/ad-width-074/scrollplus-0.7.4-chrome.zip`. The original `.output/scrollplus-0.7.4-chrome.zip` and [original QA review](http://100.65.71.13:8778/update-074/) are preserved historical evidence; use the hash above for the next upload. See [native ad correction](../qa/reels-ad-disclosure-20261014.md).
 
 ## After the first review
 
@@ -42,6 +44,6 @@ Deferred publication has a 30-day window after review completion. Recheck the da
 
 ## Release notes to paste
 
-**English:** Quieter Instagram Reels skip notices, shown after scrolling settles. Improved followed-account detection on Reels without reading neighbouring or hidden controls. Your settings and counters stay unchanged.
+**English:** Quieter Instagram Reels skip notices, shown after scrolling settles. Recognises wide Instagram ad disclosures. Improved followed-account detection on Reels without reading neighbouring or hidden controls. Your settings and counters stay unchanged.
 
-**Korean:** 릴스 넘김 알림이 스크롤이 멈춘 뒤 표시되어 깜빡임을 줄였습니다. 주변 영상이나 숨겨진 버튼을 제외하고 현재 릴스의 팔로우 상태를 더 정확히 읽습니다. 기존 설정과 누적 기록은 유지됩니다.
+**Korean:** 릴스 넘김 알림이 스크롤이 멈춘 뒤 표시되어 깜빡임을 줄였습니다. 넓게 배치된 릴스 광고 표지도 인식합니다. 주변 영상이나 숨겨진 버튼을 제외하고 현재 릴스의 팔로우 상태를 더 정확히 읽습니다. 기존 설정과 누적 기록은 유지됩니다.
