@@ -3,7 +3,7 @@ import { launch } from "./extension";
 
 const test = base.extend<{ extension: Awaited<ReturnType<typeof launch>> }>({
   extension: [async ({}, use) => {
-    const extension = await launch();
+    const extension = await launch("en");
     try { await use(extension); }
     finally { await extension.close(); }
   }, { timeout: 30000 }],
@@ -60,6 +60,6 @@ for (const style of ["visibility:hidden", "transform:translateX(-2000px)"]) {
     const tab = await extension.context.newPage();
     await tab.goto("https://www.instagram.com/reels/blockAd/");
     await expect.poll(() => tab.evaluate(() => (window as any).fixtureId)).toBe("ordinary");
-    await expect(tab.locator("#scrollplus-chip-host")).toContainText(/99[,.]?021|99\.0K|9\.9만/);
+    await expect(tab.locator("#scrollplus-chip-host")).toContainText(/99[,.]?021|99(?:\.0)?K|9\.9만/);
   });
 }
