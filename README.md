@@ -44,7 +44,7 @@ Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English an
 
 ScrollPlus is a public beta, installed from a GitHub release for now (see below).
 
-The next launch steps and remaining live checks are in [ROADMAP.md](ROADMAP.md). Store submission and the product domain are not yet selected for publication.
+The next launch steps and remaining live checks are in [ROADMAP.md](ROADMAP.md). The owner requested first Store review with deferred publication; actual dashboard status is in the [submission checkpoint](store/draft-readiness.md). Store publication and the product domain remain separate decisions.
 
 - Tested on controlled pages for all three sites, including Chrome 120, the oldest supported version.
 - Tried on real feeds: YouTube Shorts (a 24-hour automated run on 0.3.5, with two page-reload recoveries), TikTok For You, and Instagram Reels in a signed-in browser. Instagram Reels is the newest and least exercised site.
@@ -55,7 +55,7 @@ The next launch steps and remaining live checks are in [ROADMAP.md](ROADMAP.md).
 - Keep accounts I follow covers YouTube, TikTok and Instagram. 0.5.3 also recognises the longer subscribe and follow labels, and stops rereading YouTube responses that did not change. It was checked on controlled pages: a subscribed Short, a followed Reel, and a followed TikTok stay under the like bar. A signed-in browser, where those signals can be seen on a real account, has not been watched for this version. See [follow](qa/follow.md).
 - Not yet established: ordinary day-long use, and the Instagram advertisement guard on a live advertisement.
 
-The 0.7.2 state and performance checks are in [foreground hardening](qa/foreground-hardening-072.md). Earlier live claims retain their version scope in [release readiness](qa/release-readiness.md). More: [signed-in QA](qa/signed-in-smoke.md), [long feed QA](qa/soak.md), [UI audit](qa/ui-audit.md), [session Undo QA](qa/session-undo.md).
+The [0.7.3 first-review candidate](qa/release-readiness-073.md) contains the quiet left-gutter notice. The 0.7.2 state and performance checks are in [foreground hardening](qa/foreground-hardening-072.md). Earlier live claims retain their version scope in [release readiness](qa/release-readiness.md). More: [signed-in QA](qa/signed-in-smoke.md), [long feed QA](qa/soak.md), [UI audit](qa/ui-audit.md), [session Undo QA](qa/session-undo.md).
 
 ## Install
 

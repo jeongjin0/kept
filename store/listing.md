@@ -4,7 +4,7 @@ Do not submit this listing from the repository automation. It is the copy for a 
 
 Images: store/screenshots (English) and store/screenshots/ko (Korean), tiles store/tile.png and store/tile-ko.png, all rendered by npm run assets. The submission steps are in submission-checklist.md.
 
-The title and summary come from the package locale files. This description-only update keeps the uploaded 0.7.2 package unchanged. The title describes the role without implying an official relationship with a supported site.
+The title and summary come from the package locale files. The 0.7.3 review candidate includes the left-gutter notice and refreshed UI images. The title describes the role without implying an official relationship with a supported site.
 
 ## English
 
@@ -27,7 +27,7 @@ Your rules
 • Keep followed/subscribed creators is on by default when the page exposes that relationship. If it cannot be read, your count rules apply.
 
 Stay in control
-• Optional skip notices show the reason and Undo for the latest skipped video. Undo choices survive reloads and new tabs for the browser session.
+• Optional skip notices use clear space to the left of the player, showing recent reasons or a compact count and Undo. When no safe space is available, the notice stays hidden until room returns. Undo choices survive reloads and new tabs for the browser session.
 • Unreadable counts are never treated as zero. Photo posts stay. After six consecutive skips, filtering pauses and asks before continuing.
 • The popup's saved-time value is an estimate based on 3 seconds per manual dismissal, minus the time each skipped video stayed on screen.
 
@@ -60,7 +60,7 @@ Single purpose: Automatically skip short videos below the user's chosen likes, c
 • 구독·팔로우 중인 제작자 유지도 기본으로 켜집니다. 페이지에서 관계를 확인할 수 없으면 설정한 수치로 판단합니다.
 
 편하게 되돌리기
-• 넘김 알림을 켜면 사유와 되돌리기 버튼이 표시됩니다. 최근에 넘긴 영상 하나를 되돌릴 수 있고, 선택은 브라우저 세션 동안 새로고침·새 탭에서도 유지됩니다.
+• 넘김 알림은 플레이어 왼쪽 여백에 사유 또는 작은 숫자와 되돌리기를 표시합니다. 안전한 여백이 없으면 공간이 생길 때까지 숨깁니다. 최근 영상 하나를 되돌릴 수 있고, 선택은 브라우저 세션 동안 새로고침·새 탭에서도 유지됩니다.
 • 읽지 못한 수치는 0으로 취급하지 않습니다. 사진 게시물은 유지하고, 여섯 번 연속 넘기면 멈추고 물어봅니다.
 • 절약 시간은 직접 넘기는 데 영상당 3초가 걸린다는 가정에서 실제 표시 시간을 뺀 추정치입니다.
 

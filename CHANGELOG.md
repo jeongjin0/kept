@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.3 – 2026-10-14
+
+- Skip notices always use the left gutter. They track comments panels and player replacements; narrow gutters show only a count and Undo. A kept Instagram photo can anchor the preceding video's Undo.
+- Notices hide during player-column transitions and return after the motion ends or is cancelled. If no safe left space exists, they wait for room instead of covering the video or moving right. Legacy overlay positions and the Settings position picker are retired.
+- A quieter border and shadow replace the glow and expanding ring. Compact pause actions keep accessible names and keyboard focus.
+- Store images are refreshed from the candidate UI. This is the first Store review candidate; review submission and publication are separate states. Instagram Reels remains experimental and current signed-in QA remains limited.
+
 ## 0.7.2 – 2026-10-13
 
 - Hidden tabs no longer auto-skip or repeatedly scan the active player and grids. Returning checks the feed immediately. The six-skip safety pause is preserved.
