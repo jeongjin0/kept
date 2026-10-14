@@ -64,6 +64,8 @@ test("Reels shows one settled notice after a scrolling skip burst, with no inter
   await tab.goto("https://www.instagram.com/reels/motion0/");
   await expect.poll(() => tab.evaluate(() => (window as any).fixtureId)).toBe("motion3");
   await expect(tab.locator("#scrollplus-chip-host")).toBeVisible();
+  // The visibility style can change before the recorder's next animation frame.
+  await expect.poll(() => tab.evaluate(() => (window as any).visibleFrames.length)).toBeGreaterThan(0);
   const frames = await tab.evaluate(() => (window as any).visibleFrames as Array<{ at: number; lastScroll: number; id: string }>);
   expect(frames.length).toBeGreaterThan(0);
   expect(frames.every(frame => frame.id === "motion3" && frame.at - frame.lastScroll >= 180)).toBe(true);
