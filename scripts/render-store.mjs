@@ -19,7 +19,7 @@ const LANGS = {
     shots: path.join(root, "store/screenshots"), tileFile: path.join(root, "store/tile.png"), marqueeFile: path.join(root, "store/marquee.png"),
     popup: ["Low-like videos <em>skip themselves.</em>", "Ready on install. Ads skip too, and the popup counts the time you save."],
     options: ["Your numbers, <em>your rules.</em>", "Pick a preset or type your own. Likes, comments, views."],
-    chip: ["Skipped. <em>Undo</em> in one tap.", "Every skip tells you why, and you can take it back."],
+    chip: ["Skipped. <em>Undo</em> in one tap.", "A quiet notice in the left gutter. Take the latest skip back."],
     tile: "Skips Shorts, Reels &amp; TikToks <em>with too few likes.</em>",
   },
   ko: {
@@ -27,7 +27,7 @@ const LANGS = {
     shots: path.join(root, "store/screenshots/ko"), tileFile: path.join(root, "store/tile-ko.png"), marqueeFile: path.join(root, "store/marquee-ko.png"),
     popup: ["좋아요 적은 영상은 <em>알아서 넘어가요.</em>", "설치하면 바로 켜져요. 광고도 넘기고, 아낀 시간을 세어 줘요."],
     options: ["내 기준, <em>내 숫자.</em>", "프리셋을 고르거나 직접 입력하세요. 좋아요, 댓글, 조회수."],
-    chip: ["넘김. <em>되돌리기</em>는 한 번에.", "넘기는 이유가 보여요. 몇 초 동안 되돌릴 수 있어요."],
+    chip: ["넘김. <em>되돌리기</em>는 한 번에.", "왼쪽 여백에 조용히 표시해요. 최근 영상을 되돌릴 수 있어요."],
     tile: "좋아요 적은 쇼츠·릴스·틱톡을 <em>알아서 넘겨요.</em>",
   },
 };
@@ -83,7 +83,7 @@ async function capture(lang, cfg, dirOut) {
 async function captureChip(lang, cfg, dirOut) {
   const messages = JSON.parse(fs.readFileSync(path.join(root, "public/_locales", lang, "messages.json"), "utf8"));
   const browser = await chromium.launch();
-  // Reduced motion: the chip is drawn at rest, without the ring that widens while it appears.
+  // Reduced motion: capture the candidate notice at rest.
   const context = await browser.newContext({ deviceScaleFactor: 2, locale: cfg.locale, viewport: { width: 900, height: 320 }, reducedMotion: "reduce" });
   // The fixture page is not an extension page, so give it the same message lookup chrome.i18n would.
   await context.addInitScript(({ messages, ui }) => {
@@ -118,7 +118,7 @@ async function captureChip(lang, cfg, dirOut) {
   });
   await page.waitForTimeout(260);
   const box = await page.locator("#scrollplus-chip-host").boundingBox();
-  // The glow and the shadow reach 40 px or so from the chip.
+  // Transparent padding preserves the soft shadow in the composition.
   const pad = 56;
   await page.screenshot({ path: path.join(dirOut, "chip.png"), omitBackground: true, clip: { x: box.x - pad, y: box.y - pad, width: box.width + pad * 2, height: box.height + pad * 2 } });
   await browser.close();

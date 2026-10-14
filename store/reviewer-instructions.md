@@ -1,6 +1,6 @@
 # Draft Chrome Web Store test instructions
 
-Prepared 2026-10-13 for the uploaded 0.7.2 draft. ZIP SHA-256: `00451fd95dcf1460c297e20a158475255a8080dac9044d1337be72da8ca0f097`. This document is not evidence that the current live cases have all passed. If the candidate package changes before submission, replace the version/hash and verify the new package's live paths.
+Prepared 2026-10-14 for the 0.7.3 first-review candidate. ZIP SHA-256: `054ca73645ae9811efc8a4ec7cbc63cc966613cb7a7187ceb791e121c6a48ecc`. This document is not evidence that the current live cases have all passed. If the candidate package changes before submission, replace the version/hash and verify the new package's live paths.
 
 The dashboard's Additional instructions field is limited to 500 characters. The draft uses the following 367-character summary, with this document providing the full steps. Reviewer username/password fields are blank because ScrollPlus has no account system; do not provide the owner's site credentials.
 
@@ -15,7 +15,7 @@ Do not supply the owner's personal credentials to reviewers. Use a reviewer-owne
 ## Basic checks
 
 1. Open `https://www.youtube.com/shorts/` or `https://www.tiktok.com/foryou`; for Reels, sign in to Instagram and open its Reels feed. Observe a playable video with a readable like count. Unknown counts and photo posts stay.
-2. To make a controlled skip easy to encounter, temporarily set Likes in the extension's Settings above the observed count, with Comments/Views off. The extension advances using the site's own next control and briefly displays the reason and Undo. To test a passing video, set Likes at or below its known count; it stays.
+2. To make a controlled skip easy to encounter, temporarily set Likes in the extension's Settings above the observed count, with Comments/Views off. The extension advances using the site's own next control. Its optional notice uses the left gutter: recent reasons and Undo, or a compact count/Undo in narrow space. It stays hidden while a player-column CSS transition is running or no safe space exists, then returns when room is available. Widen the window if the notice or six-skip pause controls cannot fit. To test a passing video, set Likes at or below its known count; it stays.
 3. Select Undo immediately after a skip. The most recently skipped video returns and is kept for the browser session. Reload that same video; it remains kept. Reset defaults clears these temporary Undo choices while preserving saved creators and counters.
 4. Toggle the master switch off: automatic skips stop. Reenable to resume. Site switches independently affect their respective sites.
 5. With Keep accounts I follow on, a low-like video stays when the page already exposes its subscribed/followed relation. If no relation is exposed, count rules apply. Ads still skip with Skip ads on.

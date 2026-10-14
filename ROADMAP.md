@@ -1,10 +1,10 @@
 # ScrollPlus launch roadmap
 
-Updated 2026-10-13. Baseline: released 0.7.2, commit `317f01bcd4b7b734e604c96a6ab45e255c178972`.
+Updated 2026-10-14. Public GitHub beta: 0.7.2. First Store review candidate: 0.7.3, with the final left-gutter notice from PR #51.
 
 **Assessment:** a Chrome Web Store draft of 0.7.2 is saved with listing assets, privacy declarations, test instructions, Free/Unlisted distribution and verified publisher contact email. It has not been submitted for review or published. The earlier roughly 80% readiness estimate was an engineering judgment, not a measured completion score; creating the draft does not certify current live compatibility. Retention and usefulness are still unvalidated.
 
-This is a recommendation for the next launch sequence. It does not authorize domain payment, website publication or Store submission; the existing owner decision in SPEC.md remains in force.
+The owner requested first review on 2026-10-14 with the live-QA gaps disclosed and automatic publication disabled. Candidate preparation and review submission are authorized by that request. Domain payment, website publication and Store publication remain separate owner decisions. See the [current checkpoint](store/draft-readiness.md) and [candidate QA](qa/release-readiness-073.md).
 
 ## Where the product stands
 
@@ -21,7 +21,7 @@ This is a recommendation for the next launch sequence. It does not authorize dom
 ## Next steps, in order
 
 1. Freeze a release candidate after the submission documentation is settled. Use its exact ZIP/hash for live QA, screenshots and reviewer instructions. Do not carry another package's pass into this one.
-2. Finish a focused live matrix: low-like skip, passing-video keep, Undo → reload, current followed/subscribed keep, ad on/off where a live ad is encountered, hidden-tab stop/return, and six-skip pause. Use the sites' existing signed-in sessions; do not turn a review into unrelated account-entry testing. Record a missing live case as unverified. Keep Reels experimental if its latest paths cannot be observed. If a site’s basic skip/Undo path fails, repair it before including that support claim in a submission.
+2. Finish a focused live matrix before wider rollout: low-like skip, passing-video keep, Undo → reload, current followed/subscribed keep, ad on/off where a live ad is encountered, hidden-tab stop/return, and six-skip pause. Use the sites' existing signed-in sessions; do not turn a review into unrelated account-entry testing. Record a missing live case as unverified. Keep Reels experimental if its latest paths cannot be observed. If a site’s basic skip/Undo path fails, repair it before including that support claim in a submission.
 3. Recheck the saved Store draft against the final package: publisher details, single purpose, storage/host explanations, local-data declarations, privacy/support URLs and [reviewer instructions](store/reviewer-instructions.md). Contact verification is complete. Keep private account identifiers and verification links out of repository documentation. See the [draft checkpoint](store/draft-readiness.md).
 4. Launch one **unlisted Store item** after owner approval. Use deferred publication during review. Testers can install from its direct URL; unlisted still has the same review/policy requirements as public/private. Use that same item for the later public rollout instead of creating parallel beta/stable items prematurely. [Google distribution guidance](https://developer.chrome.com/docs/webstore/cws-dashboard-distribution), [publication guidance](https://developer.chrome.com/docs/webstore/publish).
 5. Run a small beta with roughly 5–10 people for 3–7 days. Ask manually: Did it skip anything wanted? Did Undo work? Was the chip distracting? Did the defaults filter enough? Would they keep it enabled? Require no telemetry or account inside the extension. A reproducible wrong skip, failed Undo or distracting placement gets fixed before wider promotion. These sample sizes and durations are proposed operating choices, not Google requirements or statistical proof.

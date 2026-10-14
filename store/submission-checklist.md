@@ -1,20 +1,20 @@
 # Chrome Web Store submission checklist
 
-Nothing here has been submitted. This is what to have ready when the owner decides to publish.
+The owner chose an initial review submission on 2026-10-14, accepting the disclosed live-QA limitations. This checklist distinguishes preparation, review submission and later manual publication.
 
 ## Before you start
 
 - A Chrome Web Store developer account (one-time registration fee).
 - Verified publisher/contact details and the required 2-Step Verification. Check these in the selected publisher account; a general Google login is not evidence of completed publisher registration.
 - The public store search for [ScrollPlus](https://chromewebstore.google.com/search/scrollplus) showed no results on 2026-10-07. Recheck before submission; this is not a trademark clearance.
-- Review the scoped [signed-in Instagram and TikTok results](../qa/signed-in-smoke.md) and finish the remaining gates in [release-readiness.md](../qa/release-readiness.md).
-- Install the exact candidate ZIP on a clean Chrome profile. Verify low-like skip, passing-video keep, Undo/reload, followed/subscribed keep, ads and background-tab return on current feeds. Instagram remains experimental until its current signed-in paths are observed.
+- Review the scoped [signed-in Instagram and TikTok results](../qa/signed-in-smoke.md) and [release-readiness.md](../qa/release-readiness.md). Current signed-in Reels/follow positive paths and ordinary day-use remain unverified; the owner elected first review before those broader-release checks. Keep Reels experimental and do not claim the open cases have passed.
+- Install the exact candidate ZIP on a clean Chrome profile. Record low-like skip, passing-video keep, Undo/reload, followed/subscribed keep, ads and background-tab return separately. The owner accepted the remaining current signed-in/follow and ordinary-use gaps for first review; they remain checks before wider promotion. Instagram remains experimental until its current signed-in paths are observed.
 - A day of ordinary use is recommended before broad promotion. Longer runs and a small manual-feedback beta follow the initial release; an older build's soak does not certify the candidate.
-- Follow [ROADMAP.md](../ROADMAP.md) for the scoped launch sequence. Domain purchase, website publication and Store submission remain owner decisions.
+- Follow [ROADMAP.md](../ROADMAP.md) for the scoped launch sequence. Domain purchase, website publication and Store publication remain owner decisions. Initial review submission was requested; approval must not automatically publish the item.
 
 ## Package
 
-- Upload `scrollplus-<version>-chrome.zip` (`npm run zip`, also attached to the GitHub release).
+- Upload the exact checked `scrollplus-<version>-chrome.zip` from `npm run zip`. A GitHub release is a separate publication step; preparing this review candidate does not publish one.
 - Manifest version 3, permissions `storage` only, host permissions for youtube.com, tiktok.com, and instagram.com.
 
 ## Store listing

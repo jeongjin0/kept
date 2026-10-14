@@ -19,9 +19,13 @@ After contact verification, reopening the item showed **Draft** and an enabled *
 
 The English and Korean descriptions were shortened into feature lists. They now distinguish desktop Chrome websites from mobile video apps, a ScrollPlus account from each site's login, and optional skip notices from unconditional notices. On-device processing is stated near the start, while experimental Reels support and the saved-time estimate remain explicit. English is 1,782 characters; Korean is 1,023. Both descriptions were saved and checked in the same draft; the package, title, summary, images, permissions and distribution remain unchanged. This copy update adds no runtime QA evidence or review submission.
 
+## First-review decision · 2026-10-14
+
+The owner requested a first review without waiting for every broader-release live case. Candidate 0.7.3 packages the final left-gutter notice, updates the English/Korean descriptions and screenshot assets, and retains experimental Reels wording. Its checked ZIP is 150,158 bytes, SHA-256 `054ca73645ae9811efc8a4ec7cbc63cc966613cb7a7187ceb791e121c6a48ecc`; see [candidate QA](../qa/release-readiness-073.md). This preparation does not establish Store approval or publication. The dashboard outcome will be recorded after submission is accepted.
+
 ## Remaining before review submission
 
-1. Finish the exact candidate's focused [live-site matrix](../qa/release-readiness.md), especially current signed-in Reels and positive subscription/follow paths. Keep unsupported or unobserved claims qualified. Creating the Store draft adds no live compatibility evidence.
+1. Keep the exact candidate's open [live-site cases](../qa/release-readiness-073.md) disclosed, especially current signed-in Reels and positive subscription/follow paths. They remain wider-rollout checks; the owner accepted those gaps for first review. Creating the Store draft adds no live compatibility evidence.
 2. Recheck the submitted ZIP, policy, listing images and data categories together. If the runtime candidate changes, update the draft package, version/hash and test instructions.
-3. Obtain the owner's review-submission decision. In the submission confirmation, choose deferred publishing. That option has not been configured because its confirmation dialog was not opened.
+3. In the submission confirmation, choose deferred publishing under the owner's first-review request. Its accepted state must be checked before recording submission; approval must not automatically publish the item.
 4. After approval, complete the proposed [manual-feedback beta](../ROADMAP.md) before a wider public rollout. An unpublished draft has no installable Store link for testers yet.
