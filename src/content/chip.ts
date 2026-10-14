@@ -84,6 +84,8 @@ function span(className: string, text: string): HTMLSpanElement {
 export interface ChipOptions {
   // Without an on-screen anchor, a side chip stays hidden until a video is available.
   anchor?: () => HTMLElement | null;
+  // Reels captions cross the gutter during scrolling. Show the notice after a quiet moment.
+  scrollQuietMs?: number;
 }
 
 // Something a person reads or presses on a site. The chip is never put on top of one of these.
@@ -94,6 +96,7 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
   let root: HTMLDivElement | null = null;
   let leaveTimer: number | null = null;
   let placeTimer: number | null = null;
+  let scrollTimer: number | null = null;
   let previousModel = "null";
   let watching = false;
   let frame: number | null = null;
@@ -126,7 +129,10 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     shadow.append(style, root);
     (document.documentElement ?? document.body).append(host);
     window.addEventListener("resize", () => queuePlace(), { passive: true });
-    window.addEventListener("scroll", () => queuePlace(), { capture: true, passive: true });
+    window.addEventListener("scroll", () => {
+      if (watching && options.scrollQuietMs) waitForScroll();
+      else queuePlace();
+    }, { capture: true, passive: true });
     document.addEventListener("transitionrun", (event) => {
       if (!watching || !(event.target instanceof Element) || !ancestors.has(event.target)) return;
       if (!transitions.size && document.activeElement === host) {
@@ -164,6 +170,19 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     });
   }
 
+  function waitForScroll(): void {
+    if (scrollTimer == null && document.activeElement === host) {
+      const focused = host?.shadowRoot?.activeElement;
+      transitionFocus = focused instanceof HTMLElement ? focused : null;
+    }
+    if (host) host.style.visibility = "hidden";
+    if (scrollTimer != null) window.clearTimeout(scrollTimer);
+    scrollTimer = window.setTimeout(() => {
+      scrollTimer = null;
+      queuePlace();
+    }, options.scrollQuietMs);
+  }
+
   function watchAnchor(anchor: HTMLElement | null): void {
     const chain: Element[] = [];
     for (let node: Element | null = anchor; node; node = node.parentElement) chain.push(node);
@@ -197,6 +216,8 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     frame = null;
     if (placeTimer != null) window.clearTimeout(placeTimer);
     placeTimer = null;
+    if (scrollTimer != null) window.clearTimeout(scrollTimer);
+    scrollTimer = null;
   }
 
   function chipNode(): HTMLElement | null {
@@ -262,7 +283,7 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     const onScreen = !!box && box.width > 0 && box.height > 0 && box.right > 0 && box.left < width && box.bottom > 0 && box.top < window.innerHeight;
     // Hide before measuring or moving, so a comments panel cannot reveal a stale position over the video.
     host.style.visibility = "hidden";
-    if (transitions.size) return;
+    if (transitions.size || scrollTimer != null) return;
     if (!box || !onScreen || !placeSide(box)) return;
     host.style.visibility = "visible";
     if (transitionFocus?.isConnected && (document.activeElement === document.body || document.activeElement === host)) {
@@ -275,7 +296,8 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
   function settle(): void {
     if (document.hidden) return;
     startWatching();
-    place();
+    if (options.scrollQuietMs) waitForScroll();
+    else place();
     if (placeTimer != null) window.clearTimeout(placeTimer);
     placeTimer = window.setTimeout(() => {
       placeTimer = null;
