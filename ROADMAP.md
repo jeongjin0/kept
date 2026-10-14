@@ -2,6 +2,8 @@
 
 Updated 2026-10-14. Public GitHub beta: 0.7.2. First Store review candidate: 0.7.3, with the final left-gutter notice from PR #51.
 
+Next update: [0.7.4 prepared separately](store/update-074.md), incorporating the post-submission Reels fixes from PR #54. It has not been uploaded, submitted or published. The first-review package and its instructions remain preserved. The next upload requires a fresh dashboard state check and another Store review; first-candidate approval does not approve this update.
+
 **Assessment:** 0.7.3 was accepted for first Store review on 2026-10-14 with automatic publication off. It is Pending review, Free and Unlisted, not approved or published. The earlier roughly 80% readiness estimate was an engineering judgment, not a measured completion score. Review submission does not certify current signed-in compatibility, retention or usefulness.
 
 The owner requested first review on 2026-10-14 with the live-QA gaps disclosed and automatic publication disabled. Candidate preparation and review submission are authorized by that request. Domain payment, website publication and Store publication remain separate owner decisions. See the [current checkpoint](store/draft-readiness.md) and [candidate QA](qa/release-readiness-073.md).
