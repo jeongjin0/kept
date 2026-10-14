@@ -1,6 +1,6 @@
 # Chrome Web Store draft checkpoint
 
-Prepared 2026-10-13 through the owner's browser. This is a saved draft, not a review submission or published Store release. Private publisher identifiers, contact details and verification links are intentionally kept outside repository documentation.
+Prepared 2026-10-13 through the owner's browser. The original checkpoint below describes a saved draft. The 2026-10-14 first review was subsequently submitted with deferred publication; see the accepted-submission section. It is not a published Store release. Private publisher identifiers, contact details and verification links are intentionally kept outside repository documentation.
 
 ## Saved in the dashboard
 
@@ -23,9 +23,18 @@ The English and Korean descriptions were shortened into feature lists. They now 
 
 The owner requested a first review without waiting for every broader-release live case. Candidate 0.7.3 packages the final left-gutter notice, updates the English/Korean descriptions and screenshot assets, and retains experimental Reels wording. Its checked ZIP is 150,158 bytes, SHA-256 `054ca73645ae9811efc8a4ec7cbc63cc966613cb7a7187ceb791e121c6a48ecc`; see [candidate QA](../qa/release-readiness-073.md). This preparation does not establish Store approval or publication. The dashboard outcome will be recorded after submission is accepted.
 
-## Remaining before review submission
+## Accepted first review · 2026-10-14
 
-1. Keep the exact candidate's open [live-site cases](../qa/release-readiness-073.md) disclosed, especially current signed-in Reels and positive subscription/follow paths. They remain wider-rollout checks; the owner accepted those gaps for first review. Creating the Store draft adds no live compatibility evidence.
-2. Recheck the submitted ZIP, policy, listing images and data categories together. If the runtime candidate changes, update the draft package, version/hash and test instructions.
-3. In the submission confirmation, choose deferred publishing under the owner's first-review request. Its accepted state must be checked before recording submission; approval must not automatically publish the item.
-4. After approval, complete the proposed [manual-feedback beta](../ROADMAP.md) before a wider public rollout. An unpublished draft has no installable Store link for testers yet.
+- Candidate **0.7.3** was accepted for review at approximately 11:33 KST. The success dialog said the extension was submitted; after dismissal, the item showed **Pending review**. No second item or duplicate submission was created.
+- The exact checked ZIP above was uploaded. The package page confirmed 0.7.3 with English/Korean and storage/host permissions. The final candidate's [push CI](https://github.com/jeongjin0/scrollplus/actions/runs/38501162395) and [PR CI](https://github.com/jeongjin0/scrollplus/actions/runs/38501168258) passed all six checks, including the 80-test suite on current Chromium and Chrome 120. The CI ZIP SHA-256 matches the uploaded candidate.
+- English description: 1,899 characters; Korean: 1,063. Both saved descriptions retain experimental Reels and local processing. Each locale has three screenshots; the settings and quiet left-notice images were replaced. Icon and promo tiles remain unchanged.
+- Single purpose, storage/host explanations, local-data declarations and public privacy/support URLs were rechecked. Free, Unlisted and all supported regions remain selected. The unchanged 367-character summary links to the candidate reviewer instructions now on main through [PR #52](https://github.com/jeongjin0/scrollplus/pull/52). Credential fields remain blank.
+- In the final confirmation, **Automatically publish after passing review was unchecked**, verified before the final submit click. The accepted dialog confirmed staging for later publication and its 30-day window after approval. This is deferred publication, not Store approval or an installable Store release. [Google publication guidance](https://developer.chrome.com/docs/webstore/publish/).
+- No Store publication, GitHub 0.7.3 release/tag, new payment or domain purchase was performed. The earlier public GitHub 0.7.2 ZIP is unchanged.
+
+## Next after review
+
+1. Read the actual review decision and address any stated issue; do not infer approval from a submitted form or a passing CI run.
+2. Current signed-in Reels/follow positive paths, live Instagram ads and ordinary day-use remain open as recorded in [candidate QA](../qa/release-readiness-073.md). Keep experimental/limited claims qualified before broader promotion.
+3. The owner decides manual Store publication after approval. Google states that approved staged submissions expire back to Draft after 30 days if not published. No automatic monitor or publication job was created.
+4. After publication, run the proposed [manual-feedback beta](../ROADMAP.md) before a wider rollout. Pending review does not provide an installable Store link yet.

@@ -2,7 +2,7 @@
 
 Updated 2026-10-14. Public GitHub beta: 0.7.2. First Store review candidate: 0.7.3, with the final left-gutter notice from PR #51.
 
-**Assessment:** a Chrome Web Store draft of 0.7.2 is saved with listing assets, privacy declarations, test instructions, Free/Unlisted distribution and verified publisher contact email. It has not been submitted for review or published. The earlier roughly 80% readiness estimate was an engineering judgment, not a measured completion score; creating the draft does not certify current live compatibility. Retention and usefulness are still unvalidated.
+**Assessment:** 0.7.3 was accepted for first Store review on 2026-10-14 with automatic publication off. It is Pending review, Free and Unlisted, not approved or published. The earlier roughly 80% readiness estimate was an engineering judgment, not a measured completion score. Review submission does not certify current signed-in compatibility, retention or usefulness.
 
 The owner requested first review on 2026-10-14 with the live-QA gaps disclosed and automatic publication disabled. Candidate preparation and review submission are authorized by that request. Domain payment, website publication and Store publication remain separate owner decisions. See the [current checkpoint](store/draft-readiness.md) and [candidate QA](qa/release-readiness-073.md).
 
@@ -11,14 +11,16 @@ The owner requested first review on 2026-10-14 with the live-QA gaps disclosed a
 | Milestone | State | Evidence / remaining work |
 | --- | --- | --- |
 | Product and UX | Implemented | Zero-setup defaults, 100/500/1,000-like presets, custom hard count rules, three platforms, ads, followed-creator keep, Undo/session persistence, side chip, aggregate time saved |
-| Automated quality | Passed for 0.7.2 | 126 unit tests; 70 browser tests on current Chromium and Chrome 120 in both [final CI 1](https://github.com/jeongjin0/scrollplus/actions/runs/38379561306) and [final CI 2](https://github.com/jeongjin0/scrollplus/actions/runs/38379567920) |
+| Automated quality | Passed for 0.7.3 | 126 unit tests; 80 browser tests on current Chromium and Chrome 120 in both [push CI](https://github.com/jeongjin0/scrollplus/actions/runs/38501162395) and [PR CI](https://github.com/jeongjin0/scrollplus/actions/runs/38501168258) |
 | Live compatibility | Partially verified | Candidate signed-out YouTube low-like/ad skips; bounded TikTok feed observation. Current signed-in Reels, positive follow/subscription paths and Instagram live ads remain open. Historical 24-hour/login evidence belongs to its older version |
-| Submission package | Draft saved | Exact 0.7.2 ZIP; English/Korean descriptions and three screenshots per locale; icon/promo images; permissions/data declarations; test instructions. [Privacy policy](PRIVACY.md) explains existing local processing |
-| Store distribution | Draft only, not submitted | Owner-selected Non-trader status and contact email verification complete. Free/Unlisted settings saved. Dashboard enables Submit for review; this is form readiness, not review approval or live QA completion |
+| Submission package | Submitted | Exact 0.7.3 ZIP; English/Korean descriptions and three screenshots per locale; icon/promo images; permissions/data declarations; test instructions. [Privacy policy](PRIVACY.md) explains existing local processing |
+| Store distribution | Pending review, not published | Free/Unlisted. Automatic publication was unchecked before final submission; the success dialog and Pending review state confirmed acceptance. No Store approval or live QA completion is inferred |
 | Website and domain | Use existing GitHub URLs for now | Cost-conscious beta preparation needs no new domain. `scroll.plus` remains a possible later independent address; purchase and deployment not done |
 | Real usefulness | Open | Small manual-feedback beta; no new analytics/backend is proposed |
 
-## Next steps, in order
+## Launch sequence
+
+Steps 1 and 3 are complete for the 0.7.3 first review. Review is pending with deferred publication; step 2 retains the broader-rollout live cases. Manual publication in step 4 still needs the owner’s decision.
 
 1. Freeze a release candidate after the submission documentation is settled. Use its exact ZIP/hash for live QA, screenshots and reviewer instructions. Do not carry another package's pass into this one.
 2. Finish a focused live matrix before wider rollout: low-like skip, passing-video keep, Undo → reload, current followed/subscribed keep, ad on/off where a live ad is encountered, hidden-tab stop/return, and six-skip pause. Use the sites' existing signed-in sessions; do not turn a review into unrelated account-entry testing. Record a missing live case as unverified. Keep Reels experimental if its latest paths cannot be observed. If a site’s basic skip/Undo path fails, repair it before including that support claim in a submission.
