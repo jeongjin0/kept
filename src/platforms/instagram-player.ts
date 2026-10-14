@@ -14,14 +14,22 @@ export function followedFromFollowLabel(label: string): boolean | null {
 export function instagramFollowButtonFollowed(): boolean | null {
   const video = visibleVideo();
   if (!video) return null;
+  const player = video.getBoundingClientRect();
   let scope: HTMLElement | null = video.parentElement;
-  for (let depth = 0; depth < 8 && scope; depth += 1, scope = scope.parentElement) {
+  // Current Reels has 13 wrappers between its video and creator controls.
+  // Bound the search to one player card, never neighbouring prefetched reels.
+  for (let depth = 0; depth < 24 && scope && scope !== document.body; depth += 1, scope = scope.parentElement) {
+    const box = scope.getBoundingClientRect();
+    if (box.height > window.innerHeight + 32 || box.width > player.width + 600 || scope.querySelectorAll("video").length > 1) break;
     const buttons = scope.querySelectorAll("button, [role='button']");
     if (buttons.length > 60) break;
     for (const node of buttons) {
       if (!(node instanceof HTMLElement)) continue;
       const followed = followedFromFollowLabel(node.getAttribute("aria-label") || node.textContent || "");
-      if (followed != null) return followed;
+      if (followed == null) continue;
+      const rect = node.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0 || rect.bottom <= 0 || rect.top >= window.innerHeight || getComputedStyle(node).visibility !== "visible") continue;
+      return followed;
     }
   }
   return null;

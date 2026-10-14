@@ -110,7 +110,7 @@ for (const site of ["youtube", "tiktok", "instagram"] as const) {
     // Default: Skip ads is on. The ad with 125 likes is skipped as soon as it is known to be one, and the chip says why.
     await expect.poll(() => fixtureId(tab)).toBe(NORMAL1);
     await expect(tab.locator("#scrollplus-chip-host")).toContainText(/Skipped · ad|넘김 · 광고/);
-    expect(await count(extension)).toBe(1);
+    await expect.poll(() => count(extension)).toBe(1);
 
     const popup = await open(context, id, "popup.html");
     const adsSwitch = popup.getByRole("switch", { name: /Skip ads|광고 건너뛰기/ });

@@ -13,3 +13,7 @@ Instagram. friendship_status.following on the reel the page loaded, and the butt
 The Chrome window on this machine was signed out of YouTube, TikTok and Instagram, so a real subscribed channel and a real followed account were not watched. The signals above are what those pages already render for a signed-in viewer, and the controlled pages exercise them.
 
 0.5.3 accepts a short label that says Subscribed to a named channel, 구독중, Following, or Unfollow. A sentence that only mentions subscribing is still ignored. YouTube no longer parses the large sequence responses, and it does not resend a video whose counts and follow flag have not changed.
+
+## Post-submission follow QA · 2026-10-14
+
+The [focused signed-in pass](reels-follow-motion-20261014.md) adds a positive YouTube subscribed keep/exception-off skip observation for the installed submitted 0.7.3, and an Instagram followed keep/exception-off skip observation for the installed post-submission source candidate. Their temporary thresholds and the hidden Instagram like count are documented. The latest Reels DOM also exposed a deep creator-control fallback gap, repaired with a bounded card search. TikTok live relation 1/3 remains unverified. These observations do not retroactively change the historical 0.5.3 scope above or the Store-submitted bytes.

@@ -52,7 +52,10 @@ export function startFilter(adapter: Adapter): void {
       keepGoing: () => engine.keepGoing(),
       lower: () => engine.lower(),
     },
-    { anchor: () => mostVisibleVideo() ?? (adapter.platform === "instagram" && adapter.readActive()?.kind === "carousel" ? mostVisiblePhoto() : null) },
+    {
+      anchor: () => mostVisibleVideo() ?? (adapter.platform === "instagram" && adapter.readActive()?.kind === "carousel" ? mostVisiblePhoto() : null),
+      scrollQuietMs: adapter.platform === "instagram" ? 200 : undefined,
+    },
   );
   const engine = createEngine({
     getSettings: () => settings,
