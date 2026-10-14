@@ -28,4 +28,10 @@ Mini's developer dashboard required Google password reauthentication. Existing s
 
 Settings were restored to defaults after the feed checks. The task-owned native extension was removed and Developer mode verified off. The submitted 0.7.3 ZIP, public 0.7.2 ZIP and corrected 0.7.4 ZIP remain unchanged. No review cancellation, upload, submission, publication, tag or release was performed.
 
+## Native test startup follow-up
+
+The documentation-only CI initially passed both current-Chromium suites but failed both Chrome 120 jobs while waiting for a native extension worker, before the relevant product assertions. A single failed-job rerun passed one complete 86-test job; the other failed at the same startup wait in a different native test. These failures and traces are preserved. They do not establish a live filter defect or its exact startup cause.
+
+The native QA launcher now wakes the installed extension through its own popup and a real session-broker request, verifies that page's extension ID and still requires the actual background worker plus initialized storage. It no longer depends on a routed site's content script for that startup handshake. The native fixture timeout, worker wait and product assertions are unchanged; no test is skipped and no visibility, relation or ad state is fabricated. This changes test tooling only, not the extension runtime or ZIP. Chromium's [ID generation source](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/components/crx_file/id_util.cc) and the observed native install ID were used to verify the unpacked-ID lookup.
+
 Private evidence includes native ad-off/skip/Undo screenshots, bridge/marker observations, counters, the follow recheck and cleanup records. Personal account captures and publisher identifiers are excluded from this repository. See [candidate readiness](release-readiness-074.md), [earlier follow attempt](tiktok-follow-20261014.md) and [update procedure](../store/update-074.md).
