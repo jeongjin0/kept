@@ -97,6 +97,10 @@ for (const platform of ["tiktok", "instagram"] as const) {
     await page.waitForTimeout(1500);
     expect(await page.evaluate(() => (window as any).fixtureMoves), "hidden tabs must not advance after settings change").toBe(0);
     await worker.evaluate(id => chrome.tabs.update(id, { active: true }), feedTabId);
+    // Activating a tab does not bring its native window in front of another
+    // concurrently launched QA browser. Exercise an actual visible return.
+    await page.bringToFront();
+    await expect.poll(() => page.evaluate(() => document.hidden)).toBe(false);
     await expect.poll(() => page.evaluate(() => (window as any).fixtureMoves)).toBe(1);
     await expect(page.locator("#scrollplus-chip-host")).toContainText(/400|4백/);
     expect(errors).toEqual([]);

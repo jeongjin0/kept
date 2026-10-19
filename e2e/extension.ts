@@ -3,9 +3,23 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
+
+// Chromium derives an unpacked ID from its key, or the native path bytes.
+// https://chromium.googlesource.com/chromium/src/+/refs/heads/main/components/crx_file/id_util.cc
+function unpackedId(extension: string): string {
+  const manifest = JSON.parse(fs.readFileSync(path.join(extension, "manifest.json"), "utf8"));
+  const nativePath = process.platform === "win32" ? extension.replace(/^[a-z]:/, drive => drive.toUpperCase()) : extension;
+  const input = typeof manifest.key === "string"
+    ? Buffer.from(manifest.key, "base64")
+    : Buffer.from(nativePath, process.platform === "win32" ? "utf16le" : "utf8");
+  return createHash("sha256").update(input).digest("hex").slice(0, 32)
+    .replace(/[0-9a-f]/g, digit => String.fromCharCode(97 + parseInt(digit, 16)));
+}
 
 export async function launch(language?: "en" | "ko", profile?: string, nativeVisibility = false) {
-  const extension = path.resolve(process.env.SCROLLPLUS_EXTENSION_PATH ?? ".output/chrome-mv3");
+  const extension = fs.realpathSync(path.resolve(process.env.SCROLLPLUS_EXTENSION_PATH ?? ".output/chrome-mv3"));
+  const expectedId = unpackedId(extension);
   const dir = profile ?? fs.mkdtempSync(path.join(os.tmpdir(), "scrollplus-ext-"));
   // Ordinary Playwright pages all emulate foreground focus. Visibility checks
   // need a disposable native browser connected without that default override.
@@ -70,17 +84,20 @@ export async function launch(language?: "en" | "ko", profile?: string, nativeVis
     }, { language, messages });
   }
   try {
-    const isExtension = (worker: { url(): string }) => worker.url().startsWith("chrome-extension://") && worker.url().endsWith("/background.js");
+    const isExtension = (worker: { url(): string }) => worker.url() === "chrome-extension://" + expectedId + "/background.js";
     let worker = context.serviceWorkers().find(isExtension);
     if (!worker && nativeVisibility) {
-      // A worker from the first install can already be idle before CDP attaches.
-      // The content script's session request wakes it again, with no live network.
-      const url = "https://www.youtube.com/scrollplus-qa-worker";
-      const fulfill = (route: import("@playwright/test").Route) => route.fulfill({ contentType: "text/html", body: "<!doctype html><title>QA worker wake</title>" });
-      await context.route(url, fulfill);
+      // Wake the actual installed extension directly. A site document is not a
+      // reliable startup handshake: its content script may not have been injected.
+      const url = "chrome-extension://" + expectedId + "/popup.html";
       const wakePage = await context.newPage();
       try {
         await wakePage.goto(url);
+        await expect.poll(() => wakePage.evaluate(expected => {
+          if (chrome.runtime.id !== expected) return false;
+          void chrome.runtime.sendMessage({ type: "scrollplus:session:get", platform: "youtube" }).catch(() => {});
+          return true;
+        }, expectedId), { message: "native QA wake page belongs to the installed extension" }).toBe(true);
         // The worker may have appeared during route/newPage setup, before an event waiter could be attached.
         // Inspect current workers as well as newly started ones, within the same bounded startup budget.
         await expect.poll(() => {
@@ -89,7 +106,6 @@ export async function launch(language?: "en" | "ko", profile?: string, nativeVis
         }, { timeout: 10000, message: "native QA extension worker is available after its wake page" }).toBe(true);
       } finally {
         await wakePage.close();
-        await context.unroute(url, fulfill);
       }
     }
     worker ??= await context.waitForEvent("serviceworker", { predicate: isExtension, timeout: 10000 });

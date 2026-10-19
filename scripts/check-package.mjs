@@ -3,7 +3,7 @@ import fs from "node:fs";
 import { execFileSync } from "node:child_process";
 
 const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
-const zip = `.output/scrollplus-${pkg.version}-chrome.zip`;
+const zip = process.argv[2] ?? `.output/scrollplus-${pkg.version}-chrome.zip`;
 execFileSync("unzip", ["-t", zip], { stdio: "pipe" });
 const manifest = JSON.parse(execFileSync("unzip", ["-p", zip, "manifest.json"], { encoding: "utf8" }));
 assert.equal(manifest.version, pkg.version);

@@ -71,6 +71,8 @@ test.describe("native tab visibility", () => {
     expect(await id(tab)).toBe("v1");
     expect(await presses(tab)).toHaveLength(1);
     await extension.worker.evaluate(id => chrome.tabs.update(id, { active: true }), feedTabId);
+    await tab.bringToFront();
+    await expect.poll(() => tab.evaluate(() => document.hidden)).toBe(false);
     await expect.poll(() => id(tab), { timeout: 8000 }).toBe("v2");
     expect(await presses(tab)).toHaveLength(2);
   });
