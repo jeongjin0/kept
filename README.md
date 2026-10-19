@@ -46,7 +46,7 @@ ScrollPlus is a beta available on the [Chrome Web Store](https://chromewebstore.
 
 The next launch steps and remaining live checks are in [ROADMAP.md](ROADMAP.md). The exact Store installation, default 500-like skip, Undo and reload check are recorded in [publication QA](qa/store-publication-20261020.md). The [submission checkpoint](store/draft-readiness.md) preserves the earlier first-review history.
 
-The [0.7.4 update candidate](store/update-074.md) includes the subsequent Reels notice, followed-account and wide ad-disclosure fixes. Its package, upgrade checks and version-specific reviewer steps are prepared separately from the first submission. It is not submitted or published, and will need its own Store review. See [candidate QA](qa/release-readiness-074.md).
+The [0.7.4 update](store/update-074.md) includes the subsequent Reels notice, followed-account and wide ad-disclosure fixes. It was submitted for Store review on 2026-10-20 with automatic publication off and is pending review. The install link continues to serve0.7.3. See [candidate QA](qa/release-readiness-074.md).
 
 - Tested on controlled pages for all three sites, including Chrome 120, the oldest supported version.
 - Tried on real feeds: YouTube Shorts (a 24-hour automated run on 0.3.5, with two page-reload recoveries), TikTok For You, and Instagram Reels in a signed-in browser. Instagram Reels is the newest and least exercised site.

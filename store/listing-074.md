@@ -1,10 +1,10 @@
 # Chrome Web Store next-update listing · 0.7.4
 
-Do not submit this listing from the repository automation. It is the copy for a later manual upload.
+This copy was saved for the manual0.7.4 update submission on2026-10-20. The update is pending review with automatic publication off; the Store continues to serve0.7.3.
 
 Images: store/screenshots (English) and store/screenshots/ko (Korean), tiles store/tile.png and store/tile-ko.png, all rendered by npm run assets. The submission steps are in submission-checklist.md.
 
-The title and summary come from the package locale files. The 0.7.4 candidate includes calmer Reels notice motion and improved followed-account detection. It has not been submitted or published; the first-review listing is preserved in listing.md. The title describes the role without implying an official relationship with a supported site.
+The title and summary come from the package locale files. The0.7.4 candidate includes calmer Reels notice motion and improved followed-account detection. It is submitted but not approved/published; the first-review listing is preserved in listing.md. The title describes the role without implying an official relationship with a supported site.
 
 ## English
 

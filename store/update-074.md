@@ -1,6 +1,6 @@
 # 0.7.4 update preparation
 
-Prepared 2026-10-14 KST. This is an upload-ready candidate, not a submitted or published Store update. Preserve the first-review 0.7.3 ZIP and its [reviewer instructions](reviewer-instructions.md). Use the same Store item for the update; do not create a second beta item.
+Prepared2026-10-14 KST; **submitted for Store review2026-10-20, currently Pending review with automatic publication off**. Published0.7.3 remains available. The original preparation/checklist below is preserved; the actual submission is recorded at the end. Preserve the first-review0.7.3 ZIP and its [reviewer instructions](reviewer-instructions.md). Use the same Store item for the update.
 
 ## Package
 
@@ -47,3 +47,11 @@ Deferred publication has a 30-day window after review completion. Recheck the da
 **English:** Quieter Instagram Reels skip notices, shown after scrolling settles. Recognises wide Instagram ad disclosures. Improved followed-account detection on Reels without reading neighbouring or hidden controls. Your settings and counters stay unchanged.
 
 **Korean:** 릴스 넘김 알림이 스크롤이 멈춘 뒤 표시되어 깜빡임을 줄였습니다. 넓게 배치된 릴스 광고 표지도 인식합니다. 주변 영상이나 숨겨진 버튼을 제외하고 현재 릴스의 팔로우 상태를 더 정확히 읽습니다. 기존 설정과 누적 기록은 유지됩니다.
+
+## Submitted update · 2026-10-20
+
+- After publishing and installing0.7.3, uploaded0.7.4 to the same Store item. Package view independently confirmed draft0.7.4 and published0.7.3, with the same English/Korean locales and storage/host permissions.
+- Rebuilt ZIP:150,625bytes, SHA-256 `48c71bcf667d9de1920cafdceb6401c7914e840e5f005d0cbf1f765b2f413269`, identical to the prior native-tested candidate and both current-head CI artifacts. All six checks passed at `0a9c06b50790bb69aaa2aec38e97312df26df2a5`: [push](https://github.com/jeongjin0/scrollplus/actions/runs/39315517426), [PR](https://github.com/jeongjin0/scrollplus/actions/runs/39315523759).
+- Saved English1968/Korean1090-character descriptions and417-character reviewer instructions pointing to the publicly verified immutable source at that head. Reviewer username/password fields remain empty. Existing images, Free/Unlisted distribution and data declarations were retained.
+- In the final confirmation, automatic publication was explicitly unchecked and verified before the final Submit action, performed once. The post-submit page became blank after its submitting state; reopening the dashboard confirmed version0.7.4 / **Pending review**. No duplicate submission or review cancellation was performed.
+-0.7.4 has not been approved or published by this step. The public Store still serves0.7.3. Store-installed upgrade delivery and ordinary day-long use remain open.

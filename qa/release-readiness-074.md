@@ -1,5 +1,7 @@
 # Next-update candidate · 0.7.4
 
+**2026-10-20 update:** submitted for Store review with automatic publication off after publishing0.7.3. The dashboard confirms0.7.4 Pending review;0.7.3 remains available. The rebuilt150,625-byte ZIP matches the native-tested candidate and both fresh CI artifacts; all six checks passed at `0a9c06b`. See [actual submission](../store/update-074.md#submitted-update--2026-10-20) and the separate [Store0.7.3 installed smoke](store-publication-20261020.md). The preparation-time reauthentication gaps below are historical, not the current submission state.
+
 Prepared 2026-10-14 KST on Mini, from main `f034392672341b42a6351511f0b304ceaedb4243` (PR #54), then corrected after a native Reels advertisement exposed a missed wide disclosure. The latest candidate is 150,625 bytes, SHA-256 `48c71bcf667d9de1920cafdceb6401c7914e840e5f005d0cbf1f765b2f413269`. Only the two Instagram bundles change from the original 0.7.4 ZIP; the other 18 non-manifest files are identical. The original 150,545-byte candidate and its observations remain frozen. See [native correction](reels-ad-disclosure-20261014.md).
 
 | Check | Result | Scope |
