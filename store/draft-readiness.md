@@ -1,6 +1,6 @@
 # Chrome Web Store draft checkpoint
 
-Prepared 2026-10-13 through the owner's browser. The original checkpoint below describes a saved draft. The 2026-10-14 first review was subsequently submitted with deferred publication; see the accepted-submission section. It is not a published Store release. Private publisher identifiers, contact details and verification links are intentionally kept outside repository documentation.
+Prepared 2026-10-13 through the owner's browser. The original checkpoints below preserve the saved draft and 2026-10-14 deferred-review history. **0.7.3 was subsequently approved and published Free/Unlisted on 2026-10-20**; see the publication section. Private publisher identifiers, contact details and verification links are intentionally kept outside repository documentation.
 
 ## Saved in the dashboard
 
@@ -38,3 +38,10 @@ The owner requested a first review without waiting for every broader-release liv
 2. Current signed-in Reels/follow positive paths, live Instagram ads and ordinary day-use remain open as recorded in [candidate QA](../qa/release-readiness-073.md). Keep experimental/limited claims qualified before broader promotion.
 3. The owner decides manual Store publication after approval. Google states that approved staged submissions expire back to Draft after 30 days if not published. No automatic monitor or publication job was created.
 4. After publication, run the proposed [manual-feedback beta](../ROADMAP.md) before a wider rollout. Pending review does not provide an installable Store link yet.
+
+## Publication · 2026-10-20
+
+- After using the existing saved Google login, the dashboard showed approved 0.7.3 ready for manual publication before 2026-11-14. The owner explicitly approved publishing that version first, checking Store installation/basic functions and following with 0.7.4.
+- Free and Unlisted were rechecked. The final confirmation said the item would be available to everyone with its link. Its final Publish action was performed once; the dashboard then showed **Published – Unlisted**, with the Published status panel confirming publication.
+- [The Store listing](https://chromewebstore.google.com/detail/bpiliaicdpeflblgjneilaphgjkgfmja) shows version0.7.3 and updated2026-10-20 in English/Korean. A new signed-out native Chrome profile installed it through Add to Chrome and the ordinary extension confirmation. Popup defaults, preset persistence and a default500 / 64-like Short skip → Undo → reload pass. See [exact scope](../qa/store-publication-20261020.md).
+- The approved/uploaded0.7.3 package is unchanged. 0.7.4 remains a separate update requiring its own review; Store upgrade delivery, TikTok followed-positive behaviour and ordinary day-long use are not established by this smoke check.
