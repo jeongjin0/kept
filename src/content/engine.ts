@@ -24,11 +24,23 @@ const RUN_SHOWN = 3;
 // Why ScrollPlus is moving on: a count under its minimum, or an ad with Skip ads on.
 export type SkipReason = "below" | "ad";
 
+export interface PlaybackState {
+  revision: string;
+  inFeed: boolean;
+  paused: boolean;
+  canLower: boolean;
+  canUndo: boolean;
+  busy: boolean;
+}
+
 export interface EngineDeps {
   getSettings: () => Settings;
   now: () => number;
   advance: (reason: SkipReason) => Promise<boolean>;
   retreat: () => Promise<boolean>;
+  // Capture the actual destination when a move completes, even if the next
+  // content observation has not arrived yet. Never guess adjacency later.
+  getActiveId?: () => string | null;
   // A skip went through. onScreenMs: how long the skipped video was the active one, from the moment it was first seen to the moment the
   // site had moved on from it.
   onSkipped: (onScreenMs: number) => void;
@@ -73,6 +85,11 @@ export function createEngine(deps: EngineDeps) {
   let activityRevision = 0;
   let runRevision = 0;
   let lastSkippedId: string | null = null;
+  let undoFromId: string | null = null;
+  let itemRevision = 0;
+  let noticeEngaged = false;
+  let chipDeadline = 0;
+  let chipRemaining = 0;
   // The reasons of the skips that follow each other while one chip is up, newest first.
   let runReasons: ChipReason[] = [];
   let metricsReady = false;
@@ -113,6 +130,7 @@ export function createEngine(deps: EngineDeps) {
   function clearChip() {
     if (chipTimer != null) deps.cancel(chipTimer);
     chipTimer = null;
+    chipRemaining = 0;
     runReasons = [];
     deps.render(null);
   }
@@ -138,6 +156,7 @@ export function createEngine(deps: EngineDeps) {
 
   function showSkipped(decision: Decision) {
     if (chipTimer != null) deps.cancel(chipTimer);
+    chipTimer = null;
     if (!deps.getSettings().showSkipChip || decision.action !== "skip") {
       deps.render(null);
       return;
@@ -146,11 +165,19 @@ export function createEngine(deps: EngineDeps) {
     runReasons.unshift(reason);
     if (runReasons.length > RUN_SHOWN) runReasons.length = RUN_SHOWN;
     deps.render({ mode: "skipped", ...reason, ...(runReasons.length > 1 ? { run: [...runReasons] } : {}) });
+    chipRemaining = CHIP_HOLD_MS;
+    armChip();
+  }
+
+  function armChip() {
+    if (noticeEngaged || !chipRemaining) return;
+    chipDeadline = deps.now() + chipRemaining;
     chipTimer = deps.schedule(() => {
       chipTimer = null;
+      chipRemaining = 0;
       runReasons = [];
       if (!paused) deps.render(null);
-    }, CHIP_HOLD_MS);
+    }, chipRemaining);
   }
 
   function showPaused() {
@@ -195,6 +222,7 @@ export function createEngine(deps: EngineDeps) {
       return;
     }
     advancing = true;
+    const startedAtItem = itemRevision;
     const revision = activityRevision;
     const run = runRevision;
     let moved = false;
@@ -224,7 +252,10 @@ export function createEngine(deps: EngineDeps) {
       return;
     }
     finished.add(item.id);
-    lastSkippedId = item.id;
+    const destination = deps.getActiveId ? deps.getActiveId() : current?.id ?? null;
+    const knownDestination = !deps.getActiveId || destination != null && destination !== item.id;
+    lastSkippedId = itemRevision - startedAtItem <= 1 && knownDestination ? item.id : null;
+    undoFromId = lastSkippedId ? destination : null;
     lastAdvanceAt = deps.now();
     deps.onSkipped(Math.max(0, lastAdvanceAt - shownAt));
     // Visibility suspends a run rather than ending it: an already-issued sixth
@@ -284,8 +315,39 @@ export function createEngine(deps: EngineDeps) {
   }
 
   return {
+    getState(): PlaybackState {
+      return {
+        revision: [activityRevision, itemRevision, lastAdvanceAt, Number(advancing), Number(paused)].join(":"),
+        inFeed: current != null,
+        paused: paused && !suspended,
+        canLower: paused && !advancing && !suspended && lowerRule(deps.getSettings().rule) != null,
+        canUndo: lastSkippedId != null && current != null && !advancing && !suspended,
+        busy: advancing,
+      };
+    },
+    setNoticeEngaged(engaged: boolean) {
+      if (noticeEngaged === engaged) return;
+      noticeEngaged = engaged;
+      if (engaged && chipTimer != null) {
+        chipRemaining = Math.max(0, chipDeadline - deps.now());
+        deps.cancel(chipTimer);
+        chipTimer = null;
+      } else if (!engaged && chipRemaining && !paused) {
+        chipRemaining = Math.max(1000, chipRemaining);
+        armChip();
+      }
+    },
+    appearanceChanged() {
+      if (paused) showPaused();
+      else clearChip();
+    },
     onItem(item: EngineItem) {
       const changed = current?.id !== item.id;
+      if (changed) {
+        itemRevision++;
+        if (lastSkippedId && current && undoFromId === current.id && current.id === lastSkippedId) undoFromId = item.id;
+        else if (item.id !== undoFromId) { lastSkippedId = null; undoFromId = null; }
+      }
       // A player can mount after its URL/counts, or replace a non-video card.
       // Reconsider that observation without clearing a user's session Undo.
       if (!changed && current && (current.kind !== item.kind || (item.followed === true && current.followed !== true))) finished.delete(item.id);
@@ -322,23 +384,37 @@ export function createEngine(deps: EngineDeps) {
       if (current.metrics == null && waitTimer != null) return;
       evaluate(current);
     },
-    undo() {
-      if (!lastSkippedId || advancing) return;
+    async undo(): Promise<boolean> {
+      if (!lastSkippedId || !current || advancing || suspended) return false;
       const id = lastSkippedId;
+      const fromId = current.id;
+      const fromRevision = itemRevision;
       sessionKeep.add(id);
       finished.delete(id);
       lastSkippedId = null;
+      undoFromId = null;
+      activityRevision++;
       clearWait();
       clearGap();
       if (chipTimer != null) deps.cancel(chipTimer);
       chipTimer = null;
+      chipRemaining = 0;
       runReasons = [];
       consecutive = Math.max(0, consecutive - 1);
       paused = false;
       deps.render(null);
       advancing = true;
       // Commit the memory-only choice before a site retreat can replace this document.
-      void (deps.rememberUndo?.(id) ?? Promise.resolve()).catch(() => {}).then(() => deps.retreat()).catch(() => false).finally(() => { advancing = false; });
+      try {
+        await (deps.rememberUndo?.(id) ?? Promise.resolve()).catch(() => {});
+        const moved = await deps.retreat();
+        if (!moved && current?.id === fromId && itemRevision === fromRevision) { lastSkippedId = id; undoFromId = fromId; }
+        return moved;
+      } catch {
+        if (current?.id === fromId && itemRevision === fromRevision) { lastSkippedId = id; undoFromId = fromId; }
+        return false;
+      }
+      finally { advancing = false; }
     },
     keepGoing() {
       resumeCurrent();
@@ -356,6 +432,8 @@ export function createEngine(deps: EngineDeps) {
     onInactive() {
       activityRevision++;
       current = null;
+      lastSkippedId = null;
+      undoFromId = null;
       clearWait();
       clearGap();
       resetRun();

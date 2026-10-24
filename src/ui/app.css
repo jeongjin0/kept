@@ -109,7 +109,27 @@ h1, h2, p { margin: 0; }
 .icon-button:hover { background: var(--surface-2); color: var(--text); }
 
 .popup { width: 320px; max-height: 480px; padding: 14px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; font-size: 14px; line-height: 1.35; }
-.popup .body { display: flex; flex-direction: column; gap: 8px; transition: opacity var(--t) var(--ease); }
+.popup .body { display: flex; flex-direction: column; gap: 6px; min-height: 0; transition: opacity var(--t) var(--ease); }
+.popup .row { min-height: 40px; }
+.popup .body > * { flex-shrink: 0; }
+.popup > .bar, .popup > .foot { flex-shrink: 0; }
+.playback { padding: 12px; display: grid; gap: 8px; }
+.playback p { font-size: 13px; }
+.playback-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.playback-actions .action { flex: 1 1 auto; min-height: 34px; padding: 7px 10px; width: auto; }
+.playback-actions .primary { background: var(--accent); color: var(--accent-ink); }
+.playback-actions .undo-only { flex: 0 0 34px; padding: 7px; }
+.notice-style { display: flex; flex-wrap: wrap; gap: 12px 20px; border: 0; padding: 0; }
+.notice-style legend { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.notice-style label { display: inline-flex; gap: 8px; align-items: center; min-height: 36px; cursor: pointer; }
+.notice-style input { accent-color: var(--accent); }
+.notice-style:disabled { opacity: .45; }
+.notice-preview { display: grid; gap: 12px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; }
+.preview-chip { justify-self: start; display: grid; gap: 10px; width: 228px; padding: 12px; color: #EEF5F4; background: #0D1414; border: 1px solid rgba(89,197,191,.24); border-radius: 18px; font-size: 14px; }
+.preview-chip > span:last-child { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; background: rgba(238,245,244,.12); border-radius: 999px; }
+.preview-chip.compact { width: 44px; padding: 6px 0 2px; gap: 4px; text-align: center; border-radius: 22px; }
+.preview-chip.compact > span { min-height: 32px; display: flex; align-items: center; justify-content: center; }
+.preview-chip.compact > span:last-child { min-height: 40px; border-top: 1px solid rgba(238,245,244,.12); border-radius: 0; background: transparent; color: var(--accent); }
 .popup.paused .body { opacity: 0.45; }
 .popup .foot { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
 

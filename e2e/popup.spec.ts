@@ -7,24 +7,26 @@ test(`popup fits in ${language} at 1x and 2x, even with the optional rows`, asyn
   try {
     for (const scale of [1, 2]) {
       const page = await open(context, id, "popup.html", scale);
+      await page.evaluate(() => {
+        const send = chrome.tabs.sendMessage.bind(chrome.tabs);
+        chrome.tabs.sendMessage = ((tabId: number, message: any) => message?.type === "scrollplus:context"
+          ? Promise.resolve({ platform: "instagram", creatorId: "fixture", instagramSignedOut: true, controls: null, documentKey: "layout" })
+          : send(tabId, message)) as typeof chrome.tabs.sendMessage;
+      });
+      await expect(page.getByRole("button", { name: /Keep this creator|이 제작자는 유지/ })).toBeVisible();
+      await expect(page.locator(".note")).toBeVisible();
       const box = await page.evaluate(() => {
         const popup = document.querySelector(".popup");
         const scrolling = document.scrollingElement;
         if (!(popup instanceof HTMLElement) || !(scrolling instanceof HTMLElement)) return null;
         const plain = popup.getBoundingClientRect().height;
         const body = popup.querySelector(".body");
-        const extra = document.createElement("button");
-        extra.className = "action";
-        extra.textContent = chrome.i18n.getMessage("keepCreator");
-        body?.append(extra);
-        const note = document.createElement("p");
-        note.className = "note";
-        note.textContent = chrome.i18n.getMessage("signedOut");
-        body?.append(note);
         return {
           plain,
           full: popup.getBoundingClientRect().height,
           fits: scrolling.scrollHeight <= scrolling.clientHeight + 1,
+          bodyBottom: body!.lastElementChild!.getBoundingClientRect().bottom,
+          footerTop: popup.querySelector(".foot")!.getBoundingClientRect().top,
           github: document.querySelector("a.github")?.getAttribute("href"),
           text: document.body.innerText,
         };
@@ -33,6 +35,7 @@ test(`popup fits in ${language} at 1x and 2x, even with the optional rows`, asyn
       expect(box?.plain).toBeLessThanOrEqual(480);
       expect(box?.full).toBeLessThanOrEqual(480);
       expect(box?.fits).toBe(true);
+      expect(box!.bodyBottom).toBeLessThanOrEqual(box!.footerTop);
       expect(box?.github).toBe("https://github.com/jeongjin0/scrollplus");
       expect(box?.text).toMatch(/ScrollPlus/);
       await page.close();
@@ -224,7 +227,7 @@ test("legacy notice positions normalize to the left gutter and Settings only tog
     });
     const options = await open(context, id, "options.html");
     await expect(options.getByRole("radiogroup", { name: "Skip chip position" })).toHaveCount(0);
-    await options.getByRole("switch", { name: "Show the skip chip" }).click();
+    await options.getByRole("switch", { name: "Skip notifications" }).click();
     await expect.poll(async () => (await stored(options)).showSkipChip).toBe(false);
     expect((await stored(options)).chipPosition).toBe("side");
     expect((await stored(options)).skipAds).toBe(false);

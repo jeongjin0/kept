@@ -61,6 +61,7 @@ export interface Settings {
   platforms: Record<Platform, boolean>;
   filterGrids: boolean;
   showSkipChip: boolean;
+  noticeStyle: "compact" | "detailed";
   chipPosition: ChipPosition;
   skipAds: boolean;
   keepFollowed: boolean;
@@ -108,6 +109,7 @@ export const DEFAULT_SETTINGS: Settings = {
   platforms: { youtube: true, tiktok: true, instagram: true },
   filterGrids: false,
   showSkipChip: true,
+  noticeStyle: "compact",
   chipPosition: "side",
   skipAds: true,
   keepFollowed: true,
@@ -244,6 +246,7 @@ export function normalizeSettings(value: unknown): Settings {
     },
     filterGrids: raw.filterGrids === true,
     showSkipChip: raw.showSkipChip !== false,
+    noticeStyle: raw.noticeStyle === "detailed" ? "detailed" : "compact",
     chipPosition: "side",
     skipAds: raw.skipAds !== false,
     keepFollowed: raw.keepFollowed !== false,

@@ -18,7 +18,7 @@ const chip = mountChip(
     keepGoing: () => engine.keepGoing(),
     lower: () => engine.lower(),
   },
-  { anchor: () => mostVisibleVideo() ?? mostVisiblePhoto() },
+  { anchor: () => mostVisibleVideo() ?? mostVisiblePhoto(), preferCompact: () => settings.noticeStyle === "compact", onEngagedChange: (engaged) => engine.setNoticeEngaged(engaged) },
 );
 const engine = createEngine({
   getSettings: () => settings,

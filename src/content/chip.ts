@@ -41,6 +41,11 @@ const CSS = [
   ".chip.compact:not(.pause) button { border-top: 1px solid rgba(238, 245, 244, 0.12); border-top-left-radius: 0; border-top-right-radius: 0; }",
   ".chip.compact .actions { gap: 2px; }",
   ".count { font-size: 14px; font-variant-numeric: tabular-nums; }",
+  ".detail-toggle { min-height: 30px; padding: 4px 10px; font-size: 12px; background: transparent; color: #99ACAB; }",
+  ".detail-toggle .count { display: none; }",
+  ".chip.has-details.compact .head { display: none; }",
+  ".chip.compact .detail-toggle { order: -1; min-height: 32px; }",
+  ".chip.compact .detail-toggle .count { display: block; }",
   ".chip.compact .head .count { display: block; }",
   "@keyframes in { from { opacity: 0; } to { opacity: 1; } }",
   "@keyframes out { from { opacity: 1; } to { opacity: 0; } }",
@@ -86,6 +91,8 @@ export interface ChipOptions {
   anchor?: () => HTMLElement | null;
   // Reels captions cross the gutter during scrolling. Show the notice after a quiet moment.
   scrollQuietMs?: number;
+  preferCompact?: () => boolean;
+  onEngagedChange?: (engaged: boolean) => void;
 }
 
 // Something a person reads or presses on a site. The chip is never put on top of one of these.
@@ -98,11 +105,13 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
   let placeTimer: number | null = null;
   let scrollTimer: number | null = null;
   let previousModel = "null";
+  let previousPreference: boolean | undefined;
   let watching = false;
   let frame: number | null = null;
   const transitions = new Map<Element, Set<string>>();
   let transitionFocus: HTMLElement | null = null;
   let watchedAnchor: HTMLElement | null = null;
+  let expanded: boolean | null = null;
   const ancestors = new Set<Element>();
   const resized = new ResizeObserver(() => queuePlace());
   const structure = new MutationObserver((records) => {
@@ -127,6 +136,14 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     style.textContent = CSS;
     root = document.createElement("div");
     shadow.append(style, root);
+    const engaged = () => options.onEngagedChange?.(Boolean(root?.matches(":hover") || shadow.activeElement));
+    host.addEventListener("pointerenter", () => options.onEngagedChange?.(true));
+    host.addEventListener("pointerleave", engaged);
+    shadow.addEventListener("focusin", () => options.onEngagedChange?.(true));
+    shadow.addEventListener("focusout", (event) => {
+      const target = (event as FocusEvent).relatedTarget;
+      if (!(target instanceof Node) || !shadow.contains(target)) options.onEngagedChange?.(Boolean(root?.matches(":hover")));
+    });
     (document.documentElement ?? document.body).append(host);
     window.addEventListener("resize", () => queuePlace(), { passive: true });
     window.addEventListener("scroll", () => {
@@ -254,8 +271,15 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     // The middle of the window. A feed such as TikTok's scrolls to the next video while the chip is up, so the video's own box is moving
     // and its middle is not where it will rest. The video is as tall as the window or nearly, so the window's middle is its middle.
     const middle = height / 2;
-    for (const compact of [false, true]) {
+    const compactFirst = expanded == null ? options.preferCompact?.() === true : !expanded;
+    for (const compact of compactFirst && chip.dataset.mode === "skipped" ? [true] : [false, true]) {
       chip.classList.toggle("compact", compact);
+      const toggle = chip.querySelector(".detail-toggle");
+      if (toggle) {
+        toggle.setAttribute("aria-expanded", String(!compact));
+        toggle.setAttribute("aria-label", t(compact ? "showDetails" : "hideDetails"));
+        (toggle as HTMLElement).title = t(compact ? "showDetails" : "hideDetails") + "\n" + chip.title;
+      }
       host.style.transform = "none";
       host.style.bottom = "auto";
       const { width, height: chipHeight } = chip.getBoundingClientRect();
@@ -321,10 +345,13 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     dot.append(svgIcon("streak", 16));
     // The narrow chip is just a count and Undo. Keep the reasons available in its tooltip and accessible name.
     head.classList.toggle("run", !!run);
-    head.replaceChildren(dot, span("count", String(run?.length ?? 1)), ...(run ? [] : [span("label", reasonLabel(model))]));
+    head.replaceChildren(dot, ...(options.preferCompact ? [] : [span("count", String(run?.length ?? 1))]), ...(run ? [] : [span("label", reasonLabel(model))]));
+    const toggleCount = chip.querySelector(".detail-toggle .count");
+    if (toggleCount) toggleCount.textContent = String(run?.length ?? 1);
     rows.replaceChildren(...(run ? run.map((reason) => span("r", reasonLabel(reason))) : []));
     chip.title = (run ?? [model]).map(reasonLabel).join("\n");
     chip.setAttribute("aria-label", chip.title);
+    chip.querySelector(".detail-toggle")?.setAttribute("aria-description", chip.title);
   }
 
   return {
@@ -334,9 +361,11 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     update(model: ChipModel | null): void {
       if (!document.documentElement) return;
       const key = JSON.stringify(model);
+      const preference = options.preferCompact?.();
       // Repeated feed polling must not replace the focused pause/Undo button.
-      if (key === previousModel) return;
+      if (key === previousModel && preference === previousPreference) return;
       previousModel = key;
+      previousPreference = preference;
       ensure();
       if (!root) return;
       clearLeave();
@@ -349,6 +378,8 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
         return;
       }
       if (!model) {
+        expanded = null;
+        options.onEngagedChange?.(false);
         stopWatching();
         const existing = chipNode();
         if (!existing) return;
@@ -369,6 +400,14 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
         const rows = document.createElement("div");
         rows.className = "rows";
         chip.append(head, rows, button(t("undo"), actions.undo, "undo"));
+        if (options.preferCompact) {
+          chip.classList.add("has-details");
+          const toggle = button(t("hideDetails"), () => { expanded = chip.classList.contains("compact"); place(); });
+          toggle.className = "detail-toggle";
+          toggle.prepend(span("count", "1"));
+          toggle.setAttribute("aria-expanded", "false");
+          chip.append(toggle);
+        }
         fillSkipped(chip, model);
       } else {
         const head = document.createElement("div");

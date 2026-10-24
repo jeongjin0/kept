@@ -4,11 +4,16 @@ import type { IconName } from "../lib/icons";
 import { parseTotals } from "../lib/saved";
 import { readSkipCount, readTotals, saveSettings } from "../lib/storage";
 import { resetFilterSettings } from "../lib/session-keep";
+import type { PlaybackState } from "../content/engine";
+
+export type PlaybackAction = "undo" | "continue" | "lower";
 
 export interface ActiveState {
   platform: Platform | null;
   creatorId: string | null;
   instagramSignedOut: boolean;
+  documentKey: string;
+  controls: PlaybackState | null;
 }
 
 export const SITES: Record<Platform, { name: string; icon: IconName }> = {
@@ -17,7 +22,7 @@ export const SITES: Record<Platform, { name: string; icon: IconName }> = {
   instagram: { name: "Instagram Reels", icon: "reels" },
 };
 
-export function useFilterState() {
+export function useFilterState(live = false) {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [ready, setReady] = useState(false);
   const [skips, setSkips] = useState(0);
@@ -25,6 +30,10 @@ export function useFilterState() {
   const [active, setActive] = useState<ActiveState | null>(null);
   const [resetting, setResetting] = useState(false);
   const [resetFailed, setResetFailed] = useState(false);
+  const [acting, setActing] = useState(false);
+  const [actionFailed, setActionFailed] = useState(false);
+  const activeRef = useRef<{ tabId: number; context: ActiveState } | null>(null);
+  const actionPending = useRef(false);
   const latest = useRef(settings);
 
   useEffect(() => {
@@ -60,15 +69,45 @@ export function useFilterState() {
       if (changes[STORAGE_TOTALS]) setTotals(parseTotals(changes[STORAGE_TOTALS].newValue));
     };
     chrome.storage.onChanged.addListener(listener);
-    void askActive().then((next) => {
-      if (alive) setActive(next);
-    });
+    let refreshing = false;
+    const refreshActive = async () => {
+      if (refreshing || actionPending.current) return;
+      refreshing = true;
+      try {
+        const next = await askActive();
+        if (alive) { activeRef.current = next; setActive(next?.context ?? null); }
+      } finally { refreshing = false; }
+    };
+    void refreshActive();
+    const refreshTimer = live ? window.setInterval(() => void refreshActive(), 500) : null;
     return () => {
       alive = false;
       window.clearTimeout(midnight);
       document.removeEventListener("visibilitychange", refreshCount);
       chrome.storage.onChanged.removeListener(listener);
+      if (refreshTimer != null) window.clearInterval(refreshTimer);
     };
+  }, [live]);
+
+  const control = useCallback(async (action: PlaybackAction) => {
+    if (actionPending.current) return;
+    const target = activeRef.current;
+    if (!target?.context.controls) return;
+    actionPending.current = true; setActing(true); setActionFailed(false);
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab?.id !== target.tabId) throw new Error("Active tab changed");
+      const response = await chrome.runtime.sendMessage({
+        type: "scrollplus:control", tabId: target.tabId, action, documentKey: target.context.documentKey, revision: target.context.controls.revision,
+      });
+      if (response?.ok !== true) throw new Error("Action unavailable");
+      const next = await askActive();
+      activeRef.current = next; setActive(next?.context ?? null);
+    } catch {
+      setActionFailed(true);
+      const next = await askActive();
+      activeRef.current = next; setActive(next?.context ?? null);
+    } finally { actionPending.current = false; setActing(false); }
   }, []);
 
   const update = useCallback((change: (current: Settings) => Settings) => {
@@ -94,16 +133,16 @@ export function useFilterState() {
     finally { setResetting(false); }
   }, []);
 
-  return { settings, ready, skips, totals, active, update, allowCurrent, reset, resetting, resetFailed };
+  return { settings, ready, skips, totals, active, update, allowCurrent, control, acting, actionFailed, reset, resetting, resetFailed };
 }
 
-async function askActive(): Promise<ActiveState | null> {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (tab?.id == null) return null;
+async function askActive(): Promise<{ tabId: number; context: ActiveState } | null> {
   try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab?.id == null) return null;
     const response = await chrome.tabs.sendMessage(tab.id, { type: "scrollplus:context" });
     if (!response || typeof response !== "object") return null;
-    return response as ActiveState;
+    return { tabId: tab.id, context: response as ActiveState };
   } catch {
     return null;
   }

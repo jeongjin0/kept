@@ -13,7 +13,7 @@ function low(id: string): EngineItem {
   };
 }
 
-function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void, undoDeps: Pick<EngineDeps, "rememberUndo" | "sessionKeep" | "advanceGapMs" | "settleMs" | "ready"> = {}) {
+function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void, undoDeps: Partial<Pick<EngineDeps, "rememberUndo" | "sessionKeep" | "advanceGapMs" | "settleMs" | "ready" | "retreat" | "getActiveId">> = {}) {
   const settings: Settings = { ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms }, rule: presetRule("balanced"), allowlist: [], ...partial };
   let clock = 0;
   let seq = 1;
@@ -889,4 +889,80 @@ describe("a site that cannot move yet", () => {
     await box.drain();
     expect(box.advances).toEqual(["a"]);
   });
+});
+
+describe("popup recovery state and notification engagement", () => {
+  it("keeps adjacent Undo after the notice expires, then retires it after another navigation", async () => {
+    const box = harness();
+    box.show(low("skipped")); await box.drain();
+    box.show({ ...low("next"), metrics: good });
+    box.flush(3000); await box.drain();
+    expect(box.models.at(-1)).toBeNull();
+    expect(box.engine.getState().canUndo).toBe(true);
+    box.show({ ...low("later"), metrics: good });
+    expect(box.engine.getState().canUndo).toBe(false);
+    expect(await box.engine.undo()).toBe(false);
+    expect(box.retreats).toEqual([]);
+  });
+
+  it("reports the safety pause with notifications off and preserves it across appearance changes", async () => {
+    const box = harness({ showSkipChip: false });
+    for (let i = 0; i < 6; i++) {
+      box.show(low("cap" + i)); await box.drain(); box.flush(450);
+    }
+    expect(box.engine.getState()).toMatchObject({ paused: true, canLower: true, canUndo: true });
+    box.settings.showSkipChip = true;
+    box.engine.appearanceChanged();
+    expect(box.engine.getState().paused).toBe(true);
+    expect(box.skips).toBe(6);
+    box.engine.keepGoing();
+    expect(box.engine.getState().paused).toBe(false);
+  });
+
+  it("holds a focused notice and leaves at least one second to use it afterward", async () => {
+    const box = harness();
+    box.show(low("held")); await box.drain(); box.flush(2400);
+    box.engine.setNoticeEngaged(true);
+    box.flush(5000);
+    expect(box.models.at(-1)).toMatchObject({ mode: "skipped" });
+    box.engine.setNoticeEngaged(false);
+    box.flush(999);
+    expect(box.models.at(-1)).toMatchObject({ mode: "skipped" });
+    box.flush(1);
+    expect(box.models.at(-1)).toBeNull();
+  });
+
+  it("retires popup controls when leaving the feed and changes the revision after navigation", async () => {
+    const box = harness();
+    box.show(low("one")); await box.drain();
+    const first = box.engine.getState();
+    box.show({ ...low("two"), metrics: good });
+    expect(box.engine.getState().revision).not.toBe(first.revision);
+    box.engine.onInactive();
+    expect(box.engine.getState()).toMatchObject({ inFeed: false, canUndo: false, paused: false });
+    expect(await box.engine.undo()).toBe(false);
+  });
+});
+
+it("allows a failed popup retreat to be retried while the adjacent source stays current", async () => {
+  let calls = 0;
+  const box = harness({}, true, undefined, { retreat: async () => ++calls > 1 });
+  box.show(low("retry-skip")); await box.drain();
+  box.show({ ...low("retry-next"), metrics: good });
+  expect(await box.engine.undo()).toBe(false);
+  expect(box.engine.getState().canUndo).toBe(true);
+  expect(await box.engine.undo()).toBe(true);
+  expect(box.engine.getState().canUndo).toBe(false);
+  expect(calls).toBe(2);
+});
+
+it("uses the actual skip destination when a fast manual move outruns content observations", async () => {
+  const box = harness({}, true, undefined, { getActiveId: () => "actual-next" });
+  box.show(low("original")); await box.drain();
+  // The engine has not observed actual-next, but the adapter confirmed that
+  // destination at move completion. The first late observation is already past it.
+  box.show({ ...low("manual-two-ahead"), metrics: good });
+  expect(box.engine.getState().canUndo).toBe(false);
+  expect(await box.engine.undo()).toBe(false);
+  expect(box.retreats).toEqual([]);
 });
