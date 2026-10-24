@@ -38,6 +38,9 @@ export interface EngineDeps {
   now: () => number;
   advance: (reason: SkipReason) => Promise<boolean>;
   retreat: () => Promise<boolean>;
+  // Capture the actual destination when a move completes, even if the next
+  // content observation has not arrived yet. Never guess adjacency later.
+  getActiveId?: () => string | null;
   // A skip went through. onScreenMs: how long the skipped video was the active one, from the moment it was first seen to the moment the
   // site had moved on from it.
   onSkipped: (onScreenMs: number) => void;
@@ -249,8 +252,10 @@ export function createEngine(deps: EngineDeps) {
       return;
     }
     finished.add(item.id);
-    lastSkippedId = itemRevision - startedAtItem <= 1 ? item.id : null;
-    undoFromId = lastSkippedId ? current?.id ?? null : null;
+    const destination = deps.getActiveId ? deps.getActiveId() : current?.id ?? null;
+    const knownDestination = !deps.getActiveId || destination != null && destination !== item.id;
+    lastSkippedId = itemRevision - startedAtItem <= 1 && knownDestination ? item.id : null;
+    undoFromId = lastSkippedId ? destination : null;
     lastAdvanceAt = deps.now();
     deps.onSkipped(Math.max(0, lastAdvanceAt - shownAt));
     // Visibility suspends a run rather than ending it: an already-issued sixth

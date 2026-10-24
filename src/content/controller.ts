@@ -68,6 +68,7 @@ export function startFilter(adapter: Adapter): void {
     ready: adapter.ready,
     advance: (reason) => adapter.advance(reason),
     retreat: () => adapter.retreat(),
+    getActiveId: () => adapter.readActive()?.id ?? null,
     onSkipped: (onScreenMs) => {
       void incrementSkips(onScreenMs);
     },

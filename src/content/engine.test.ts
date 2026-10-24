@@ -13,7 +13,7 @@ function low(id: string): EngineItem {
   };
 }
 
-function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void, undoDeps: Partial<Pick<EngineDeps, "rememberUndo" | "sessionKeep" | "advanceGapMs" | "settleMs" | "ready" | "retreat">> = {}) {
+function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void, undoDeps: Partial<Pick<EngineDeps, "rememberUndo" | "sessionKeep" | "advanceGapMs" | "settleMs" | "ready" | "retreat" | "getActiveId">> = {}) {
   const settings: Settings = { ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms }, rule: presetRule("balanced"), allowlist: [], ...partial };
   let clock = 0;
   let seq = 1;
@@ -954,4 +954,15 @@ it("allows a failed popup retreat to be retried while the adjacent source stays 
   expect(await box.engine.undo()).toBe(true);
   expect(box.engine.getState().canUndo).toBe(false);
   expect(calls).toBe(2);
+});
+
+it("uses the actual skip destination when a fast manual move outruns content observations", async () => {
+  const box = harness({}, true, undefined, { getActiveId: () => "actual-next" });
+  box.show(low("original")); await box.drain();
+  // The engine has not observed actual-next, but the adapter confirmed that
+  // destination at move completion. The first late observation is already past it.
+  box.show({ ...low("manual-two-ahead"), metrics: good });
+  expect(box.engine.getState().canUndo).toBe(false);
+  expect(await box.engine.undo()).toBe(false);
+  expect(box.retreats).toEqual([]);
 });
