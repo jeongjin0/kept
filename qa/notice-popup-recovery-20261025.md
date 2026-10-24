@@ -8,7 +8,7 @@ The previous full card remains an explicit Detailed setting. Switching notificat
 
 ## Behavior and failure handling
 
-- The popup polls only while open. Its commands retain the displayed tab/document/revision, recheck current playback, and fail without acting when stale. It does not look up another tab to perform the old action.
+- The popup polls only while open. Control commands use the existing trusted runtime-to-background broker, with the same UI-origin check as Reset, before being forwarded to content scripts. Its commands retain the displayed tab/document/revision, recheck current playback, and fail without acting when stale. It does not look up another tab to perform the old action.
 - The actual destination is captured from the adapter at move completion, so a fast manual move cannot be mistaken for an unobserved first successor. A regression covers that delayed-observation case.
 - Undo is available only for the latest adjacent skip, survives notification expiry, and retires after another manual navigation or leaving the feed. Reload resets the document's target; remembered Undo keep choices still use the existing RAM-only broker.
 - A failed retreat reports an error and allows retry if the source video is still current. No new permission, network API, persisted video identifier or backend is introduced.
@@ -19,7 +19,7 @@ The previous full card remains an explicit Detailed setting. Switching notificat
 
 TypeScript and 133 unit checks pass. The full 93-case browser suite passed before the final popup fit adjustment. After that adjustment, all 14 popup/recovery checks passed, and the five recovery checks additionally cover an actual failed retreat/retry. Current-head CI must run the full final 94-case suite on Chromium and minimum Chrome 120 in both push and PR workflows before landing. Controlled pages exercise the shipped extension/content scripts and real runtime messaging. The toolbar popup is represented by its actual extension page with its active-tab query pinned to the routed feed. This is not a live signed-in platform check.
 
-Production ZIP and `scripts/check-package.mjs` pass with unchanged permissions/version. The local development ZIP is 157,055 bytes, SHA-256 `dc07d4f83631f250c53ee22eb0fa0667df383793dc23a1ecca3b1cd69aa216a2`. This is an unreleased development package, not the already published Store 0.7.4 artifact.
+Production ZIP and `scripts/check-package.mjs` pass with unchanged permissions/version. The local development ZIP is 157,192 bytes, SHA-256 `87377bf210660c470d074b2145141ba94a0a923d76c25ec762f845b799b736a7`. This is an unreleased development package, not the already published Store 0.7.4 artifact.
 
 Visual inspection caught an English recovery-button wrap that overlapped the footer even though the outer popup still measured 480px. The Undo action now uses its existing icon and accessible name alongside the two pause actions. Tests additionally compare the final body child against the footer; they exercise real optional creator/signed-out rows instead of appending impossible combinations of rows. Both languages measure 460px normally and 467.55px in the captured pause state, within an actual 320×480 viewport. The bilingual 1x/2x tests retain the no-scroll/fit requirement. Captures: [English pause](screenshots/notice-popup-20261025/en-popup-paused.png), [Korean pause](screenshots/notice-popup-20261025/ko-popup-paused.png), [compact](screenshots/notice-popup-20261025/notice-compact.png), [expanded](screenshots/notice-popup-20261025/notice-expanded.png).
 
@@ -30,3 +30,9 @@ The final runtime was loaded in a disposable signed-out Chrome for Testing 153.0
 The first new routed fixture lacked YouTube's navigation wrappers and could not move; traces are preserved under `qa/tmp/notice-recovery-first-failure/`. Adding the wrappers allowed the safety pause, popup resume and Undo paths to execute. The next pass found an incorrect test expectation for Lower the bar: the existing number ladder moves 500 to 200, not 100. That expectation was corrected to preserve the existing product rule; traces remain under `qa/tmp/notice-recovery-second-failure/`.
 
 No release number, Store package submission or publication is authorized by this source task. Store delivery and long-term usefulness remain separate.
+
+## Compatibility investigation
+
+The first Chrome 120 CI run rejected popup actions while current Chromium passed. Those failure traces are preserved in the CI artifacts and locally under `qa/tmp/notice-chrome120-first-failure/`. The control route now authenticates the UI in the existing background broker instead of depending on optional sender URL metadata in content messaging; final-head Chrome 120 CI must confirm the repair. No permission or external sender access was added.
+
+A local TikTok For You adapter run also timed out during an asynchronous storage read after Reset. Its trace is preserved in `qa/tmp/notice-adapter-failure/`; it did not establish a wrong counter value. The same adapter and the complete current-head CI remain required.

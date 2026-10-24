@@ -29,6 +29,21 @@ export default defineBackground(() => {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (sender.id !== chrome.runtime.id) return false;
     const trusted = sender.url?.startsWith(chrome.runtime.getURL("")) === true;
+    if (message?.type === "scrollplus:control") {
+      if (!trusted || !Number.isSafeInteger(message.tabId) || !["undo", "continue", "lower"].includes(message.action)) {
+        sendResponse({ ok: false }); return false;
+      }
+      // Authenticate the UI on runtime messaging, as Reset already does, then
+      // forward through the worker. Do not depend on tabs.sendMessage's optional
+      // sender URL metadata in the content world on older supported Chrome.
+      void chrome.tabs.get(message.tabId).then(async tab => {
+        if (!platformAt(tab.url)) return { ok: false };
+        return chrome.tabs.sendMessage(message.tabId, {
+          type: "scrollplus:control", action: message.action, documentKey: message.documentKey, revision: message.revision,
+        });
+      }).then(sendResponse).catch(() => sendResponse({ ok: false }));
+      return true;
+    }
     const platform = PLATFORMS.includes(message?.platform) ? message.platform as Platform : undefined;
     const sessionRequest = message?.type === "scrollplus:session:get" || message?.type === "scrollplus:session:keep";
     if (sessionRequest && (!platform || !trusted && platformAt(sender.url ?? sender.tab?.url) !== platform)) return false;

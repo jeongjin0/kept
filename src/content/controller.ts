@@ -251,9 +251,9 @@ export function startFilter(adapter: Adapter): void {
     if (message?.type === "scrollplus:control") {
       showActive();
       const state = engine.getState();
-      const trusted = _sender.id === chrome.runtime.id && _sender.url?.startsWith(chrome.runtime.getURL(""));
+      const trusted = _sender.id === chrome.runtime.id;
       if (!trusted || message.documentKey !== documentKey || message.revision !== state.revision || !ready || !adapter.readActive() || state.busy) {
-        sendResponse({ ok: false }); return false;
+        sendResponse({ ok: false, error: !trusted ? "sender" : message.documentKey !== documentKey || message.revision !== state.revision ? "stale" : "unavailable" }); return false;
       }
       if (message.action === "undo" && state.canUndo) {
         void engine.undo().then((ok) => sendResponse({ ok, context: context() })).catch(() => sendResponse({ ok: false }));

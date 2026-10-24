@@ -97,8 +97,8 @@ export function useFilterState(live = false) {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (tab?.id !== target.tabId) throw new Error("Active tab changed");
-      const response = await chrome.tabs.sendMessage(target.tabId, {
-        type: "scrollplus:control", action, documentKey: target.context.documentKey, revision: target.context.controls.revision,
+      const response = await chrome.runtime.sendMessage({
+        type: "scrollplus:control", tabId: target.tabId, action, documentKey: target.context.documentKey, revision: target.context.controls.revision,
       });
       if (response?.ok !== true) throw new Error("Action unavailable");
       const next = await askActive();

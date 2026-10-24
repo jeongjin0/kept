@@ -28,6 +28,12 @@ async function setup(language: "en" | "ko", passingAfterFirst = false, notificat
     if (!location.href.startsWith("chrome-extension://") || !location.pathname.endsWith("/popup.html")) return;
     const query = chrome.tabs.query.bind(chrome.tabs);
     chrome.tabs.query = ((info: chrome.tabs.QueryInfo) => info.active && info.currentWindow ? query({ url: "https://www.youtube.com/*" }) : query(info)) as typeof chrome.tabs.query;
+    const send = chrome.runtime.sendMessage.bind(chrome.runtime);
+    chrome.runtime.sendMessage = ((message: any) => {
+      const pending = send(message);
+      if (message?.type === "scrollplus:control") void pending.then(result => { (window as any).lastControlResult = result ?? { ok: false, error: "no-response" }; });
+      return pending;
+    }) as typeof chrome.runtime.sendMessage;
   });
   const tab = await context.newPage();
   await tab.goto("https://www.youtube.com/shorts/recovery0");
@@ -54,6 +60,7 @@ for (const language of ["en", "ko"] as const) {
       await expect(ext.tab.locator("#scrollplus-chip-host")).toBeHidden();
       expect(await ext.tab.evaluate(() => (window as any).fixtureIndex)).toBe(6);
       await popup.getByRole("button", { name: language === "ko" ? "이어서 보기" : "Keep going", exact: true }).click();
+      await expect.poll(() => popup.evaluate(() => (window as any).lastControlResult)).toMatchObject({ ok: true });
       await expect.poll(() => ext.tab.evaluate(() => (window as any).fixtureIndex)).toBe(12);
       await expect(popup.getByText(language === "ko" ? "6회 연속 넘겨 잠시 멈췄습니다." : "Paused after six consecutive skips.")).toBeVisible();
       await popup.getByRole("button", { name: language === "ko" ? "기준 낮추기" : "Lower the bar", exact: true }).click();
@@ -74,6 +81,7 @@ test("popup Undo works after notification expiry and keeps the same video across
     await expect(ext.tab.locator("#scrollplus-chip-host .chip")).toHaveCount(0);
     const popup = await ext.popup();
     await popup.getByRole("button", { name: "Undo", exact: true }).click();
+    await expect.poll(() => popup.evaluate(() => (window as any).lastControlResult)).toMatchObject({ ok: true });
     await expect.poll(() => ext.tab.evaluate(() => (window as any).fixtureIndex)).toBe(0);
     expect(await ext.tab.evaluate(() => (window as any).fixtureBacks)).toBe(1);
     await expect(popup.getByRole("button", { name: "Undo", exact: true })).toHaveCount(0);
