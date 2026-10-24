@@ -46,6 +46,7 @@ export function startFilter(adapter: Adapter): void {
   const sessionKeep = new Set<string>();
   const cache = new Map<string, ExtractedItem>();
   let pointerDown = false;
+  const documentKey = crypto.randomUUID();
   const chip = mountChip(
     {
       undo: () => engine.undo(),
@@ -55,6 +56,8 @@ export function startFilter(adapter: Adapter): void {
     {
       anchor: () => mostVisibleVideo() ?? (adapter.platform === "instagram" && adapter.readActive()?.kind === "carousel" ? mostVisiblePhoto() : null),
       scrollQuietMs: adapter.platform === "instagram" ? 200 : undefined,
+      preferCompact: () => settings.noticeStyle === "compact",
+      onEngagedChange: (engaged) => engine.setNoticeEngaged(engaged),
     },
   );
   const engine = createEngine({
@@ -97,12 +100,15 @@ export function startFilter(adapter: Adapter): void {
   }
 
   function context() {
+    showActive();
     const active = adapter.readActive();
     const cached = active ? cache.get(active.id) : undefined;
     return {
       platform: adapter.platform,
       creatorId: cached?.creatorId ?? active?.creatorId ?? null,
       instagramSignedOut: adapter.instagramSignedOut?.() === true,
+      documentKey,
+      controls: active && ready ? engine.getState() : null,
     };
   }
 
@@ -241,6 +247,22 @@ export function startFilter(adapter: Adapter): void {
       sendResponse(context());
       return false;
     }
+    if (message?.type === "scrollplus:control") {
+      showActive();
+      const state = engine.getState();
+      const trusted = _sender.id === chrome.runtime.id && _sender.url?.startsWith(chrome.runtime.getURL(""));
+      if (!trusted || message.documentKey !== documentKey || message.revision !== state.revision || !ready || !adapter.readActive() || state.busy) {
+        sendResponse({ ok: false }); return false;
+      }
+      if (message.action === "undo" && state.canUndo) {
+        void engine.undo().then((ok) => sendResponse({ ok, context: context() })).catch(() => sendResponse({ ok: false }));
+        return true;
+      }
+      if (message.action === "continue" && state.paused) engine.keepGoing();
+      else if (message.action === "lower" && state.canLower) engine.lower();
+      else { sendResponse({ ok: false }); return false; }
+      sendResponse({ ok: true, context: context() }); return false;
+    }
     if (message?.type === "scrollplus:allow") {
       const creatorId = context().creatorId;
       if (!creatorId) { sendResponse({ ok: false }); return false; }
@@ -262,8 +284,12 @@ export function startFilter(adapter: Adapter): void {
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "local" || !changes[STORAGE_SETTINGS]) return;
     settingsRevision++;
+    const previous = settings;
     settings = normalizeSettings(changes[STORAGE_SETTINGS].newValue);
-    engine.settingsChanged();
+    const { showSkipChip: _oldChip, noticeStyle: _oldStyle, ...oldFilter } = previous;
+    const { showSkipChip: _newChip, noticeStyle: _newStyle, ...newFilter } = settings;
+    if (JSON.stringify(oldFilter) === JSON.stringify(newFilter)) engine.appearanceChanged();
+    else engine.settingsChanged();
     scanGrids();
   });
 

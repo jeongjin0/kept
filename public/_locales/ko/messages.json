@@ -90,7 +90,7 @@
     "message": "목록·그리드에서도 거르기"
   },
   "showChip": {
-    "message": "넘김 표시"
+    "message": "넘김 알림 표시"
   },
   "allowTitle": {
     "message": "유지할 제작자"
@@ -232,5 +232,38 @@
   },
   "posSide": {
     "message": "옆 여백"
+  },
+  "noticeHelp": {
+    "message": "넘긴 뒤 왼쪽 여백에 잠깐 표시합니다. 안전한 공간이 없으면 숨깁니다. 숫자를 누르면 사유를 볼 수 있습니다."
+  },
+  "noticeSafetyHelp": {
+    "message": "알림을 꺼도 6회 연속 넘김 뒤 안전 정지는 유지됩니다. 팝업에서 이어서 보거나 되돌릴 수 있습니다."
+  },
+  "noticeStyle": {
+    "message": "표시 방식"
+  },
+  "noticeCompact": {
+    "message": "간단히"
+  },
+  "noticeDetailed": {
+    "message": "자세히"
+  },
+  "noticePreview": {
+    "message": "미리보기"
+  },
+  "showDetails": {
+    "message": "넘김 사유 보기"
+  },
+  "hideDetails": {
+    "message": "넘김 사유 접기"
+  },
+  "playbackTitle": {
+    "message": "현재 영상 피드"
+  },
+  "pauseReason": {
+    "message": "6회 연속 넘겨 잠시 멈췄습니다."
+  },
+  "playbackError": {
+    "message": "영상이 바뀌었거나 동작을 마치지 못했습니다. 다시 시도하세요."
   }
 }

@@ -45,6 +45,7 @@ test("the chip always stays left and lists the last three skips without a headin
     await page.evaluate(({ index, metrics }) => {
       // Legacy overlay settings cannot bring back an over-video position.
       (window as any).__scrollplus.settings.chipPosition = "middle";
+      (window as any).__scrollplus.settings.noticeStyle = "detailed";
       window.__scrollplus.show({ id: "weak" + index, metrics });
     }, { index, metrics: { ...low, likes: 9 + index } });
     await expect(page.locator("#advances")).toHaveText(String(index));

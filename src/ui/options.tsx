@@ -93,7 +93,27 @@ export function OptionsApp() {
               title={t("keepFollowed")}
             />
             <Row icon="grid" title={t("filterGrids")} on={settings.filterGrids} label={t("filterGrids")} onToggle={(next) => update((current) => ({ ...current, filterGrids: next }))} />
+          </div>
+        </section>
+
+        <section>
+          <h2>{t("showChip")}</h2>
+          <div className="card">
             <Row icon="pill" title={t("showChip")} on={settings.showSkipChip} label={t("showChip")} onToggle={(next) => update((current) => ({ ...current, showSkipChip: next }))} />
+            <div className="pad stack">
+              <p className="note">{t("noticeHelp")}</p>
+              <fieldset className="notice-style" disabled={!settings.showSkipChip}>
+                <legend>{t("noticeStyle")}</legend>
+                {(["compact", "detailed"] as const).map((style) => <label key={style}><input type="radio" name="notice-style" value={style} checked={settings.noticeStyle === style} onChange={() => update((current) => ({ ...current, noticeStyle: style }))} />{t(style === "compact" ? "noticeCompact" : "noticeDetailed")}</label>)}
+              </fieldset>
+              <div className="notice-preview" aria-label={t("noticePreview")}>
+                <span className="note">{t("noticePreview")}</span>
+                <div className={settings.noticeStyle === "compact" ? "preview-chip compact" : "preview-chip"} aria-hidden="true">
+                  <span>{settings.noticeStyle === "compact" ? "1" : t("chipLikes", 64)}</span><span><Icon name="undo" size={14} />{settings.noticeStyle === "detailed" ? t("undo") : null}</span>
+                </div>
+                <p className="note">{t("noticeSafetyHelp")}</p>
+              </div>
+            </div>
           </div>
         </section>
 

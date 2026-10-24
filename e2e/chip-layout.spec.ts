@@ -7,6 +7,7 @@ async function open(page: Page, model: unknown = skipped) {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/player.html");
   await page.evaluate((model) => {
+    window.__scrollplus.settings.noticeStyle = "detailed";
     const video = document.querySelector("video")!;
     Object.assign(video.style, { left: "565.875px", top: "64px", width: "452px", height: "804px" });
     const guide = document.createElement("nav");
@@ -181,4 +182,21 @@ test("placement has no idle polling and stops after the notice is dismissed", as
   await page.waitForTimeout(300);
   expect(await page.evaluate(() => (window as any).__hitTests)).toBe(0);
   await expect(page.locator("#scrollplus-chip-host").locator(".chip")).toHaveCount(0);
+});
+
+test("compact default expands with the keyboard and focused Undo outlives the notice timeout", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto("/player.html");
+  await page.evaluate(() => window.__scrollplus.show({ id: "keyboard-details", metrics: { views: 10000, likes: 10, comments: 0, shares: 0, saves: null } }));
+  const host = page.locator("#scrollplus-chip-host");
+  await expect.poll(async () => (await host.boundingBox())?.width).toBe(44);
+  const expand = page.getByRole("button", { name: "Show skip details", exact: true });
+  await expand.focus(); await expand.press("Enter");
+  await expect.poll(async () => (await host.boundingBox())?.width).toBe(228);
+  await expect(page.getByRole("button", { name: "Hide skip details", exact: true })).toHaveAttribute("aria-expanded", "true");
+  await page.getByRole("button", { name: "Undo", exact: true }).focus();
+  await page.waitForTimeout(3000);
+  await expect(host).toBeVisible();
+  await page.locator("#comment").focus();
+  await expect(host.locator(".chip")).toHaveCount(0, { timeout: 4000 });
 });

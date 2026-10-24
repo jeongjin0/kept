@@ -114,3 +114,6 @@ Fresh, signed-out Chrome for Testing profile using the exact 0.3.5 ZIP identifie
 - The finite run ended naturally and all thirteen recorded task-owned processes ended. This is a limited default-rule check, not signed-in, positive Following, long-term reliability or ordinary day-use evidence.
 
 Local evidence: `qa/tmp/tiktok-live-035-signedout/report.json`, `verdict.json`, `cleanup.json`, the chip and final frames, and the original recording. They are retained locally and ignored by Git. The 26-second review clip is a trimmed/transcoded copy; the original recording is preserved.
+# 2026-10-25 notice/popup source update
+
+Disposable signed-out Chrome for Testing153.0.8010.12 on the real YouTube Shorts site: default-on,500-like and compact settings loaded, active feed confirmed, zero default skips in the short observed segment. A temporary100,000,000-like bar produced six moves and the safety pause; the extension popup displayed its controls and Undo moved back. Defaults restored; no collected extension page errors. This does not establish a default low-like positive, Store-delivered upgrade or signed-in Reels/TikTok compatibility. See [scoped notice/recovery QA](notice-popup-recovery-20261025.md).

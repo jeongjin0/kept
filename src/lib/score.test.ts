@@ -260,3 +260,10 @@ describe("moving settings from 0.5.x and 0.6.x to the chip beside the video", ()
     expect(migrateSettings(saved(), 3).chipPosition).toBe("side");
   });
 });
+
+it("defaults to compact notices without re-enabling an explicitly disabled notice", () => {
+  expect(normalizeSettings(undefined).noticeStyle).toBe("compact");
+  expect(normalizeSettings({ showSkipChip: false }).showSkipChip).toBe(false);
+  expect(normalizeSettings({ noticeStyle: "detailed" }).noticeStyle).toBe("detailed");
+  expect(normalizeSettings({ noticeStyle: "unknown" }).noticeStyle).toBe("compact");
+});

@@ -90,7 +90,7 @@
     "message": "Also filter lists and grids"
   },
   "showChip": {
-    "message": "Show the skip chip"
+    "message": "Skip notifications"
   },
   "allowTitle": {
     "message": "Creators to keep"
@@ -232,5 +232,38 @@
   },
   "posSide": {
     "message": "Beside"
+  },
+  "noticeHelp": {
+    "message": "Shown briefly in the left gutter after a skip. Hidden when there is no safe space. Click the count to see details."
+  },
+  "noticeSafetyHelp": {
+    "message": "The six-skip safety pause stays on even when notifications are off. You can resume or undo from the popup."
+  },
+  "noticeStyle": {
+    "message": "Display style"
+  },
+  "noticeCompact": {
+    "message": "Compact"
+  },
+  "noticeDetailed": {
+    "message": "Detailed"
+  },
+  "noticePreview": {
+    "message": "Preview"
+  },
+  "showDetails": {
+    "message": "Show skip details"
+  },
+  "hideDetails": {
+    "message": "Hide skip details"
+  },
+  "playbackTitle": {
+    "message": "This video feed"
+  },
+  "pauseReason": {
+    "message": "Paused after six consecutive skips."
+  },
+  "playbackError": {
+    "message": "The video changed or the action could not finish. Try again."
   }
 }
