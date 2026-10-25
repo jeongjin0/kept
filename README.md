@@ -32,7 +32,7 @@ In Settings you can also turn on a minimum for comments or views, switch a site 
 
 **The skip chip** stays in the video's left gutter and follows it when a comments panel opens or closes. If no safe space exists on the left, the notice stays hidden. Reels waits for scrolling to settle before showing it. Notifications can be turned off without disabling the six-skip safety pause.
 
-**Unreleased source update (2026-10-25):** notifications start compact, with a count and Undo. Click the count for details when there is room; Settings also offers a detailed style, explains the display conditions and previews both styles. Hovering or focusing notification controls keeps them available. The popup provides the six-skip pause's Keep going/Lower the bar actions and the latest adjacent Undo even after the notice expires or cannot fit. Recovery actions take the place of the popup's site rows; all site switches remain in Settings. Moving beyond the next video, leaving the feed or reloading retires the popup Undo target. Existing session keep choices still survive reloads. This source update has not been released through the Store.
+**0.7.5 update candidate (2026-10-25):** skip notifications start compact, with count and Undo; open the count for details when safe space exists, or choose Detailed in Settings. Hover/focus keeps controls available. The popup offers Keep going/Lower the bar after six skips, and Undo for the latest adjacent skip after its notice expires or cannot fit. Moving further, leaving the feed or reloading clears that Undo target; a video already restored stays kept for the browser session. See the [update checkpoint](store/update-075.md) for Store delivery state.
 
 A skip is the site's own Next control, pressed for you, so you see the usual slide to the next video. On YouTube Shorts a skipped video is on screen for about half a second, and it is muted meanwhile. That half second is YouTube's own pace between moves ([timing](qa/skip-timing.md)). On TikTok a skipped video is on screen for about 0.4 s, with its sound on: TikTok takes a mute made by a script as your own choice, so ScrollPlus leaves it alone ([timing](qa/skip-timing-tiktok.md)). On Instagram Reels it is about 0.3 s, measured signed in with the built scripts run in the page ([timing](qa/skip-timing-instagram.md)).
 
@@ -44,11 +44,9 @@ Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English an
 
 ## Status
 
-ScrollPlus is a beta available on the [Chrome Web Store](https://chromewebstore.google.com/detail/bpiliaicdpeflblgjneilaphgjkgfmja). Version **0.7.3** was published on 2026-10-20 as a free, unlisted item; anyone with its link can install it. It is not listed in Store discovery.
+ScrollPlus is a free beta on the [Chrome Web Store](https://chromewebstore.google.com/detail/bpiliaicdpeflblgjneilaphgjkgfmja). The public listing showed **0.7.4**, updated 2026-10-20, when checked on 2026-10-25. The owner chose Free/Public distribution and automatic publication after review on 2026-10-20; this supersedes the earlier unlisted/deferred launch instructions.
 
-The next launch steps and remaining live checks are in [ROADMAP.md](ROADMAP.md). The exact Store installation, default 500-like skip, Undo and reload check are recorded in [publication QA](qa/store-publication-20261020.md). The [submission checkpoint](store/draft-readiness.md) preserves the earlier first-review history.
-
-The [0.7.4 update](store/update-074.md) includes the subsequent Reels notice, followed-account and wide ad-disclosure fixes. It was submitted for Store review on 2026-10-20 with automatic publication off and is pending review. The install link continues to serve0.7.3. See [candidate QA](qa/release-readiness-074.md).
+The next **0.7.5** package contains compact notifications and popup recovery from [PR #56](https://github.com/jeongjin0/scrollplus/pull/56). Preparation/review submission is separate from approval and delivery: [update checkpoint](store/update-075.md), [candidate QA](qa/release-readiness-075.md), [roadmap](ROADMAP.md).
 
 - Tested on controlled pages for all three sites, including Chrome 120, the oldest supported version.
 - Tried on real feeds: YouTube Shorts (a 24-hour automated run on 0.3.5, with two page-reload recoveries), TikTok For You, and Instagram Reels in a signed-in browser. Instagram Reels is the newest and least exercised site.
@@ -65,7 +63,7 @@ The [0.7.3 first-review candidate](qa/release-readiness-073.md) contains the qui
 
 Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/bpiliaicdpeflblgjneilaphgjkgfmja). No developer mode or ScrollPlus account is required. Chrome 120 or newer; Instagram Reels requires Instagram sign-in and remains experimental.
 
-For an unpacked development build, use the zip on the [GitHub beta releases page](https://github.com/jeongjin0/scrollplus/releases): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked. The GitHub ZIP remains 0.7.2; the Store version is 0.7.3. Keep only one copy enabled.
+For an unpacked development build, use the zip on the [GitHub beta releases page](https://github.com/jeongjin0/scrollplus/releases): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked. The GitHub ZIP remains 0.7.2; the last checked Store version is 0.7.4. Keep only one copy enabled.
 
 To update a beta, replace the contents of the unpacked folder you already loaded with the new ZIP's files, then click Reload on the ScrollPlus card in `chrome://extensions`. Keep only one copy enabled. Extension reloads clear temporary Undo choices. Updating from 0.4.x moves your settings once: each preset keeps its name (Balanced is 500 likes now, it was 5,000), a rule of your own stays as it is, and Skip ads turns on.
 

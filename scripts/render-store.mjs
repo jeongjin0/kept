@@ -17,17 +17,19 @@ const LANGS = {
   en: {
     ui: "en", locale: "en-US", dropKo: true,
     shots: path.join(root, "store/screenshots"), tileFile: path.join(root, "store/tile.png"), marqueeFile: path.join(root, "store/marquee.png"),
-    popup: ["Low-like videos <em>skip themselves.</em>", "Ready on install. Ads skip too, and the popup counts the time you save."],
+    popup: ["Low-like videos <em>skip themselves.</em>", "Ready on install. Choose your minimum and keep the latest skip in reach."],
     options: ["Your numbers, <em>your rules.</em>", "Pick a preset or type your own. Likes, comments, views."],
-    chip: ["Skipped. <em>Undo</em> in one tap.", "A quiet notice in the left gutter. Take the latest skip back."],
+    recovery: ["Paused? <em>Your next move.</em>", "Keep going, lower the bar or undo the latest skip from the popup."],
+    chip: ["Skipped. <em>Undo</em> in one tap.", "A compact notice in the left gutter. Open its count for details."],
     tile: "Skips Shorts, Reels &amp; TikToks <em>with too few likes.</em>",
   },
   ko: {
     ui: "ko", locale: "ko-KR", dropKo: false,
     shots: path.join(root, "store/screenshots/ko"), tileFile: path.join(root, "store/tile-ko.png"), marqueeFile: path.join(root, "store/marquee-ko.png"),
-    popup: ["좋아요 적은 영상은 <em>알아서 넘어가요.</em>", "설치하면 바로 켜져요. 광고도 넘기고, 아낀 시간을 세어 줘요."],
+    popup: ["좋아요 적은 영상은 <em>알아서 넘어가요.</em>", "설치하면 바로 켜져요. 내 기준을 고르고, 최근 넘김도 되돌려요."],
     options: ["내 기준, <em>내 숫자.</em>", "프리셋을 고르거나 직접 입력하세요. 좋아요, 댓글, 조회수."],
-    chip: ["넘김. <em>되돌리기</em>는 한 번에.", "왼쪽 여백에 조용히 표시해요. 최근 영상을 되돌릴 수 있어요."],
+    recovery: ["잠깐 멈춤. <em>다음은 내 선택.</em>", "팝업에서 이어서 보거나, 기준을 낮추거나, 최근 넘김을 되돌려요."],
+    chip: ["넘김. <em>되돌리기</em>는 한 번에.", "왼쪽 여백에 작게 표시해요. 숫자를 누르면 자세히 볼 수 있어요."],
     tile: "좋아요 적은 쇼츠·릴스·틱톡을 <em>알아서 넘겨요.</em>",
   },
 };
@@ -77,6 +79,24 @@ async function capture(lang, cfg, dirOut) {
   await options.waitForSelector(".ready");
   await options.waitForTimeout(400);
   await options.locator(".sheet").screenshot({ path: path.join(dirOut, "options-full.png") });
+  // Capture the real extension popup over a controlled feed. No live-site or
+  // personal video content is used in Store screenshots.
+  await context.route("https://www.youtube.com/**", route => route.fulfill({ contentType: "text/html", body: `<!doctype html><meta charset="utf-8"><title>ScrollPlus Store demo</title>
+    <video muted style="position:absolute;left:20px;top:64px;width:320px;height:600px"></video>
+    <div id="navigation-button-down"><button aria-label="Next video">Next</button></div>
+    <div id="navigation-button-up"><button aria-label="Previous video">Previous</button></div>
+    <script>let i=0;function show(n){i=n;history.replaceState({},'', '/shorts/store'+i);window.ytInitialPlayerResponse={videoDetails:{videoId:'store'+i,channelId:'UCstore',viewCount:'100000'},likeCount:10};document.dispatchEvent(new Event('yt-navigate-finish'))}
+    document.querySelector('[aria-label="Next video"]').onclick=()=>show(i+1);document.querySelector('[aria-label="Previous video"]').onclick=()=>show(i-1);show(0);</script>` }));
+  const feed = await context.newPage();
+  await feed.goto("https://www.youtube.com/shorts/store0");
+  await context.addInitScript(() => {
+    if (!location.href.startsWith('chrome-extension://') || !location.pathname.endsWith('/popup.html')) return;
+    const query = chrome.tabs.query.bind(chrome.tabs);
+    chrome.tabs.query = info => info.active && info.currentWindow ? query({ url: 'https://www.youtube.com/*' }) : query(info);
+  });
+  await popup.reload();
+  await popup.getByText(lang === 'ko' ? '6회 연속 넘겨 잠시 멈췄습니다.' : 'Paused after six consecutive skips.', { exact: true }).waitFor();
+  await popup.locator('.popup').screenshot({ path: path.join(dirOut, 'recovery.png') });
   await context.close();
 }
 
@@ -162,13 +182,14 @@ async function render(lang, cfg) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
   const stage = await context.newPage();
   // The chip is shown about 250 px wide, beside the video card and not on it: its right edge 18 px from the video's left edge, centred on it.
-  const chipScale = 250 / chipBox.inner;
+  const chipScale = Math.min(1.5, 250 / chipBox.inner);
   const chipW = Math.round(chipBox.w * chipScale);
   const chipH = Math.round(chipBox.h * chipScale);
   const chipTop = Math.round(64 + 672 / 2 - chipH / 2 - 20);
   const chipLeft = Math.round(900 - 18 - chipW + chipBox.pad * chipScale);
   const jobs = [
     { file: "popup.png", html: page(copy(cfg.popup) + '<div class="shot" style="left:700px;top:96px"><img src="' + uri(path.join(dirOut, "popup.png")) + '" width="480"></div>') },
+    { file: "recovery.png", html: page(copy(cfg.recovery) + '<div class="shot" style="left:700px;top:48px"><img src="' + uri(path.join(dirOut, "recovery.png")) + '" width="480"></div>') },
     { file: "options.png", html: page(copy(cfg.options) + '<div class="shot" style="left:640px;top:0;width:560px;height:800px;overflow:hidden;border-radius:0 0 22px 22px"><img src="' + uri(path.join(dirOut, "options-full.png")) + '" width="560" style="border-radius:0;margin-top:56px"></div>') },
     { file: "chip.png", html: page(copy(cfg.chip) + '<div class="card"><div class="orb"></div><div class="blob"></div><div class="acts"><i></i><i></i><i></i></div><div class="who"><b></b><span></span></div></div><div class="chipwrap" style="left:' + chipLeft + 'px;top:' + chipTop + 'px"><img src="' + uri(path.join(dirOut, "chip.png")) + '" width="' + chipW + '"></div>', CARD_CSS) },
   ];

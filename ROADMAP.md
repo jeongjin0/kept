@@ -1,37 +1,24 @@
 # ScrollPlus launch roadmap
 
-Updated 2026-10-20. Published Store beta: [0.7.3, Free/Unlisted](https://chromewebstore.google.com/detail/bpiliaicdpeflblgjneilaphgjkgfmja), with the final left-gutter notice from PR #51. Public GitHub ZIP: 0.7.2.
+Updated 2026-10-25. The public [Store listing](https://chromewebstore.google.com/detail/bpiliaicdpeflblgjneilaphgjkgfmja) showed **0.7.4**, updated 2026-10-20. The owner chose **Free/Public with automatic publication after review** on 2026-10-20, superseding the earlier Unlisted/deferred launch plan. GitHub's downloadable beta remains 0.7.2.
 
-Next update: [0.7.4 submitted for review on 2026-10-20](store/update-074.md), incorporating the post-submission Reels fixes from PR #54 and the [native ad-disclosure correction](qa/reels-ad-disclosure-20261014.md). It is pending review with automatic publication off; published0.7.3 remains installable. The first-review package and instructions remain preserved. Approval of0.7.3 does not approve this update.
+## Current update
 
-**Assessment:** 0.7.3 passed review with deferred publication. On 2026-10-20 the owner chose to publish the approved version first and follow with 0.7.4. The dashboard now confirms Published/Unlisted; its public listing and an actual signed-out Chrome installation work. The installed 500-like default skips a 64-like Short, Undo returns to the same video, and reload keeps it. See [publication QA](qa/store-publication-20261020.md). This is a short delivery/basic-function check, not ordinary day-long use, all-site compatibility or demand validation.
+The owner approved continuing after the compact-notice/popup-recovery source change merged in [PR #56](https://github.com/jeongjin0/scrollplus/pull/56). Prepare and submit **0.7.5** through the same Store item. [Update checkpoint](store/update-075.md) records actual submission/delivery state; [candidate QA](qa/release-readiness-075.md) separates current checks from historical evidence.
 
-The owner requested first review on 2026-10-14 with the live-QA gaps disclosed, then explicitly approved the 0.7.3 publication → Store install/basic check → 0.7.4 follow-up sequence on 2026-10-20. Domain payment, a separate website and a switch to searchable Public visibility are not part of this publication. See the [checkpoint](store/draft-readiness.md) and [candidate QA](qa/release-readiness-073.md).
+- Compact count/Undo notifications default on, with Detailed available in Settings. An explicitly disabled notification stays off during upgrade.
+- Popup Keep going/Lower the bar after six skips, plus latest adjacent Undo when the notice expires or cannot fit.
+- No new permissions, server, analytics, persistent video identifiers or schema change. Existing local data declarations remain applicable.
+- Freeze the checked ZIP, verify the actual 0.7.4 → 0.7.5 upgrade, refresh English/Korean Store metadata/screenshots and reviewer instructions, and submit with Public/automatic publication preserved.
+- After review/publication, verify the public version and actual Store delivery. A local unpacked upgrade does not establish Store delivery.
 
-## Where the product stands
+## Remaining product validation
 
-| Milestone | State | Evidence / remaining work |
-| --- | --- | --- |
-| Product and UX | Implemented | Zero-setup defaults, 100/500/1,000-like presets, custom hard count rules, three platforms, ads, followed-creator keep, Undo/session persistence, side chip, aggregate time saved |
-| Automated quality | Passed for submitted and next candidates | 0.7.3: 126 units and 80 browser cases. The unchanged corrected 0.7.4 runtime plus follow-refresh regressions at `63ac4e0` passes 126 units and 88 browser cases on current Chromium and Chrome 120 in both [push CI](https://github.com/jeongjin0/scrollplus/actions/runs/38626058360) and [PR CI](https://github.com/jeongjin0/scrollplus/actions/runs/38626064828); both built ZIPs match the installed candidate. Controlled follow signals are not live follow persistence |
-| Live compatibility | Partially verified | Signed-out YouTube low-like/ad skips; signed-in YouTube subscribed exception in the submitted build; corrected 0.7.4 Reels followed on/off, notice motion and one real ad on/off/Undo; TikTok default 325-like skip and three real ads on/off with two Undo actions. [Follow diagnosis](qa/tiktok-follow-diagnosis-20261015.md) reproduces success acknowledgement followed by relationship 0 with ScrollPlus fully removed, including a same-viewer browser-no-store read. Its exact internal cause and the live followed-positive exception remain unverified. Broader ad variants and ordinary day-long use remain open; historical 24-hour/login evidence belongs to its older version |
-| Submission package | Published0.7.3;0.7.4 pending review | Exact0.7.4 ZIP; English/Korean descriptions1968/1090 characters, existing screenshots and417-character version-specific reviewer instructions saved. Automatic publication off; [privacy policy](PRIVACY.md) and permission/data declarations remain applicable |
-| Store distribution | Published 0.7.3, Free/Unlisted | Actual dashboard and public listing confirmed 2026-10-20. Signed-out native Chrome Store installation, popup defaults/settings persistence, a default low-like skip and Undo/reload pass. Store-delivered upgrade and broader live cases remain open |
-| Website and domain | Use existing GitHub URLs for now | Cost-conscious beta preparation needs no new domain. `scroll.plus` remains a possible later independent address; purchase and deployment not done |
-| Real usefulness | Open | Small manual-feedback beta; no new analytics/backend is proposed |
+Scoped new-version YouTube checks and controlled three-site regressions do not establish all signed-in variants or ordinary day-long use. Current TikTok followed-positive relation persistence, broader ad variants and full-day human use remain open. Reels stays experimental. Historical native evidence remains in [0.7.4 QA](qa/release-readiness-074.md), [signed-in smoke](qa/signed-in-smoke.md) and [release readiness](qa/release-readiness.md).
 
-## Launch sequence
+A proposed manual-feedback beta with roughly 5–10 people for 3–7 days can ask: did it skip wanted videos, did Undo work, was the notice distracting, did the defaults filter enough, and would they keep it enabled? No telemetry or account is required. The numbers are operating suggestions, not a Google requirement or statistical validation. Contacting people, a paid domain or a separate website is outside this update.
 
-Steps 1, 3 and 4 are complete for0.7.3, including an actual Store installation/basic smoke check.0.7.4 is now pending review in the same item while0.7.3 remains available. Its manual publication and actual Store-upgrade check follow approval; small-beta feedback and the broader live cases remain open.
-
-1. Freeze a release candidate after the submission documentation is settled. Use its exact ZIP/hash for live QA, screenshots and reviewer instructions. Do not carry another package's pass into this one.
-2. Finish a focused live matrix before wider rollout: low-like skip, passing-video keep, Undo → reload, current followed/subscribed keep, ad on/off where a live ad is encountered, hidden-tab stop/return, and six-skip pause. Use the sites' existing signed-in sessions; do not turn a review into unrelated account-entry testing. Record a missing live case as unverified. Keep Reels experimental if its latest paths cannot be observed. If a site’s basic skip/Undo path fails, repair it before including that support claim in a submission.
-3. Recheck the saved Store draft against the final package: publisher details, single purpose, storage/host explanations, local-data declarations, privacy/support URLs and [reviewer instructions](store/reviewer-instructions.md). Contact verification is complete. Keep private account identifiers and verification links out of repository documentation. See the [draft checkpoint](store/draft-readiness.md).
-4. Launch one **unlisted Store item** after owner approval. Use deferred publication during review. Testers can install from its direct URL; unlisted still has the same review/policy requirements as public/private. Use that same item for the later public rollout instead of creating parallel beta/stable items prematurely. [Google distribution guidance](https://developer.chrome.com/docs/webstore/cws-dashboard-distribution), [publication guidance](https://developer.chrome.com/docs/webstore/publish).
-5. Run a small beta with roughly 5–10 people for 3–7 days. Ask manually: Did it skip anything wanted? Did Undo work? Was the chip distracting? Did the defaults filter enough? Would they keep it enabled? Require no telemetry or account inside the extension. A reproducible wrong skip, failed Undo or distracting placement gets fixed before wider promotion. These sample sizes and durations are proposed operating choices, not Google requirements or statistical proof.
-6. Switch the same Store item to public and update the README/website install link once the basic paths and tester feedback support it. Store distribution then provides ordinary extension updates; an unpacked GitHub install still requires Reload.
-
-One short landing page is enough for the beta: a concrete promise, real extension screenshots, installation CTA, three-site/experimental-support note, GitHub, Privacy and Support. Account systems, pricing and extra features are outside this launch.
+Keep using the current GitHub introduction, privacy and support URLs. No new domain or purchase is needed for the Store update.
 
 ## Domain recommendation
 

@@ -53,8 +53,19 @@ try {
   const after = await browser.worker.evaluate(async () => ({ version: chrome.runtime.getManifest().version, local: await chrome.storage.local.get(null), session: await chrome.storage.session.get(null) }));
   report.candidate = { id: browser.id, ...after };
   assert.equal(report.prior.id, report.candidate.id);
-  assert.equal(before.version, '0.7.3'); assert.equal(after.version, '0.7.4');
+  const priorManifest = JSON.parse(execFileSync('unzip', ['-p', path.resolve(priorArg), 'manifest.json'], { encoding: 'utf8' }));
+  const candidateManifest = JSON.parse(execFileSync('unzip', ['-p', path.resolve(candidateArg), 'manifest.json'], { encoding: 'utf8' }));
+  assert.equal(before.version, priorManifest.version); assert.equal(after.version, candidateManifest.version);
+  assert.notEqual(before.version, after.version);
   assert.deepEqual(after.local, before.local);
+  const options = await browser.context.newPage();
+  await options.goto('chrome-extension://' + browser.id + '/options.html');
+  await options.waitForSelector('.ready');
+  // Legacy settings have no noticeStyle; the new UI defaults compact while
+  // preserving an explicitly disabled notification and every stored value.
+  assert.equal(await options.locator('input[name="notice-style"][value="compact"]').isChecked(), true);
+  assert.equal((await browser.worker.evaluate(async () => (await chrome.storage.local.get('settings')).settings)).showSkipChip, false);
+  assert.deepEqual(await browser.worker.evaluate(() => chrome.storage.local.get(null)), before.local);
   assert.equal(after.session.undoKeeps, undefined); // RAM choices clear on restart.
   report.passed = true;
 } finally {

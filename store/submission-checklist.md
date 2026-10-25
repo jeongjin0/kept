@@ -1,6 +1,6 @@
 # Chrome Web Store submission checklist
 
-The owner chose an initial review submission on 2026-10-14, accepting the disclosed live-QA limitations. This checklist distinguishes preparation, review submission and later manual publication.
+Current update: [0.7.5](update-075.md), authorized 2026-10-25. Same Free/Public item, automatic publication after review, following the owner’s 2026-10-20 distribution decision. The older initial-review instructions below are historical where they mention Unlisted or deferred publication. Current package, listing and reviewer instructions must match the version being submitted.
 
 ## Before you start
 
