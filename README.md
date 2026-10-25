@@ -46,7 +46,7 @@ Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English an
 
 ScrollPlus is a free beta on the [Chrome Web Store](https://chromewebstore.google.com/detail/bpiliaicdpeflblgjneilaphgjkgfmja). The public listing showed **0.7.4**, updated 2026-10-20, when checked on 2026-10-25. The owner chose Free/Public distribution and automatic publication after review on 2026-10-20; this supersedes the earlier unlisted/deferred launch instructions.
 
-The next **0.7.5** package contains compact notifications and popup recovery from [PR #56](https://github.com/jeongjin0/scrollplus/pull/56). Preparation/review submission is separate from approval and delivery: [update checkpoint](store/update-075.md), [candidate QA](qa/release-readiness-075.md), [roadmap](ROADMAP.md).
+**0.7.5 was submitted for Store review on 2026-10-25 with automatic publication on.** It contains compact notifications and popup recovery from [PR #56](https://github.com/jeongjin0/scrollplus/pull/56). Approval/public delivery remains pending: [update checkpoint](store/update-075.md), [candidate QA](qa/release-readiness-075.md), [roadmap](ROADMAP.md).
 
 - Tested on controlled pages for all three sites, including Chrome 120, the oldest supported version.
 - Tried on real feeds: YouTube Shorts (a 24-hour automated run on 0.3.5, with two page-reload recoveries), TikTok For You, and Instagram Reels in a signed-in browser. Instagram Reels is the newest and least exercised site.
