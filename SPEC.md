@@ -4,7 +4,7 @@ This file is the product spec. Implement it. Do not add features that are not wr
 
 ## Authorized notice and popup recovery update — 2026-10-25
 
-The owner approved implementing the high-confidence notice improvements after a code/controlled-screen review. This section supersedes the older notice presentation rules below. It does not authorize a new release or Store publication.
+The owner approved implementing the high-confidence notice improvements after a code/controlled-screen review. This section supersedes the older notice presentation rules below. On 2026-10-25, after the source change merged, the owner authorized continuing the remaining next steps: prepare the 0.7.5 update and submit it through the existing Store item, retaining Free/Public distribution and automatic publication after review. This supersedes the older deferred/unlisted launch instructions below.
 
 - Notifications remain on by default. A compact count/Undo notice is the default; Settings offers compact or detailed presentation and preserves an explicitly saved off choice. Clicking or keyboard-activating the count reveals details when a full card fits safely on the left. Never place a notice over the video or to its right.
 - Settings calls this “Skip notifications”, explains the brief left-gutter display, lack-of-space hiding and separate six-skip safety pause, and includes a representative preview.

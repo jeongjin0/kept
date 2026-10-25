@@ -1,6 +1,13 @@
 # Changelog
 
-## 0.7.4 – update candidate (not published)
+## 0.7.5 – Store update candidate
+
+- Skip notifications start compact, with a count and Undo. Open the count for details when safe left-gutter space is available, or choose the detailed style in Settings. An existing off choice stays off.
+- The popup now offers Keep going and Lower the bar after six consecutive skips, plus Undo for the latest adjacent skipped video when the brief notification has gone or cannot fit.
+- Hovering or focusing notification controls keeps them available. Appearance changes preserve the safety pause, and popup actions reject stale tab/document state.
+- Filtering thresholds, followed-creator/ad rules, permissions and storage schema remain unchanged. Version-specific checks and limits: [0.7.5 readiness](qa/release-readiness-075.md).
+
+## 0.7.4 – published 2026-10-20
 
 - Instagram recognises a small Ad disclosure even when its span stretches across the caption column. Ads off keeps the disclosed ad below the count minimum; ads on skips it with the ad reason. Hidden and off-screen disclosure text is ignored.
 
