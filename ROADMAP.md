@@ -4,7 +4,7 @@ Updated 2026-10-25. The public [Store listing](https://chromewebstore.google.com
 
 ## Current update
 
-The owner approved continuing after the compact-notice/popup-recovery source change merged in [PR #56](https://github.com/jeongjin0/scrollplus/pull/56). Prepare and submit **0.7.5** through the same Store item. [Update checkpoint](store/update-075.md) records actual submission/delivery state; [candidate QA](qa/release-readiness-075.md) separates current checks from historical evidence.
+The owner approved continuing after the compact-notice/popup-recovery source change merged in [PR #56](https://github.com/jeongjin0/scrollplus/pull/56). **0.7.5 was submitted for review on 2026-10-25 with automatic publication on**, through the same Store item; published 0.7.4 remains available until approval/publication. [Update checkpoint](store/update-075.md) records actual submission/delivery state; [candidate QA](qa/release-readiness-075.md) separates current checks from historical evidence.
 
 - Compact count/Undo notifications default on, with Detailed available in Settings. An explicitly disabled notification stays off during upgrade.
 - Popup Keep going/Lower the bar after six skips, plus latest adjacent Undo when the notice expires or cannot fit.
