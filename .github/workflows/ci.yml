@@ -19,7 +19,7 @@ jobs:
       - run: npm test
       - run: npm run zip
       - run: node scripts/check-package.mjs
-      - uses: actions/upload-artifact@v7.0.1
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: extension-zip
           path: .output/*.zip
@@ -40,7 +40,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
         timeout-minutes: 30
       - run: xvfb-run -a npm run test:e2e
-      - uses: actions/upload-artifact@v7.0.1
+      - uses: actions/upload-artifact@v7.0.2
         if: failure()
         with:
           name: e2e-failure
@@ -74,7 +74,7 @@ jobs:
           printf '%s\n' "$actual_version"
           printf 'SCROLLPLUS_CHROME_EXECUTABLE=%s\n' "$executable" >> "$GITHUB_ENV"
       - run: xvfb-run -a npm run test:e2e
-      - uses: actions/upload-artifact@v7.0.1
+      - uses: actions/upload-artifact@v7.0.2
         if: failure()
         with:
           name: minimum-chrome-failure
